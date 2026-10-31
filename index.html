@@ -443,6 +443,9 @@
     #codex .cx-detail .cx-hero { width: 100%; max-width: 300px; margin: 0 auto; }
     /* 左右翻页键占位的左右 padding 收窄，不然 390 屏上内容只剩一半宽度 */
     #codex .cx-dwrap .cx-dscroll { padding-left: 46px; padding-right: 46px; }
+    /* 窄屏放不下「主图 + 两张完整残影」，残影收到一半宽度：
+     * 完整露在两侧，只跟主图擦一点边，仍能看出「旁边还有东西」。 */
+    #codex .cx-stage .cx-ghost { width: calc(var(--cxfig) * .5); opacity: .26; }
     #codex .cx-dwrap button.cx-nav { width: 34px; height: 62px; font-size: 22px; }
     #codex .cx-dwrap button.cx-nav.prev { left: 4px; }
     #codex .cx-dwrap button.cx-nav.next { right: 4px; }
@@ -546,28 +549,29 @@
   flex: 1 1 auto; position: relative; display: flex;
   align-items: center; justify-content: center;
   min-height: 0; padding: 4px clamp(28px, 7vw, 96px) 0;
-  /* 左右两条渐隐遮罩：残影贴到边缘时自然淡出，不会硬切一刀 */
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
-          mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+  /* 左右两条渐隐遮罩：残影贴到边缘时自然淡出，不会硬切一刀。
+   * 起始点从 9% 收到 4% —— 原来 1440 屏上要吃掉 130px，正好把整张残影的左半边抹平，
+   * 那「给完整图」就白给了。现在只淡掉最外侧那一条。 */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
 }
 
 /* —— 相邻项残影 ——
- * 刻意不给完整图：只留靠近主图的那一侧，越靠边越淡。
- * 给全了就会和主图抢注意力，看图鉴变成了「比较三张图」。
- * 尺寸跟主图挂钩（.82 倍 + 同高），这样看着是「同一排被切掉两头」而不是缩小的别的东西。 */
+ * 给完整图：裁掉一半的图认不出是什么，「旁边还有一座塔」的暗示就只剩「旁边有块东西」。
+ * 靠的是「淡 + 虚 + 不带字」拉开层级，而不是靠裁切 —— 完整但失焦，眼睛扫过去知道有货、不会去读。
+ * 尺寸跟主图挂钩（.82 倍宽 + 同高），否则三者大小不一，读起来像三张不相干的图。 */
 #codex .cx-ghost {
-  position: absolute; top: 50%; width: calc(var(--cxfig) * .82); height: var(--cxfig);
+  position: absolute; top: 50%; width: calc(var(--cxfig) * .86); height: var(--cxfig);
   transform: translateY(-50%);
-  opacity: .22; filter: blur(1.2px) saturate(.6);
+  opacity: .30; filter: blur(1.3px) saturate(.7);
   pointer-events: none; overflow: hidden;
-  display: flex; align-items: center;
+  display: flex; align-items: center; justify-content: center;
   transition: opacity .25s ease;
 }
-#codex .cx-ghost.l { left: 0; justify-content: flex-end; }
-#codex .cx-ghost.r { right: 0; justify-content: flex-start; }
-#codex .cx-ghost .gf { position: relative; width: 170%; height: 100%; flex: 0 0 auto; }
-#codex .cx-ghost.l .gf { margin-right: -70%; }
-#codex .cx-ghost.r .gf { margin-left: -70%; }
+/* 完整图不再往画外推，所以要自己跟屏幕边留点气口（贴着边会像被切掉的） */
+#codex .cx-ghost.l { left: clamp(6px, 2.2vw, 44px); }
+#codex .cx-ghost.r { right: clamp(6px, 2.2vw, 44px); }
+#codex .cx-ghost .gf { position: relative; width: 100%; height: 100%; flex: 0 0 auto; }
 #codex .cx-ghost img { position: absolute; display: block; object-fit: contain; }
 #codex .cx-ghost img.b { left: 50%; bottom: 4%; width: 74%; height: 74%; transform: translateX(-50%); }
 #codex .cx-ghost img.t { left: 50%; top: 50%; width: 84%; height: 84%; transform: translate(-50%, -50%); }
@@ -588,30 +592,30 @@
   padding: 10px 34px 6px; border-radius: 22px; cursor: pointer;
   transition: transform .18s ease, background .18s ease;
 }
-#codex .cx-focus:hover { transform: translateY(-4px); background: rgba(93,160,74,.07); }
+#codex .cx-focus:hover { transform: translateY(-4px); }
 #codex .cx-focus:focus-visible { outline: 2px solid #8fe06a; outline-offset: 4px; }
 
 /* —— 主图尺寸 ——
  * 抽成变量是因为「残影」必须跟主图同比例缩放：残影一旦比主图小太多，
  * 读起来就是「三张大小不一的图」，而不是「同一排里被切掉两头的相邻项」。
  * 38vh 在 900 高屏上约 342px —— 图鉴这一层唯一的任务就是认图，图必须够大。 */
-#codex { --cxfig: min(clamp(180px, 44vh, 400px), 64vw); }
+/* 52vw 这一档只在 769px 以下生效（769 × 52% ≈ 400，正好等于上限）。
+ * 之前是 64vw，窄屏上主图把两侧挤得一点不剩，残影只能压在主图身上 —— 三张完整图摆不开。 */
+#codex { --cxfig: min(clamp(180px, 44vh, 400px), 52vw); }
 
 #codex .cx-fig {
   position: relative;
   width: var(--cxfig); height: var(--cxfig);
-  border-radius: 18px; overflow: hidden;
-  border: 1px solid rgba(60,92,68,.55);
+  overflow: hidden;
+  /* 不画边框、不铺实色底。之前那圈 1px 描边 + 圆角矩形底色会读成「一张卡片」，
+   * 和「看这个大图」的意图正好相反；去掉之后图直接浮在遮罩上，
+   * 只靠下面两圈无硬边的径向柔光把暗色石塔从深背景里托出来。 */
   background:
-    radial-gradient(ellipse 56% 42% at 50% 60%, rgba(158,212,126,.18), transparent 74%),
-    radial-gradient(ellipse 60% 26% at 50% 94%, rgba(140,200,110,.24), transparent 70%),
-    rgba(12,19,12,.55);
-  transition: box-shadow .2s ease, border-color .2s ease;
+    radial-gradient(ellipse 58% 44% at 50% 62%, rgba(158,212,126,.16), transparent 76%),
+    radial-gradient(ellipse 62% 28% at 50% 94%, rgba(140,200,110,.22), transparent 72%);
+  transition: filter .2s ease;
 }
-#codex .cx-focus:hover .cx-fig {
-  border-color: #5da04a;
-  box-shadow: 0 14px 38px rgba(0,0,0,.5), 0 0 0 1px rgba(143,224,106,.25) inset;
-}
+#codex .cx-focus:hover .cx-fig { filter: brightness(1.07); }
 #codex .cx-fig::before {   /* 落地阴影，让大图站在地上而不是浮着 */
   content: ''; position: absolute; left: 50%; bottom: 5%; width: 60%; height: 11%;
   transform: translateX(-50%); border-radius: 50%; pointer-events: none;
@@ -736,12 +740,12 @@
 #codex .cx-hero { min-width: 0; }
 #codex .cx-hero-stage {
   position: relative; width: 100%; aspect-ratio: 1 / 1; min-height: 200px;
-  border: 1px solid rgba(60,92,68,.75); border-radius: 16px; overflow: hidden;
+  overflow: hidden;
+  /* 同样不画框：边框 + 圆角 + 实色底会把它读成一张卡片，和第一层保持一致 */
   background:
     /* 中段一圈暖绿反光：暗色石塔/铁塔压在纯深色上会糊成一团，垫一层才看得出轮廓 */
-    radial-gradient(ellipse 58% 44% at 50% 58%, rgba(158,212,126,.20), transparent 74%),
-    radial-gradient(ellipse 62% 30% at 50% 92%, rgba(140,200,110,.26), transparent 70%),
-    rgba(12,19,12,.72);
+    radial-gradient(ellipse 58% 44% at 50% 58%, rgba(158,212,126,.20), transparent 76%),
+    radial-gradient(ellipse 62% 30% at 50% 92%, rgba(140,200,110,.26), transparent 72%);
 }
 #codex .cx-hero-stage::before {   /* 落地阴影，让大图「站在地上」而不是浮着 */
   content: ''; position: absolute; left: 50%; bottom: 5%; width: 60%; height: 11%;
@@ -763,10 +767,10 @@
   font-size: 54px; font-weight: 800;
 }
 #codex .cx-hero-stage img ~ .gt { display: none; }
-#codex .cx-hero-stage::after {   /* 顶部一点冷光，避免大图糊成一块 */
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse 46% 30% at 50% 14%, rgba(214,255,186,.10), transparent 70%);
-}
+/* 原来这里有一层「顶部冷光」（::after，inset:0 的径向渐变）用来把大图从深背景里托起来。
+ * 现在卡片底和边框都撤了，它反而成了唯一的矩形边界：渐变中心在 14% 高度、垂直半径 30%，
+ * 到容器顶边时 alpha 还没衰减完，于是顶端挂出一条淡淡的亮边 —— 看着就是个没画边框的框。
+ * 托底交给下面那两圈暖绿柔光就够了，这层直接去掉。 */
 
 /* 等级滑动轨 */
 #codex .cx-lvbar { margin-top: 12px; }
