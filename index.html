@@ -240,11 +240,16 @@
    * 标题放大放上半区，难度与图鉴缩小弱化悬浮底部角落，构图重心留给建筑与兵种。
    * 所以这一版**没有卡片、没有分隔线、没有信息块**——
    * 只有一张海报底图 + 三组漂浮文字（标题 / 主按钮 / 两角小控件）。 */
+  /* fixed 而不是 absolute：#panel 在 #app 之外，absolute 只覆盖 #app 的范围，
+   * 桌面端窗口较高时底部会把放置面板露出来（v21 实测：开始界面下方露出一排卡片）。
+   * fixed + inset:0 覆盖整个视口，同时 JS 还会把 #panel 直接置 hidden。 */
   #start {
-    position: absolute; inset: 0; z-index: 30;
+    position: fixed; inset: 0; z-index: 30;
     display: block; overflow: hidden; background: #0a0f0a;
   }
   #start.hide { display: none; }
+  /* 开始界面存在期间放置面板整个不参与布局（也不进 Tab 焦点序列） */
+  #panel[hidden] { display: none !important; }
 
   /* 海报层：底图 + 三段柔和压暗（上给标题、下给按钮、四周暗角）。
    * 全是渐变、没有一条硬边 —— 「不要条框感」的关键就在这里。 */
@@ -776,7 +781,7 @@
       </div>
     </div>
   </div>
-  <div id="panel">
+  <div id="panel" hidden>
     <div class="tabs">
       <button class="tab on" id="tabBuild">建筑 / 派兵 / 法术</button>
       <button class="tab" id="tabGlobal">总体升级</button>
@@ -829,6 +834,17 @@
   var overCard = document.getElementById('overcard');
   var overMeta = document.getElementById('overmeta');
   var startEl = document.getElementById('start');
+  /* 开始界面与放置面板互斥显示。
+   * 只靠 CSS 不够：#start 虽然改成了 fixed 全屏，视觉上盖住了 #panel，
+   * 但 #panel 里的卡片按钮仍在 Tab 焦点序列里，键盘操作会跑到看不见的按钮上。
+   * 所以统一走这个开关，顺带处理「菜单期间 #panel 不参与 flex 布局」。 */
+  function setStartVisible(v) {
+    var p = document.getElementById('panel');
+    if (!startEl) startEl = document.getElementById('start');
+    if (!startEl) return;
+    if (v) { startEl.classList.remove('hide'); if (p) p.hidden = true; }
+    else { startEl.classList.add('hide'); if (p) p.hidden = false; }
+  }
   var diffsEl = document.getElementById('diffs');
   var difficulty = 'normal';   // 默认普通
   var startedAt = -1;
@@ -1495,7 +1511,7 @@
     startedAt = 0;
     if (overEl) overEl.classList.remove('show');
     if (detailEl) { detailEl.classList.remove('show'); detailEl.innerHTML = ''; }
-    if (startEl) startEl.classList.add('hide');
+    setStartVisible(false);
     if (autoDeployEl) autoDeployEl.checked = false;   // PvP 不能本地直接派兵
     if (PVP.net) { try { PVP.net.close(); } catch (e) {} PVP.net = null; }
     PVP.net = NetMod.createLockstep({
@@ -1638,7 +1654,7 @@
 
   /* 开始游戏：先把开局界面收起来，再重置一局 */
   function startGame() {
-    startEl.classList.add('hide');
+    setStartVisible(false);
     newGame();
     startedAt = 0;
   }
@@ -1653,11 +1669,20 @@
     layout.ox = (W - cell * C.COLS) / 2;
     layout.oy = (H - cell * rows) / 2;
   }
-  /* 逻辑格 → 屏幕矩形。多格建筑（size 全为 1×1）按左上角格算，
-   * 若将来出现 N×M 建筑，红方视角下左上角会变成右下角 —— 那时要改成按四角取 min。 */
-  function cellRect(row, col) {
+  /* 逻辑格 → 屏幕矩形。
+   * 多格建筑（大本营 2×2）必须传 spanRows/spanCols：
+   * 180° 镜像会把「左上角」翻成「右下角」，只按单格算会让整块建筑向右下错一格 ——
+   * 红方视角下大本营会压到最底那条通道行上，盖住通道标签（v21 实测到的现象）。
+   * 所以镜像时对四角取 min，才是真正的屏幕左上角。 */
+  function cellRect(row, col, spanRows, spanCols) {
     var s = layout.cell;
-    return { x: layout.ox + (vCol(col) - 1) * s, y: layout.oy + vRow(row) * s, s: s };
+    var sr = (spanRows | 0) || 1, sc = (spanCols | 0) || 1;
+    var vr = vRow(row), vc = vCol(col);
+    if (sr > 1 || sc > 1) {
+      vr = Math.min(vr, vRow(row + sr - 1));
+      vc = Math.min(vc, vCol(col + sc - 1));
+    }
+    return { x: layout.ox + (vc - 1) * s, y: layout.oy + vr * s, s: s };
   }
   /* 屏幕点 → 逻辑格。180° 旋转是自逆变换，所以「正向」和「反向」用同一对映射。 */
   function pointToCell(px, py) {
@@ -2824,7 +2849,7 @@
 
     // 2 建筑
     state.buildings.forEach(function (b) {
-      var r = cellRect(b.row, b.col);
+      var r = cellRect(b.row, b.col, b.def.size[0], b.def.size[1]);
       var w = s * b.def.size[1], h = s * b.def.size[0];
       var hurt = (state.time - (b.justDamaged || -99)) < 0.18;
       var color = b.def.color;
@@ -2968,7 +2993,7 @@
     }
     if (selectedBuilding && state.buildings.indexOf(selectedBuilding) >= 0) {
       var sb = selectedBuilding;
-      var sr = cellRect(sb.row, sb.col);
+      var sr = cellRect(sb.row, sb.col, sb.def.size[0], sb.def.size[1]);
       var cx0 = sr.x + s * sb.def.size[1] / 2;
       var cy0 = sr.y + s * sb.def.size[0] / 2;
       var stb = C.combatStatsOf(sb);
@@ -3814,7 +3839,7 @@
   document.getElementById('tomenu').onclick = function () {
     if (PVP.active) pvpLeave();
     overEl.classList.remove('show');
-    startEl.classList.remove('hide');   // #start 重新 display，入场动画自动重放
+    setStartVisible(true);              // 同时把放置面板收起来（桌面端底部不再露出卡片）
     newGame();
     syncDiffHint();
     setStartMode('ai');
