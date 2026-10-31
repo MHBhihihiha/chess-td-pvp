@@ -105,11 +105,82 @@
     var transport = opts.transport;
     if (!transport) throw new Error('createLockstep: 缺少 opts.transport');
 
-    var delayTicks = opts.delayTicks != null ? opts.delayTicks : 6;   // 输入延迟
+    /* --------------------------------------------- 输入延迟 & 往返测量
+     * delayTicks（下称 D）决定「自己按下去之后多久才真正生效」，也决定了这局能容忍
+     * 多大的网络延迟。它是锁步的**硬下限**，不是可随意调的画质参数：
+     *
+     *   命令带着「未来的 tick 号」发出去，必须在那个 tick 到来之前抵达对手。
+     *   设对手领先我 L 个 tick、单向延迟 d 个 tick，则要求 D >= L + d。
+     *   而为了避免「双方同时判定自己领先、互相干等」的死锁，又要求 D >= 2d（一个往返）。
+     *
+     *   旧代码写死 D=6（300ms），只要 RTT 超过 300ms 就先天不满足 —— 命令到对手手上时
+     *   目标 tick 已经过去，对手只能在错位的时刻执行它，rng 序列当场分家。
+     *   这解释了「明明网络没问题却一直不同步」：之前所有测试都在 RTT <= 600ms 内跑，
+     *   恰好卡在 D 的边界上，看起来是「勉强能过」。
+     *
+     * 所以 D 由 index.html 开局时按实测 RTT 算好传进来（两端必须拿到同一个值），
+     * 这里只负责兜底：没传就按已知 RTT 推，再没有就给 6。 */
+    var rtt = opts.rtt != null ? opts.rtt : -1;                       // 往返延迟（ms，-1 = 未知）
+    var TICK_MS = 50;                                                 // 20Hz，与 logic 的 DT 对应
+    function rttTicks(ms) { return Math.ceil(Math.max(0, ms) / TICK_MS); }
+    var delayTicks = opts.delayTicks != null
+      ? opts.delayTicks
+      : (rtt >= 0 ? Math.max(6, rttTicks(rtt) + 4) : 6);
     var checkEvery = opts.checkEvery != null ? opts.checkEvery : 20;  // 每 N tick 校验
     var onDesync = opts.onDesync || function () {};
     var onChecksum = opts.onChecksum || null;
     var onLate = opts.onLate || null;
+
+    /* --------------------------------------------------- tick 对齐（v22）
+     * 旧实现两端各自按自己的帧率自由推进 tick，谁也不等谁 —— 这是个致命漏洞。
+     *
+     * 为什么会致命：命令的 _t 是「绝对 tick 编号」，只有当两端 tick 大致相同时，
+     * 「提前 delayTicks 排期」才等价于「提前 delayTicks×50ms 排期」。一旦 tick 漂移：
+     *   · 落后 200 tick 的一端，收到 _t 早已过去的命令 → 立即执行 → 显得「零延迟」；
+     *   · 领先 200 tick 的一端，收到 _t 还在未来的命令 → 硬等 200 tick ≈ 10 秒。
+     * 同一条命令在两端差了 10 秒才执行，rng 调用序列必然错开 ⇒ 不同步。
+     * 实测症状完全吻合：一方基本没延时、另一方延时 10 秒左右，且双方状态越走越偏。
+     *
+     * 漂移从哪来（都不是网络问题）：
+     *   · 主循环 dt 上限 0.1s —— 帧率掉到 10fps 以下时真实过了 0.15s 却只推进 0.1s，
+     *     仿真按半速跑，落后的量以「每秒几 tick」稳定累积；
+     *   · 后台标签页 rAF 被浏览器节流到 ~1fps，切走再切回来能一次差出几十秒；
+     *   · 开局 start 消息有先后差、贴图加载期掉帧，都会留下初始偏移。
+     *
+     * 修法：每 tick 广播一次自己的 tick 号，落后者主动等对手追上，领先量封顶 maxLead。
+     * 这样「等」的成本被摊到每一帧（每帧最多多等一帧），玩家看到的只是偶尔抖一下，
+     * 而不是攒到 10 秒后一次性爆发。
+     *
+     * stallLimitMs 是死锁兜底：如果对手真的卡死/断线（后台标签、手机息屏），
+     * 不能陪着一起冻结，久无音讯就放行让本地继续跑。
+     */
+    var stallLimitMs = opts.stallLimitMs != null ? opts.stallLimitMs : 2500;
+    var peerTick = -1;         // 对手最近一次广播的 tick（-1 = 还没收到过）
+    var lastPeerAt = 0;        // 上次收到对手 tick 的时刻（超时兜底用）
+    var pingSentAt = -1;
+    var waiting = false;       // 本帧是否因为等对手而没有推进（UI 诊断用）
+    var extraLead = 0;         // 自适应放宽量：反复超时说明阈值估低了，逐渐放大
+    /* align=false 只用于对照实验（dev/tick-align-test.js 拿它证明「不纠偏就会漂」）
+     * 与极端情况下的紧急回退，正常对局永远是 true。 */
+    var align = opts.align !== false;
+
+    /* 允许的「领先对手多少 tick」。
+     * 两个方向都得留够，否则分别踩两种坑：
+     *   太小 → 对手的进度心跳要过半个往返才到我手上，我看到的 peerTick 天然是旧值，
+     *          两端会同时算出「我领先很多」而双双停下等对方，只能靠超时解开，
+     *          表现成规律性卡顿（这是死锁，比延迟更难查）。
+     *   太大 → 我领先太多时，对手那边收到的命令目标 tick 已经过去，直接分叉。
+     * 由上一条注释的推导，取 D - d（d = 单向延迟），既不会死锁，也刚好保住命令准时。
+     * RTT 还未知时放宽到 D + 8，宁可先不纠偏也别一开局就卡住。 */
+    function leadLimit() {
+      if (rtt < 0) return delayTicks + 8;
+      var d = Math.ceil(rttTicks(rtt) / 2);                 // 单向延迟 tick 数
+      /* 有个夹缝要专门处理：当 D < 2d（输入延迟撑不住一个往返）时，两个目标无法同时满足 ——
+       * 取 D - d 会让两端互等（死锁，表现成整局卡住），取 d 又会让命令迟到（分叉）。
+       * 这里选「不死锁」：卡住比偶发分叉更像掉线，玩家会直接弃局；分叉至少还能打完。
+       * 正常部署由 index.html 的 pvpDelayTicks() 保证 D >= 一个往返 + 4，走不到这个分支。 */
+      return Math.max(d + 2, delayTicks - d);
+    }
 
     var tick = 0;              // 下一个要模拟的 tick
     var localSeq = 0;
@@ -130,6 +201,19 @@
       } else if (msg.type === 'chk') {
         remoteHash[msg.tick] = msg.h;
         compareHash(msg.tick);
+      } else if (msg.type === 'tk') {
+        /* 对手的进度心跳。只增不减（乱序到达的旧值直接丢掉）。 */
+        if (msg.t > peerTick) peerTick = msg.t;
+        lastPeerAt = nowMs();
+        /* 落后量回到正常范围后，把超时逼出来的放宽量慢慢收回去 ——
+         * 只减不增的话，一次网络抖动会把阈值永久撑大，之后就再也纠不回来了。 */
+        if (extraLead > 0 && tick - peerTick <= leadLimit()) {
+          extraLead = Math.max(0, extraLead - 2);
+        }
+      } else if (msg.type === 'ping2') {
+        transport.send({ type: 'pong2', t: msg.t });    // 原样回显，对方据此算往返
+      } else if (msg.type === 'pong2') {
+        if (msg.t === pingSentAt) { rtt = nowMs() - pingSentAt; pingSentAt = -1; }
       }
     });
 
@@ -157,8 +241,28 @@
       }
     }
 
+    /* 本帧是否允许推进。三种放行情形：
+     *   1. 还没收到过对手心跳 —— 开局阶段不能卡住自己（对手可能刚进页面在载贴图）；
+     *   2. 领先量在阈值以内 —— 正常，这是 delayTicks 预留的输入缓冲 + 网络延迟补偿；
+     *   3. 对手久未动（超过 stallLimitMs）—— 兜底放行，绝不陪着一起冻结。 */
+    function canStep() {
+      if (closed) return false;
+      if (!align) return true;
+      if (peerTick < 0) return true;
+      if (tick - peerTick <= leadLimit() + extraLead) return true;
+      if ((nowMs() - lastPeerAt) > stallLimitMs) {
+        /* 走到这里说明「等」已经等不出结果了：要么对手真的卡住/断线，要么阈值估低了。
+         * 放行，并把阈值往上抬一点，避免下一步又立刻卡回来。 */
+        extraLead = Math.min(extraLead + 4, 40);
+        return true;
+      }
+      return false;
+    }
+
     function step() {
-      if (closed) return;
+      if (closed) return false;
+      if (!canStep()) { waiting = true; return false; }
+      waiting = false;
       // 取出所有「到期」命令（_t <= 当前 tick），其余留在队列
       var due = [], rest = [];
       for (var i = 0; i < queue.length; i++) {
@@ -177,6 +281,10 @@
       C.update(state, C.DT);
       tick++;
 
+      /* 广播进度。必须每 tick 都发：这是对手判断「该不该等我」的唯一依据，
+       * 攒批发会让对齐精度退化到批间隔。20Hz × 十几字节，带宽可以忽略。 */
+      transport.send({ type: 'tk', t: tick });
+
       if (checkEvery > 0 && tick % checkEvery === 0) {
         var h = checksum(state);
         localHash[tick] = h;
@@ -184,16 +292,42 @@
         compareHash(tick);
         if (onChecksum) onChecksum(tick, h);
       }
+      return true;
     }
+
+    /* 每 2 秒测一次往返：just for UI 诊断（「延时」到底是多少必须有数字，
+     * 靠体感争论永远说不清 —— 之前正是因为没数字，把本地 tick 漂移误判成网络问题）。 */
+    var pingTimer = setInterval(function () {
+      if (closed) return;
+      if (pingSentAt >= 0) return;                 // 上一次还没回，不叠着发
+      pingSentAt = nowMs();
+      transport.send({ type: 'ping2', t: pingSentAt });
+    }, 2000);
+    if (pingTimer && pingTimer.unref) pingTimer.unref();   // Node 下别拖着进程不退出
 
     return {
       submit: submit,
       step: step,
+      canStep: canStep,
       state: state,
       get tick() { return tick; },
+      get peerTick() { return peerTick; },
+      get lead() { return peerTick < 0 ? 0 : tick - peerTick; },   // 正 = 我领先
+      get waiting() { return waiting; },
+      get rtt() { return rtt; },
+      get delayTicks() { return delayTicks; },
+      setRtt: function (ms) {
+        /* 只往小里取：RTT 的偶发毛刺（一次排队、一次重传）不代表链路变差，
+         * 用它去收紧阈值反而会误触发等待。真变差时 ping 会持续给出更小的值。 */
+        if (ms > 0 && (rtt < 0 || ms < rtt)) rtt = ms;
+      },
       get pending() { return queue.length; },
       checksum: function () { return checksum(state); },
-      close: function () { closed = true; if (transport.close) transport.close(); },
+      close: function () {
+        closed = true;
+        if (pingTimer) clearInterval(pingTimer);
+        if (transport.close) transport.close();
+      },
       _inject: function (c) { queue.push(c); }   // 测试/调试用
     };
   }

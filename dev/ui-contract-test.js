@@ -60,8 +60,10 @@ var baseStart = blockAfter(html, /#start\s*\{/);
 item('基础规则 #over 为 position:absolute; inset:0; z-index:30',
   baseOver !== null && norm(baseOver).indexOf('position: absolute; inset: 0; z-index: 30') >= 0,
   baseOver ? norm(baseOver).slice(0, 80) : '规则缺失');
-item('基础规则 #start 为 position:absolute; inset:0; z-index:30',
-  baseStart !== null && norm(baseStart).indexOf('position: absolute; inset: 0; z-index: 30') >= 0,
+/* #start 必须是 fixed：它只覆盖 #app，而 #panel 在 #app 之外，
+ * absolute 时桌面端底部会把放置面板露出来。 */
+item('基础规则 #start 为 position:fixed; inset:0; z-index:30（盖住 #app 外的 #panel）',
+  baseStart !== null && norm(baseStart).indexOf('position: fixed; inset: 0; z-index: 30') >= 0,
   baseStart ? norm(baseStart).slice(0, 80) : '规则缺失');
 
 /* ========== 2. 响应式恰好四档 ========== */
@@ -139,7 +141,7 @@ item('TURRET_STYLE 无 base 条目（大本营不再有矢量炮管样式）',
 
 /* ========== 7. 开始界面结构 + 林绿 palette ========== */
 section('7. 开始界面 #start：海报式结构（v16）+ 林绿 palette');
-var startHtml = sliceBetween('<div id="start">', '<div id="panel">');
+var startHtml = sliceBetween('<div id="start">', '<div id="panel"');
 item('#start 区块存在', startHtml.length > 0);
 /* v16 改版：从「卡片堆」改成「海报 + 三组漂浮文字」。
  * 这里锁的是**新**结构，并且反向锁死旧的卡片元素不许回潮

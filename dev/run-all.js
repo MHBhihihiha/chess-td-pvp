@@ -51,6 +51,7 @@ var SUITES = [
   { name: 'soak',       file: 'soak-test.js',       kind: 'assert', note: '长跑稳定性' },
   { name: 'deep',       file: 'deep-selfcheck.js',  kind: 'assert', note: '8 种子逐帧扫' },
   { name: 'net',        file: 'net-test.js',        kind: 'assert', note: '双人锁步/中继' },
+  { name: 'tick-align', file: 'tick-align-test.js', kind: 'assert', note: 'tick 对齐/输入延迟' },
   { name: 'mirror',     file: 'mirror-test.js',     kind: 'assert', note: '红方视角镜像' },
   { name: 'mirror-render', file: 'mirror-render-test.js', kind: 'assert', note: '镜像点击/渲染' },
   { name: 'playtest',   file: 'playtest.js',        kind: 'assert', note: '对局流程' },

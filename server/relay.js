@@ -179,7 +179,9 @@ function createRelay(opts) {
         '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
         '.svg': 'image/svg+xml', '.webp': 'image/webp'
       }[ext] || 'application/octet-stream';
-      res.writeHead(200, { 'Content-Type': mime });
+      /* 开发期一律不缓存：改完文件刷新就能拿到新版本（手机上没有 Ctrl+Shift+R 可用）。
+       * 生产部署时这行也没什么代价 —— 单文件 225KB，本地/内网瞬间传完。 */
+      res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'no-cache, no-store, must-revalidate' });
       res.end(data);
     });
   });
@@ -197,6 +199,15 @@ function createRelay(opts) {
     );
     var c = { socket: socket, buf: Buffer.alloc(0), msg: null, room: null, closed: false,
               id: Math.random().toString(36).slice(2, 8) };
+
+    /* 关掉 Nagle，打开 TCP 保活。
+     * Nagle 的规则是「上一个包还没被 ACK 就把后续小包攒着一起发」，配合对端的
+     * delayed ACK，每次转发能凭空多等 40–200ms。锁步链路恰恰全是最难受的形状：
+     * 每 tick 一个小进度包、每 20 tick 一个小校验包，包小、频率稳、永远凑不满一个 MSS。
+     * 这个算法为吞吐量优化，对实时对局是纯负债 —— 必须显式关掉。
+     * （Node 的 http 服务对象自己会设 noDelay，但 upgrade 之后拿到的是裸 socket，没人管。） */
+    if (socket.setNoDelay) socket.setNoDelay(true);
+    if (socket.setKeepAlive) socket.setKeepAlive(true, 30000);
 
     socket.on('data', function (chunk) {
       parseFrames(c, chunk, function (t) { handleText(c, t); }, function () {

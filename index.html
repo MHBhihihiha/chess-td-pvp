@@ -240,11 +240,16 @@
    * 标题放大放上半区，难度与图鉴缩小弱化悬浮底部角落，构图重心留给建筑与兵种。
    * 所以这一版**没有卡片、没有分隔线、没有信息块**——
    * 只有一张海报底图 + 三组漂浮文字（标题 / 主按钮 / 两角小控件）。 */
+  /* fixed 而不是 absolute：#panel 在 #app 之外，absolute 只覆盖 #app 的范围，
+   * 桌面端窗口较高时底部会把放置面板露出来（v21 实测：开始界面下方露出一排卡片）。
+   * fixed + inset:0 覆盖整个视口，同时 JS 还会把 #panel 直接置 hidden。 */
   #start {
-    position: absolute; inset: 0; z-index: 30;
+    position: fixed; inset: 0; z-index: 30;
     display: block; overflow: hidden; background: #0a0f0a;
   }
   #start.hide { display: none; }
+  /* 开始界面存在期间放置面板整个不参与布局（也不进 Tab 焦点序列） */
+  #panel[hidden] { display: none !important; }
 
   /* 海报层：底图 + 三段柔和压暗（上给标题、下给按钮、四周暗角）。
    * 全是渐变、没有一条硬边 —— 「不要条框感」的关键就在这里。 */
@@ -776,7 +781,7 @@
       </div>
     </div>
   </div>
-  <div id="panel">
+  <div id="panel" hidden>
     <div class="tabs">
       <button class="tab on" id="tabBuild">建筑 / 派兵 / 法术</button>
       <button class="tab" id="tabGlobal">总体升级</button>
@@ -829,6 +834,17 @@
   var overCard = document.getElementById('overcard');
   var overMeta = document.getElementById('overmeta');
   var startEl = document.getElementById('start');
+  /* 开始界面与放置面板互斥显示。
+   * 只靠 CSS 不够：#start 虽然改成了 fixed 全屏，视觉上盖住了 #panel，
+   * 但 #panel 里的卡片按钮仍在 Tab 焦点序列里，键盘操作会跑到看不见的按钮上。
+   * 所以统一走这个开关，顺带处理「菜单期间 #panel 不参与 flex 布局」。 */
+  function setStartVisible(v) {
+    var p = document.getElementById('panel');
+    if (!startEl) startEl = document.getElementById('start');
+    if (!startEl) return;
+    if (v) { startEl.classList.remove('hide'); if (p) p.hidden = true; }
+    else { startEl.classList.add('hide'); if (p) p.hidden = false; }
+  }
   var diffsEl = document.getElementById('diffs');
   var difficulty = 'normal';   // 默认普通
   var startedAt = -1;
@@ -1341,7 +1357,8 @@
    * ================================================================ */
   var NetMod = (typeof window !== 'undefined' && window.Net) ? window.Net : null;
   var REAL_C = Object.assign({}, C);   // 原始动作函数快照（必须在包裹之前）
-  var PVP = { active: false, role: null, net: null, raw: null, transport: null, sudden: true, room: null };
+  var PVP = { active: false, role: null, net: null, raw: null, transport: null, sudden: true, room: null,
+              rtt: -1, pingAt: -1, pingTimer: 0, desync: false };
 
   (function installPvpHooks() {
     C.deployUnit = function (s, team, key, col) {
@@ -1431,12 +1448,37 @@
   }
   function genSeed() { return (Math.random() * 2147483647) >>> 0; }
 
+  /* 开局前就要把 RTT 量出来 —— 输入延迟 D 必须大于一个完整往返，这是锁步的硬下限，
+   * 等进了对局再测就晚了（那时命令已经在路上，改 D 会让已排期的命令全部错位）。
+   * 取多次最小值：单次结果可能被一次排队/重传污染，最小值才接近真实链路。 */
+  function pvpStartPing() {
+    if (PVP.pingTimer) clearInterval(PVP.pingTimer);
+    function ping() {
+      if (!PVP.transport || !NetMod) return;
+      if (PVP.pingAt >= 0) return;                 // 上一条没回，不叠着发
+      PVP.pingAt = NetMod.nowMs();
+      PVP.transport.send({ type: 'ping2', t: PVP.pingAt });
+    }
+    ping();
+    PVP.pingTimer = setInterval(ping, 1200);
+  }
+
+  /* 按实测 RTT 定输入延迟。200ms 余量是给抖动留的：RTT 稳定 300ms，不代表每一刻
+   * 都是 300ms，偶发多 100ms 就会让命令迟到、当场分叉。 */
+  function pvpDelayTicks() {
+    var ms = PVP.rtt > 0 ? PVP.rtt : 250;          // 还没测出来就按 250ms 保守估
+    var t = Math.ceil(ms / 50) + 4;
+    return Math.max(6, Math.min(40, t));           // 上限 40 tick = 2 秒，再高就没法玩了
+  }
+
   function pvpConnect(room) {
     if (!NetMod || !NetMod.WsTransport) {
       pvpStatus('联机模块未加载：请用 relay 服务器打开页面（node server/relay.js）', true);
       return;
     }
     if (PVP.transport) { try { PVP.transport.close(); } catch (e) {} }
+    if (PVP.pingTimer) { clearInterval(PVP.pingTimer); PVP.pingTimer = 0; }
+    PVP.rtt = -1; PVP.pingAt = -1;
     var raw = NetMod.WsTransport(pvpServerUrl());
     var mux = makeMux(raw);
     PVP.raw = raw; PVP.transport = mux; PVP.room = room;
@@ -1444,6 +1486,7 @@
     raw.onOpen = function () {
       mux.send({ type: 'join', room: room });
       pvpStatus('已连接，进入房间 ' + room + '，等待对手…');
+      pvpStartPing();
     };
     try {
       raw.ws.addEventListener('error', function () {
@@ -1460,18 +1503,30 @@
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'waiting') {
       pvpStatus('房间 ' + msg.room + '：等待对手加入…');
+    } else if (msg.type === 'ping2') {
+      /* 对手在量链路，原样回显。这条在配对前就要能处理 —— 大厅阶段也得测得出 RTT。 */
+      if (PVP.transport) PVP.transport.send({ type: 'pong2', t: msg.t });
+    } else if (msg.type === 'pong2') {
+      if (msg.t === PVP.pingAt) {
+        var d = NetMod ? (NetMod.nowMs() - PVP.pingAt) : -1;
+        if (d >= 0) PVP.rtt = (PVP.rtt > 0 && PVP.rtt < d) ? PVP.rtt : d;
+        PVP.pingAt = -1;
+      }
     } else if (msg.type === 'paired') {
       PVP.role = msg.role;
       if (PVP.role === 'host') {
         pvpStatus('配对成功（你是房主），正在开局…');
         var seed = genSeed();
-        PVP.transport.send({ type: 'start', seed: seed, sudden: !!(suddenEl && suddenEl.checked) });
-        pvpBegin(seed, !!(suddenEl && suddenEl.checked));
+        /* D 由房主算、随 start 下发，保证两端拿到完全同一个值 ——
+         * 两端各自算的话，一次 RTT 抖动就能让两边取到不同的 D，直接分叉。 */
+        var dt = pvpDelayTicks();
+        PVP.transport.send({ type: 'start', seed: seed, sudden: !!(suddenEl && suddenEl.checked), dt: dt });
+        pvpBegin(seed, !!(suddenEl && suddenEl.checked), dt);
       } else {
         pvpStatus('配对成功（你是应战方），等待房主开局…');
       }
     } else if (msg.type === 'start') {
-      pvpBegin(msg.seed >>> 0, msg.sudden !== false);
+      pvpBegin(msg.seed >>> 0, msg.sudden !== false, msg.dt);
     } else if (msg.type === 'rematch') {
       if (PVP.role === 'host' && PVP.active) pvpRestart();
     } else if (msg.type === 'peer-left') {
@@ -1480,7 +1535,22 @@
     }
   }
 
-  function pvpBegin(seed, sudden) {
+  /* 联机状态角标：把「延迟」和「帧差」变成具体数字。
+   * 为什么必须做：之前所有关于「延时很重」的判断都只能靠体感，而真实原因却是本地
+   * tick 漂移（帧率掉下去仿真变慢），跟网络一点关系都没有 —— 没有数字就只能猜，
+   * 一猜就猜错方向，白改好几轮。现在玩家截图就能看到到底是网络还是帧差。 */
+  function pvpNetHud() {
+    if (!PVP.active || !PVP.net || !hintEl) return;
+    if (PVP.desync) { hintEl.textContent = '⚠ 与对手不同步，建议返回菜单重开一局'; return; }
+    var s = '双人对战：你在蓝方（下方），对手在红方（上方）';
+    var r = PVP.net.rtt, l = PVP.net.lead;
+    if (r >= 0) s += '　·　网络 ' + Math.round(r) + 'ms';
+    s += '　·　输入延迟 ' + (PVP.net.delayTicks * 50) + 'ms';
+    if (Math.abs(l) >= 4) s += '　·　帧差 ' + (l > 0 ? '+' : '') + l + (PVP.net.waiting ? '（已暂停等对手）' : '');
+    hintEl.textContent = s;
+  }
+
+  function pvpBegin(seed, sudden, dt) {
     if (!NetMod || !NetMod.createLockstep) { pvpStatus('联机模块未加载', true); return; }
     PVP.active = true;
     PVP.sudden = sudden !== false;
@@ -1495,14 +1565,18 @@
     startedAt = 0;
     if (overEl) overEl.classList.remove('show');
     if (detailEl) { detailEl.classList.remove('show'); detailEl.innerHTML = ''; }
-    if (startEl) startEl.classList.add('hide');
+    setStartVisible(false);
     if (autoDeployEl) autoDeployEl.checked = false;   // PvP 不能本地直接派兵
+    if (PVP.pingTimer) { clearInterval(PVP.pingTimer); PVP.pingTimer = 0; }   // 交给锁步自己测，别两套 ping 打架
     if (PVP.net) { try { PVP.net.close(); } catch (e) {} PVP.net = null; }
+    PVP.desync = false;
+    var D = (dt | 0) || pvpDelayTicks();
     PVP.net = NetMod.createLockstep({
       C: REAL_C, state: state, me: ME, transport: PVP.transport,
-      delayTicks: 6, checkEvery: 20,
+      delayTicks: D, checkEvery: 20, rtt: PVP.rtt,
       onDesync: function (e) {
-        if (hintEl) hintEl.textContent = '⚠ 与对手不同步（tick ' + e.tick + '），建议重开一局';
+        PVP.desync = true;
+        pvpStatus('⚠ 与对手不同步（tick ' + e.tick + '），建议重开一局', true);
         try { console.warn('[PvP] desync', e); } catch (x) {}
       }
     });
@@ -1513,11 +1587,13 @@
 
   function pvpRestart() {
     var seed = genSeed();
-    if (PVP.transport) PVP.transport.send({ type: 'start', seed: seed, sudden: PVP.sudden });
-    pvpBegin(seed, PVP.sudden);
+    var dt = pvpDelayTicks();
+    if (PVP.transport) PVP.transport.send({ type: 'start', seed: seed, sudden: PVP.sudden, dt: dt });
+    pvpBegin(seed, PVP.sudden, dt);
   }
 
   function pvpLeave() {
+    if (PVP.pingTimer) { clearInterval(PVP.pingTimer); PVP.pingTimer = 0; }
     if (PVP.transport) { try { PVP.transport.close(); } catch (e) {} }
     if (PVP.net) { try { PVP.net.close(); } catch (e) {} }
     PVP.active = false; PVP.net = null; PVP.transport = null; PVP.raw = null;
@@ -1638,7 +1714,7 @@
 
   /* 开始游戏：先把开局界面收起来，再重置一局 */
   function startGame() {
-    startEl.classList.add('hide');
+    setStartVisible(false);
     newGame();
     startedAt = 0;
   }
@@ -3823,17 +3899,22 @@
   document.getElementById('tomenu').onclick = function () {
     if (PVP.active) pvpLeave();
     overEl.classList.remove('show');
-    startEl.classList.remove('hide');   // #start 重新 display，入场动画自动重放
+    setStartVisible(true);              // 同时把放置面板收起来（桌面端底部不再露出卡片）
     newGame();
     syncDiffHint();
     setStartMode('ai');
   };
 
   /* ---------------------------------------------------------------- 主循环 */
-  var last = 0, acc = 0, autoTimer = 0;
+  var last = 0, acc = 0, autoTimer = 0, hudTimer = 0;
   function frame(ts) {
     if (!last) last = ts;
-    var dt = Math.min(0.1, (ts - last) / 1000);
+    /* dt 上限从 0.1 提到 0.2。
+     * 0.1 意味着帧率一旦掉到 10fps 以下（老旧手机、贴图还在解码、后台标签被节流），
+     * 真实过了 0.15s 却只给仿真 0.1s —— 仿真按 2/3 速跑，tick 就一路落后对手。
+     * 双人锁步下这就是「一方延时 10 秒」的源头之一，所以必须放宽。
+     * 单机模式放宽只会让卡顿后追帧更猛，而下面 guard<60 已把单帧最多 3 秒封顶。 */
+    var dt = Math.min(0.2, (ts - last) / 1000);
     last = ts;
     renderDt = dt;
     acc += dt;
@@ -3844,7 +3925,12 @@
         /* 双人：不跑 AI，由锁步引擎消费双方命令后推进一 tick。
          * suddenDeath 是「仿真输入」，必须两端一致，否则会分叉 —— 用开局同步的值。 */
         state.suddenDeath = PVP.sudden;
-        if (PVP.net) PVP.net.step();
+        if (PVP.net) {
+          /* step() 返回 false = 对手 tick 还没跟上，本帧不推进（保持两端口径一致）。
+           * 把 acc 压回一步之内：否则等待期间会攒一堆积压，放开瞬间猛追几十 tick，
+           * 又反过来把对手甩开 —— 抖动会自我放大。 */
+          if (!PVP.net.step()) { acc = Math.min(acc, C.DT); break; }
+        }
       } else {
         state.suddenDeath = !suddenEl || suddenEl.checked;
         C.update(state, C.DT);
@@ -3868,6 +3954,8 @@
     /* 草地贴图（L3/L4）是异步加载的：一旦就绪，让背景板重建一次就再也不跑（规范 §B5）。
      * 每 15 帧查一次而不是每帧 —— 省掉每帧一次的字符串查表，延迟最多 250ms，用户感知不到。 */
     if (bgTexPending && (bgTexTick++ % 15) === 0) syncGrassTexture();
+    /* 联机角标每 0.5 秒刷一次（每帧写 textContent 会白白触发版面重算） */
+    if (PVP.active) { hudTimer += dt; if (hudTimer >= 0.5) { hudTimer = 0; pvpNetHud(); } }
     render();
     if (selectedBuilding) {
       lastDetailRefresh += dt;
