@@ -1,0 +1,44 @@
+{
+  "note": "美术 v9 装饰件叠加规则。核心思路：10 级 = 5 材质纪元母版 + 纪元内二级挂 1~3 件装饰。装饰件只做加法，永远不改母版本身。",
+  "version": "v9",
+  "canvas": 256,
+  "rules": [
+    "装饰件一律画在 base 之上、top 之下（不能盖住炮管/法球，否则旋转时会露出破绽）",
+    "装饰件随 base 一起缩放，锚点与 base 相同（底边对齐）",
+    "阵营色只允许由 dc_banner_{team} / dc_skull(红方) 提供，绝不出现在母版里",
+    "同屏同族建筑数量多时，装饰件可关闭（性能开关），母版已足够分纪元"
+  ],
+  "levels": [
+    { "level": 1,  "era": "e1_wood",    "deco": [],                                          "why": "纯净起点，什么都不挂，让成长有落差" },
+    { "level": 2,  "era": "e1_wood",    "deco": ["dc_rivets", "dc_emblem_star"],             "why": "木架上打铁钉、挂星徽，第一次\"被修缮过\"的感觉" },
+    { "level": 3,  "era": "e2_stone",   "deco": [],                                          "why": "换材质本身就是变化，不再叠加，避免杂乱" },
+    { "level": 4,  "era": "e2_stone",   "deco": ["dc_moss"],                                 "why": "石头长青苔 = 存在得够久了" },
+    { "level": 5,  "era": "e3_iron",    "deco": ["dc_rivets"],                               "why": "铁件铆钉加固" },
+    { "level": 6,  "era": "e3_iron",    "deco": ["dc_banner_{team}"],                        "why": "第一次出现阵营旗 —— 归属感" },
+    { "level": 7,  "era": "e4_armor",   "deco": ["dc_rust"],                                 "why": "久经战阵的锈" },
+    { "level": 8,  "era": "e4_armor",   "deco": ["dc_chain", "dc_rust"],                     "why": "挂铁链 + 锈迹，重装感" },
+    { "level": 9,  "era": "e5_gold",    "deco": ["dc_gold_band"],                            "why": "金饰带收边" },
+    { "level": 10, "era": "e5_gold",    "deco": ["dc_gold_band", "dc_crown_tiny", "dc_gem_blue"], "why": "王冠 + 宝石 + 金饰带，满配" }
+  ],
+  "state_overlays": [
+    { "file": "dc_cracks", "when": "hp / hpMax < 0.5", "alpha": "0.35 → 1.0 随血量下降线性提高", "note": "受损裂纹，任何等级都可叠；满血时不显示" }
+  ],
+  "team_overrides": [
+    { "team": "blue", "level_gte": 2, "add": ["dc_emblem_star"], "note": "蓝方星徽" },
+    { "team": "red",  "level_gte": 2, "add": ["dc_skull"],       "note": "红方兽骨战利品，与星徽同位置互斥" }
+  ],
+  "anchors": {
+    "dc_rivets":      { "anchor": "band",   "fit": 0.55, "y": 0.62, "note": "横向条带，铺在墙体中段" },
+    "dc_gold_band":   { "anchor": "band",   "fit": 0.62, "y": 0.55 },
+    "dc_banner_blue": { "anchor": "hang",   "fit": 0.42, "x": 0.74, "y": 0.06, "note": "从顶部边缘垂下" },
+    "dc_banner_red":  { "anchor": "hang",   "fit": 0.42, "x": 0.74, "y": 0.06 },
+    "dc_emblem_star": { "anchor": "face",   "fit": 0.30, "x": 0.50, "y": 0.52, "note": "墙面正中" },
+    "dc_skull":       { "anchor": "face",   "fit": 0.32, "x": 0.50, "y": 0.50 },
+    "dc_gem_blue":    { "anchor": "face",   "fit": 0.22, "x": 0.50, "y": 0.40 },
+    "dc_crown_tiny":  { "anchor": "crown",  "fit": 0.30, "x": 0.50, "y": 0.02, "note": "坐在顶部 socket 后方" },
+    "dc_chain":       { "anchor": "hang",   "fit": 0.40, "x": 0.26, "y": 0.04 },
+    "dc_cracks":      { "anchor": "fill",   "fit": 1.00, "note": "按 base 剪影做 mask 整片覆盖" },
+    "dc_moss":        { "anchor": "fill",   "fit": 1.00, "note": "同上，只用下半部（苔藓长在底部）" },
+    "dc_rust":        { "anchor": "fill",   "fit": 1.00, "note": "同上，只用下半部" }
+  }
+}

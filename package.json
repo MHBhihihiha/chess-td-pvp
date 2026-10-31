@@ -1,0 +1,15 @@
+{
+  "name": "chess-td-pvp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "棋盘塔防 —— 双人对战（确定性锁步 + WebSocket 中继）。零第三方依赖。",
+  "main": "server/relay.js",
+  "scripts": {
+    "start": "node server/relay.js",
+    "test": "node dev/run-all.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

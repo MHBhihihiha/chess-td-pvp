@@ -1,0 +1,4478 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>棋盘塔防 · 蓝方 vs 红方</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    background: #12161f; color: #e6edf7;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    user-select: none; touch-action: none;
+  }
+  #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
+  #topbar {
+    display: flex; align-items: center; gap: 8px; padding: 5px 9px;
+    background: #1b2130; border-bottom: 1px solid #2a3348; font-size: 12px; flex: 0 0 auto;
+  }
+  #topbar .gold { color: #ffd479; font-weight: 700; }
+  #topbar .rate { color: #8fa4c4; font-size: 11px; }
+  #topbar .spacer { flex: 1; }
+  #topbar button {
+    background: #2a3348; color: #cfe0ff; border: 1px solid #3b4763; border-radius: 6px;
+    padding: 3px 8px; font-size: 11px; cursor: pointer;
+  }
+  #board-wrap { flex: 1 1 auto; position: relative; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #panel {
+    flex: 0 0 auto; background: #1b2130; border-top: 1px solid #2a3348;
+    padding: 5px 7px calc(5px + env(safe-area-inset-bottom));
+  }
+  .rowlabel { font-size: 11px; color: #8fa4c4; margin: 1px 0 3px 2px; display: flex; align-items: center; }
+  .rowlabel .sp { flex: 1; }
+  .rowlabel label { cursor: pointer; }
+  .cards { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; }
+  .tabs { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .tabs .tab {
+    background: #232b3d; color: #9fb2d0; border: 1px solid #3b4763; border-radius: 7px;
+    padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .tabs .tab.on { background: #2f6fd0; color: #fff; border-color: #4f8fe0; }
+  .tabs .sp { flex: 1; }
+  .gcards .card { width: 84px; }
+  .card .eff { font-size: 10px; color: #7ef0a0; }
+  .card .lvtag { font-size: 9px; color: #9fd0ff; }
+  .card {
+    flex: 0 0 auto; width: 62px; border-radius: 8px; border: 1px solid #3b4763;
+    background: #232b3d; padding: 4px 2px 3px; text-align: center; cursor: pointer; position: relative;
+    overflow: hidden;
+  }
+  .card.sel { border-color: #6fd3ff; box-shadow: 0 0 0 1px #6fd3ff inset; background: #26334a; }
+  .card.locked { opacity: .38; }
+  .card .g { font-size: 16px; line-height: 18px; font-weight: 700; }
+  .card .n { font-size: 10px; color: #b9c8e2; margin-top: 1px; white-space: nowrap; }
+  .card .c { font-size: 10px; color: #ffd479; }
+  .card .cd {
+    position: absolute; left: 0; right: 0; bottom: 0; background: rgba(10,14,22,.78);
+    font-size: 9px; color: #9fd0ff; padding: 1px 0;
+  }
+  .card .cdbar { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(110,180,255,.16); }
+  #hint {
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 8px;
+    background: rgba(18,22,31,.9); border: 1px solid #3b4763; border-radius: 8px;
+    padding: 4px 11px; font-size: 12px; color: #cfe0ff; pointer-events: none;
+    max-width: 94%; text-align: center;
+  }
+  /* 建筑详情卡：贴在屏幕底部，往下挡住下面的卡片栏，而不是挡住棋盘 */
+  #detail {
+    position: fixed; left: 7px; right: 7px; bottom: 6px; display: none;
+    background: rgba(22,28,40,.99); border: 1px solid #4a5a7d; border-radius: 10px;
+    padding: 7px 10px; font-size: 12px; box-shadow: 0 -6px 28px rgba(0,0,0,.65); z-index: 20;
+    max-height: 38vh; overflow-y: auto;
+  }
+  #detail.show { display: block; }
+  #detail .head { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+  #detail .head .g { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 13px; }
+  #detail .head .nm { font-size: 13px; font-weight: 700; }
+  #detail .head .lv { color: #ffd479; }
+  #detail .head .x { margin-left: auto; cursor: pointer; color: #8fa4c4; padding: 2px 6px; }
+  #detail .desc { color: #9fb2d0; margin-bottom: 4px; font-size: 11px; }
+  #detail table { width: 100%; border-collapse: collapse; }
+  #detail td { padding: 1px 0; vertical-align: top; font-size: 11px; }
+  #detail td.k { color: #8fa4c4; width: 40%; }
+  #detail td.v { color: #dfe9fb; }
+  #detail .up { color: #7ef0a0; }
+  #detail .bar { height: 5px; background: #2a3348; border-radius: 3px; overflow: hidden; margin: 4px 0 5px; }
+  #detail .bar i { display: block; height: 100%; background: #54d96b; }
+  #detail .acts { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+  #detail button {
+    flex: 1 1 40%; border: 0; border-radius: 7px; padding: 7px 4px; font-size: 12px; font-weight: 700;
+    background: #2f6fd0; color: #fff; cursor: pointer;
+  }
+  #detail button.alt { background: #6a4fb0; }
+  #detail button.danger { background: #a33a3a; flex: 1 1 100%; }
+  #detail button:disabled { background: #39445c; color: #8b97ad; cursor: not-allowed; }
+  #over {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(8,10,16,.82); z-index: 5; flex-direction: column; gap: 12px;
+  }
+  #over.show { display: flex; }
+  #over .t { font-size: 24px; font-weight: 800; }
+  #over .sub { font-size: 13px; color: #9fb2d0; }
+  #over .stats { font-size: 12px; color: #cfe0ff; background: #1b2130; border: 1px solid #2a3348; border-radius: 8px; padding: 8px 14px; text-align: left; line-height: 1.7; }
+  #over button, #start button { background: #2f6fd0; color: #fff; border: 0; border-radius: 8px; padding: 9px 22px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  #start {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(8,10,16,.94); z-index: 6; gap: 14px; padding: 20px; text-align: center;
+  }
+  #start.hide { display: none; }
+  #start .title { font-size: 32px; font-weight: 800; color: #6fd3ff; letter-spacing: 2px; }
+  #start .tag { font-size: 14px; color: #9fb2d0; }
+  #start .rules { font-size: 12px; color: #b9c8e2; text-align: left; line-height: 1.9; background: #1b2130; border: 1px solid #2a3348; border-radius: 10px; padding: 12px 16px; max-width: 460px; }
+  #start .rules b { color: #ffd479; }
+  #start .dtitle { font-size: 15px; font-weight: 700; color: #cfe0ff; margin-top: 4px; }
+  #start .diffs { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  #start .diff {
+    width: 158px; border: 2px solid #3b4763; border-radius: 10px; background: #1b2130;
+    padding: 10px 10px 12px; cursor: pointer; text-align: center; transition: .12s;
+  }
+  #start .diff:hover { border-color: #5a7bb0; }
+  #start .diff.on { border-color: #6fd3ff; background: #223048; box-shadow: 0 0 0 1px #6fd3ff inset; }
+  #start .diff .dn { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
+  #start .diff .dp { font-size: 11px; color: #7ef0a0; font-weight: 700; }
+  #start .diff .dd { font-size: 11px; color: #9fb2d0; margin-top: 5px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <span>金币 <span class="gold" id="gold">0</span></span>
+    <span class="rate" id="rate">+0/s</span>
+    <span class="spacer"></span>
+    <span class="rate" id="enemyinfo">红方大本营 —</span>
+    <button id="btnpath">路线</button>
+    <button id="btnrestart">重开</button>
+  </div>
+  <div id="board-wrap">
+    <canvas id="cv"></canvas>
+    <div id="hint">点卡片选建筑/兵种/法术，再点棋盘</div>
+    <div id="detail"></div>
+    <div id="over">
+      <div class="t" id="overtext"></div>
+      <div class="sub" id="oversub"></div>
+      <div class="stats" id="overstats"></div>
+      <button id="again">再来一局</button>
+    </div>
+    <div id="start">
+      <div class="title">棋盘塔防</div>
+      <div class="tag">蓝方（你） vs 红方（电脑）</div>
+      <div class="rules">
+        <div>· 目标：先摧毁对方<b>大本营</b></div>
+        <div>· 建筑盖在自己半场（<b>行6~10</b>），点建筑可升级 / 选分支 / 拆除</div>
+        <div>· 派兵点最下面那条<b>行B</b>；兵有冷却（步兵 5 秒，越贵越久）</div>
+        <div>· 法术随大本营等级解锁，选中后点棋盘落点</div>
+        <div>· 点自己建筑可<b>拆除返还金币</b>；下侧「总体升级」可买全局加成</div>
+      </div>
+      <div class="dtitle">选择难度</div>
+      <div class="diffs" id="diffs"></div>
+      <button id="startbtn">开始游戏</button>
+    </div>
+  </div>
+  <div id="panel">
+    <div class="tabs">
+      <button class="tab on" id="tabBuild">建筑 / 派兵 / 法术</button>
+      <button class="tab" id="tabGlobal">总体升级</button>
+      <span class="sp"></span>
+      <label><input type="checkbox" id="sudden" checked> 5分钟后决胜</label>
+      <label style="margin-left:6px"><input type="checkbox" id="autodeploy"> 自动派兵</label>
+    </div>
+    <div id="paneBuild">
+      <div class="rowlabel">建筑（自己半场行6~10；点已有建筑可升级 / 选分支 / 拆除）</div>
+      <div class="cards" id="bcards"></div>
+      <div class="rowlabel" style="margin-top:4px">派兵（时间冷却制 · 点行B 派出去）</div>
+      <div class="cards" id="ucards"></div>
+      <div class="rowlabel" style="margin-top:4px">法术（随大本营等级解锁 · 选中后点棋盘落点）</div>
+      <div class="cards" id="scards"></div>
+    </div>
+    <div id="paneGlobal" style="display:none">
+      <div class="rowlabel">
+        总体升级（全局科技 · 只影响己方 · 建筑每级 +10%/20%，士兵每级 +15%/30%）
+      </div>
+      <div class="cards gcards" id="gcards"></div>
+    </div>
+  </div>
+</div>
+<script>
+/* =============================================================================
+ * 10x10 棋类 + 塔防 融合对战游戏 —— 逻辑层（无 DOM 依赖）
+ * -----------------------------------------------------------------------------
+ * 设计原则：本文件只算规则，不碰画面。将来移植微信小游戏时，本文件可以原样使用，
+ * 只需要重写渲染层（view.js）。
+ *
+ * 坐标约定（绝对坐标，不随视角变化）：
+ *   行(row)  1..10  从屏幕上方往下数；行 1..5 = 红方（敌方）半场
+ *                                     行 6..10 = 蓝方（己方）半场
+ *   列(col)  1..10  从屏幕左侧往右数
+ *   行A = 行0 = 红方棋盘外出兵通道（在行1上方，红方单位在此并行、找空列向下进入）
+ *   行B = 行11 = 蓝方棋盘外出兵通道（在行10下方，蓝方单位在此并行、找空列向上进入）
+ *
+ * 单位朝向：蓝方 targetRow = +1（向下→朝行号大的方向打红方），红方 targetRow = -1
+ * ========================================================================== */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api; // Node
+  root.GameCore = api;                                                   // 浏览器
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  /* ---------------------------------------------------------------- 常量 */
+  var ROWS = 10, COLS = 10;
+  var RED = 'red', BLUE = 'blue';
+  var TEAMS = [RED, BLUE];
+  var OPP = { red: BLUE, blue: RED };
+  var DIR = { red: -1, blue: 1 };          // 本单位向前推进的行方向
+  var CHANNEL_ROW = { red: 0, blue: ROWS + 1 }; // 行A / 行B
+  // 大本营自带防御的范围：4×4（按格距离算就是 2 格内）
+  var BASE_DEF_RANGE = 2;
+  var BASE_RECT = {
+    red:  { r1: 1, r2: 2, c1: 5, c2: 6 },
+    blue: { r1: 9, r2: 10, c1: 5, c2: 6 }
+  };
+  var HALF = { red: [1, 5], blue: [6, 10] };   // 可建造的半场
+  var TILE = { EMPTY: 0, CHANNEL: 1 };         // 格子地形
+  var TICK_HZ = 20;
+  var DT = 1 / TICK_HZ;
+  var UNIT_CAP = 80;                            // 每方单位上限（性能保护）
+  var RESERVE_CAP = 8;                          // 每方待命区（棋盘外）容量
+  var CHANNEL_CAP = 4;                          // 同一通道格最多堆几个兵
+  var SUDDEN_DEATH_AT = 300;                    // 5 分钟后进入「决胜时刻」
+  var SUDDEN_DEATH_DPS = 6;                     // 决胜期每秒烧大本营的血（只惩罚僵持，不掩盖实力差距）
+  var MAX_SIM_SECONDS = 60 * 60;
+
+  /* ------------------------------------------------------------ 配置表 */
+  /* 想调数值只改这里。数值故意先给一套偏保守的初稿，等试玩手感再定。 */
+  var DATA = {
+    /* 大本营：可以一直升到 6 级（每级解锁一个法术、提高固定收入）
+     * selfHeal：不受攻击时每秒回血；selfHealDelay：停火多少秒后才开始自愈 */
+    baseLevels: [
+      { level: 1, hp: 3200, income: 3, upgradeCost: 320 },
+      { level: 2, hp: 4200, income: 4, upgradeCost: 550 },
+      { level: 3, hp: 5400, income: 5, upgradeCost: 850 },
+      { level: 4, hp: 6800, income: 6, upgradeCost: 1250 },
+      { level: 5, hp: 8400, income: 7, upgradeCost: 1750 },
+      { level: 6, hp: 10400, income: 9, upgradeCost: null }
+    ],
+    baseDefenseRange: BASE_DEF_RANGE,   // 大本营防御范围 4×4
+    selfHeal: { perSecond: 0.01, delay: 8 },   // 8 秒没挨打后，按最大血量的 1%/秒 自愈
+    // 其他建筑的自愈速度是大本营的一半
+    buildingSelfHeal: { perSecond: 0.005, delay: 8 },
+
+    buildings: {
+      mine: {
+        key: 'mine', name: '金矿', glyph: '金', color: '#d8a125', size: [1, 1],
+        cost: 150, hp: 600, armor: 2, tier: 1, maxLevel: 5,
+        income: 2, incomeByLevel: [2, 3, 4, 5, 8],   // 取整后的产出曲线：1-4 级 +30%，4→5 级 +60%
+        desc: '金币加成：随等级提升产出（4→5 级一跃 +60%，成为终极金矿）'
+      },
+      cannon: {
+        key: 'cannon', name: '炮塔', glyph: '炮', color: '#6f8fd6', size: [1, 1],
+        cost: 70, hp: 760, armor: 6, tier: 1,
+        atk: 14, atkInterval: 0.6, range: 1.0, targets: 'ground', mode: 'single',
+        hpBonus: 0.10, atkBonus: 0.10, desc: '便宜、血较低；对地单体、攻速较快、伤害较低；射程 3×3'
+      },
+      arrow: {
+        key: 'arrow', name: '箭塔', glyph: '箭', color: '#5aab6a', size: [1, 1],
+        cost: 110, hp: 900, armor: 6, tier: 1,
+        atk: 16, atkInterval: 0.45, range: 2.0, targets: 'both', mode: 'single',
+        hpBonus: 0.10, atkBonus: 0.10, desc: '较便宜、血中；对地对空单体、攻速快、伤害低；射程 5×5'
+      },
+      mage: {
+        key: 'mage', name: '法师塔', glyph: '法', color: '#9a6fd0', size: [1, 1],
+        cost: 160, hp: 1000, armor: 6, tier: 1,
+        atk: 34, atkInterval: 1.1, range: 1.0, targets: 'both', mode: 'single',
+        hpBonus: 0.10, atkBonus: 0.10, desc: '价格中、血较高；对地对空单体、攻速中、伤害中；射程 3×3'
+      },
+      mortar: {
+        key: 'mortar', name: '迫击炮塔', glyph: '迫', color: '#a86a9c', size: [1, 1],
+        cost: 220, hp: 1100, armor: 7, tier: 1,
+        atk: 78, atkInterval: 2.4, range: 2.0, targets: 'ground', mode: 'group',
+        /* 溅射：重炮砸下来对周围一圈也造成伤害（玩家要求"对群造成伤害"）。
+         * 1 = 目标格 + 上下左右 + 斜角，共 3×3。 */
+        splash: 1,
+        hpBonus: 0.10, atkBonus: 0.10, desc: '价格较高、血较高；对地群攻、攻速慢、伤害高；射程 5×5'
+      },
+      tesla: {
+        key: 'tesla', name: '特斯拉电塔', glyph: '电', color: '#59b39a', size: [1, 1],
+        cost: 280, hp: 1400, armor: 8, tier: 1,
+        atk: 46, atkInterval: 1.6, range: 2.0, targets: 'both', mode: 'group',
+        hpBonus: 0.10, atkBonus: 0.10, desc: '价格高、血高；对地对空群攻、攻速较慢、伤害较高；射程 5×5'
+      },
+      ward: {
+        key: 'ward', name: '防御塔', glyph: '御', color: '#d8b04a', size: [1, 1],
+        cost: 200, hp: 2400, armor: 8, tier: 1,
+        aura: { radius: 1.0, dr: 0.10, drPerLevel: 0.02, drStep: 0.04, drFinal: 0.10 },
+        hpBonus: 0.10, desc: '不能攻击，只给周围己方建筑减伤；保护范围 3×3，随等级提升（血量为同档最高）'
+      }
+    },
+
+    /* ---------------------------------------------------------------- 建筑升级总规则
+     * 等级 1-4：每级 攻击/生命 +10%
+     * 等级 5  ：分支二选一（两个方向各有自己的加成）
+     * 等级 5-9：每级 攻击/生命 +30%
+     * 等级 10 ：攻击/生命 +60%（终极形态）
+     * 升级费用：越贵的建筑升级越贵（基础造价 × 系数^等级） */
+    upgrade: {
+      maxLevel: 10,
+      branchLevel: 4,          // 4 级升 5 级时出现分支
+      costFactor: 0.35,        // 升级费用 ≈ 基础造价 × (1 + 0.35×等级) × 1.22^等级
+      costRound: 5
+    },
+
+    /* 分支形态：commitAt = 第几级时把这个分支的加成一次性生效 */
+    branches: {
+      /* 炮塔 */
+      twin:    { key: 'twin',    name: '双管炮塔', parent: 'cannon', color: '#7fa8f0', commitAt: 5,
+                 mods: { atkInterval: 0.5 }, hpMul: 1, atkMul: 1, desc: '攻速翻倍' },
+      bigcannon: { key: 'bigcannon', name: '大炮塔', parent: 'cannon', color: '#8f7fe0', commitAt: 5,
+                 mods: {}, atkMul: 2, hpMul: 1, desc: '伤害翻两倍' },
+      /* 箭塔 */
+      rapid:   { key: 'rapid',   name: '速射塔', parent: 'arrow', color: '#71c47f', commitAt: 5,
+                 mods: { atkInterval: 0.5 }, atkMul: 1, desc: '攻速翻倍' },
+      crossbow: { key: 'crossbow', name: '弩塔', parent: 'arrow', color: '#4f9e8a', commitAt: 5,
+                 mods: {}, atkMul: 2, desc: '伤害翻两倍' },
+      /* 法师塔 */
+      white:   { key: 'white',   name: '白魔法塔', parent: 'mage', color: '#e8e8ff', commitAt: 5,
+                 mods: { mode: 'line', lineLen: 3 }, atkMul: 1, desc: '群攻：单次攻击沿方向贯穿 3 格' },
+      black:   { key: 'black',   name: '黑魔法塔', parent: 'mage', color: '#6a4fa0', commitAt: 5,
+                 mods: { atkInterval: 1.6667 }, atkMul: 5, desc: '伤害翻五倍，但攻速减慢 40%' },
+      /* 迫击炮塔 */
+      bigmortar: { key: 'bigmortar', name: '大迫击炮塔', parent: 'mortar', color: '#b877a8', commitAt: 5,
+                 mods: {}, atkMul: 2, desc: '伤害翻两倍' },
+      missile: { key: 'missile', name: '导弹塔', parent: 'mortar', color: '#c98a6a', commitAt: 5,
+                 mods: { range: 3.0, splash: 3.0 }, atkMul: 1, desc: '射程扩大到 7×7' },
+      /* 特斯拉电塔 */
+      pulse:   { key: 'pulse',   name: '脉冲塔', parent: 'tesla', color: '#6fd3c4', commitAt: 5,
+                 mods: { mode: 'allInRange' }, atkMul: 1, desc: '每攻击一次打中射程内所有敌人' },
+      bigtesla: { key: 'bigtesla', name: '大电塔', parent: 'tesla', color: '#4fc4d8', commitAt: 5,
+                 mods: { mode: 'multi3', maxTargets: 3 }, atkMul: 4, desc: '伤害翻四倍，最多同时打 3 个目标' },
+      /* 防御塔 */
+      crystal: { key: 'crystal', name: '水晶塔', parent: 'ward', color: '#8fd8f0', commitAt: 5,
+                 mods: { auraRadius: 2.0 }, hpMul: 1, desc: '保护范围扩大到 5×5，减伤 +40%' },
+      bunker:  { key: 'bunker',  name: '碉堡塔', parent: 'ward', color: '#c8a44a', commitAt: 5,
+                 mods: { auraDR: 0.40 }, hpMul: 1, desc: '对周围己方建筑减伤 40%' }
+    },
+
+    /* ---------------------------------------------------------------- 法术
+     * 随大本营等级逐级解锁，每个法术独立冷却。
+     * 范围用「格距离」表示：aoe = 允许的最大格距离
+     *   1×1 → 0（只有落点那一格）  2×2 → 1   3×3 → 2 */
+    spells: [
+      { key: 'arrowRain', name: '箭雨', glyph: '雨', color: '#8fd3f4', unlockBaseLevel: 1,
+        cooldown: 22, aoe: 2, dmg: 90, affects: 'enemy', desc: '3×3 范围，对敌人与建筑造成较低伤害' },
+      { key: 'fireball', name: '火球', glyph: '火', color: '#ff9a4a', unlockBaseLevel: 2,
+        cooldown: 26, aoe: 1, dmg: 200, affects: 'enemy', desc: '2×2 范围，中等伤害' },
+      { key: 'rocket', name: '火箭', glyph: '箭', color: '#ff6a6a', unlockBaseLevel: 3,
+        cooldown: 30, aoe: 0, dmg: 420, affects: 'enemy', desc: '1×1 范围（只有落点那一格），较高伤害' },
+      { key: 'rage', name: '狂暴', glyph: '怒', color: '#ffd479', unlockBaseLevel: 4,
+        cooldown: 40, aoe: 1, dmg: 0, affects: 'ally', atkSpeedMul: 2, duration: 8,
+        desc: '2×2 范围，己方部队与建筑攻速 +100%，持续 8 秒' },
+      { key: 'freeze', name: '冰冻', glyph: '冰', color: '#9fe8ff', unlockBaseLevel: 5,
+        cooldown: 45, aoe: 1, dmg: 0, affects: 'enemy', frozen: 4,
+        desc: '2×2 范围，敌人与建筑停止攻击 4 秒' },
+      { key: 'weaken', name: '弱化', glyph: '弱', color: '#c9a0d8', unlockBaseLevel: 6,
+        cooldown: 42, aoe: 1, dmg: 0, affects: 'enemy', weakenMul: 0.2, duration: 5,
+        desc: '2×2 范围，敌人与建筑伤害降低 80%，持续 5 秒' }
+    ],
+
+    /* 兵种：priority 决定打谁 ——
+     *   'field'：只打敌兵 → 大本营，不打建筑
+     *   'siege'：只打建筑 → 大本营，完全不打敌兵（所以敌兵拦不住它）
+     *   targets: 'ground' 只对地 / 'both' 对地对空
+     *   地面兵在棋盘内只沿本列推进；飞行兵（air:true）无视建筑直线飞。
+     *   range：近战 1.0；弓箭手 3.0；气球兵 2.5。
+     *   数值分档（相对这 8 种兵）：
+     *     价格 低 步兵/攻城兵 · 中 弓箭手/攻城车 · 高 气球兵/飞艇/重甲/飞龙
+     *     血量 低 弓箭手 · 中 步兵/攻城兵/气球兵/飞艇 · 高 攻城车/重甲/飞龙
+     *     移速 慢 重甲/弓箭手 · 中 飞龙/步兵/气球兵/攻城兵 · 快 攻城飞艇/攻城车
+     *     攻击 低 飞龙/攻城车 · 中 步兵/攻城兵/弓箭手/气球兵/飞艇 · 高 重甲 */
+    units: {
+      infantry: {
+        key: 'infantry', name: '步兵', glyph: '步', color: '#3d7fd6', air: false,
+        cost: 75, deployCd: 5.0, hp: 220, armor: 2, atk: 28, atkInterval: 0.8, range: 1.0,
+        speed: 0.90, priority: 'field', targets: 'ground',
+        desc: '便宜、血中、速度中、攻中；只对地，只打兵和大本营'
+      },
+      heavy: {
+        key: 'heavy', name: '重甲兵', glyph: '甲', color: '#6b7f9e', air: false,
+        cost: 280, deployCd: 14.0, hp: 660, armor: 6, atk: 68, atkInterval: 1.0, range: 1.0,
+        speed: 0.50, priority: 'field', targets: 'ground',
+        desc: '贵、血高、速度慢、攻强；只对地，只打兵和大本营'
+      },
+      siege: {
+        key: 'siege', name: '攻城兵', glyph: '攻', color: '#c2703c', air: false,
+        cost: 120, deployCd: 6.0, hp: 280, armor: 3, atk: 42, atkInterval: 1.1, range: 1.0,
+        speed: 1.0, priority: 'siege', targets: 'ground',
+        desc: '较便宜、血中、速度中、攻中；只对地，只拆建筑和大本营'
+      },
+      ram: {
+        key: 'ram', name: '攻城车', glyph: '车', color: '#8c6a4a', air: false,
+        cost: 270, deployCd: 13.0, hp: 1480, armor: 5, atk: 32, atkInterval: 1.4, range: 1.0,
+        speed: 1.1, priority: 'siege', targets: 'ground',
+        desc: '较贵、血高、速度快、攻击较低；只对地，只拆建筑和大本营'
+      },
+      archer: {
+        key: 'archer', name: '弓箭手', glyph: '弓', color: '#5aab6a', air: false,
+        cost: 180, deployCd: 9.0, hp: 100, armor: 1, atk: 36, atkInterval: 0.9, range: 3.0,
+        speed: 0.70, priority: 'field', targets: 'both',
+        desc: '价格中、血低、速度中、攻中；可对地对空，只打兵和大本营（射程 3 格，按上下左右算）'
+      },
+      balloon: {
+        key: 'balloon', name: '气球兵', glyph: '球', color: '#d98cc4', air: true,
+        cost: 260, deployCd: 12.0, hp: 300, armor: 2, atk: 44, atkInterval: 0.8, range: 1.5,
+        speed: 1.00, priority: 'field', targets: 'both',
+        desc: '飞行、较贵、血中、速度较快、攻中；可对地对空，只打兵和大本营（射程 1.5 格，按上下左右算）'
+      },
+      airship: {
+        key: 'airship', name: '攻城飞艇', glyph: '艇', color: '#8a7fb8', air: true,
+        cost: 240, deployCd: 12.0, hp: 320, armor: 3, atk: 40, atkInterval: 1.0, range: 1.0,
+        speed: 1.08, priority: 'siege', targets: 'ground',
+        desc: '飞行、较贵、血中、速度较快、攻中；只对地，只拆建筑和大本营'
+      },
+      dragon: {
+        key: 'dragon', name: '飞龙', glyph: '龙', color: '#b0613a', air: true,
+        cost: 420, deployCd: 18.0, hp: 1680, armor: 5, atk: 24, atkInterval: 1.2, range: 1.0,
+        speed: 0.80, priority: 'field', targets: 'ground',
+        desc: '飞行、贵、血高、速度中、攻低；只对地，只打兵和大本营'
+      }
+    },
+
+    /* ---------------------------------------------------------------- 总体升级（全局科技）
+     * 四种，各自 1-10 级，只影响己方：
+     *   建筑攻击 / 建筑生命：1-4 级每级 +10%，5-9 级每级 +20%
+     *   士兵攻击 / 士兵生命：1-4 级每级 +15%，5-9 级每级 +30% */
+    globalUpgrades: {
+      bAtk: { key: 'bAtk', name: '建筑攻击', glyph: '攻', color: '#ff8a5c', baseCost: 260,
+        desc: '所有己方建筑攻击力提升',
+        effectLabel: function (lv) { return '+' + Math.round((globalMulOf(lv, 0.10, 0.20) - 1) * 100) + '%'; } },
+      bHp: { key: 'bHp', name: '建筑生命', glyph: '盾', color: '#7ec8ff', baseCost: 260,
+        desc: '所有己方建筑生命值提升',
+        effectLabel: function (lv) { return '+' + Math.round((globalMulOf(lv, 0.10, 0.20) - 1) * 100) + '%'; } },
+      uAtk: { key: 'uAtk', name: '士兵攻击', glyph: '剑', color: '#ffd479', baseCost: 220,
+        desc: '所有己方士兵攻击力提升',
+        effectLabel: function (lv) { return '+' + Math.round((globalMulOf(lv, 0.15, 0.30) - 1) * 100) + '%'; } },
+      uHp: { key: 'uHp', name: '士兵生命', glyph: '心', color: '#7ef0a0', baseCost: 220,
+        desc: '所有己方士兵生命值提升',
+        effectLabel: function (lv) { return '+' + Math.round((globalMulOf(lv, 0.15, 0.30) - 1) * 100) + '%'; } }
+    },
+
+    /* AI 参数 */
+    ai: { thinkEvery: 1.2, deployMinReserve: 1, pushMinUnits: 3 },
+
+    /* 普通建筑的升级规则：等级 1..maxLevel
+     *   每级：血量 ×hpMul、攻击 ×atkMul、射程 +rangeAdd、收入 ×incMul、产兵间隔 ÷prodMul
+     *   升级费用 = 基础造价 × costMul^(当前等级-1)（四舍五入到 5） */
+    buildingUpgrade: {
+      maxLevel: 5,
+      costMul: 1.7,
+      hpMul: 1.30,
+      atkMul: 1.22,
+      rangeAdd: 0.2,
+      incMul: 1.35,
+      prodMul: 1.18
+    }
+  };
+
+  /* ============================================================================
+   * 建筑等级系统
+   *   1-4 级：每级 攻击/生命 ×1.10
+   *   4→5 级：二选一分支（一次性加成，比如攻速翻倍 / 伤害翻两倍 / 范围扩大）
+   *   5-9 级：每级 攻击/生命 ×1.30
+   *   9→10 级：攻击/生命 ×1.60（终极形态）
+   * 所有建筑一开始都能建造（没有 tier 限制）。
+   * ========================================================================== */
+  function levelMultipliers(level, branchKey) {
+    var U = DATA.upgrade;
+    level = Math.max(1, Math.min(U.maxLevel, level || 1));
+    var hpMul = 1, atkMul = 1;
+    for (var lv = 2; lv <= level; lv++) {
+      var step = (lv <= U.branchLevel) ? 0.10 : (lv < U.maxLevel ? 0.30 : 0.60);
+      hpMul *= (1 + step);
+      atkMul *= (1 + step);
+    }
+    // 分支的自带倍率（在 commitAt 那一级生效一次）
+    var br = branchKey ? DATA.branches[branchKey] : null;
+    if (br && level >= br.commitAt) {
+      atkMul *= (br.atkMul || 1);
+      hpMul *= (br.hpMul || 1);
+    }
+    return { hpMul: hpMul, atkMul: atkMul, branch: br };
+  }
+
+  /* 金矿专用：金币加成按等级跃升（1-4 级每级 +30%，4→5 级 +60%） */
+  function incomeMultiplier(level) {
+    level = Math.max(1, Math.min(DATA.upgrade.maxLevel, level || 1));
+    var mul = 1;
+    for (var lv = 2; lv <= level; lv++) mul *= (1 + (lv === 5 ? 0.60 : 0.30));
+    return mul;
+  }
+
+  /* 把「基础配置 + 等级 + 分支」合成一份实际数值 */
+  function statsForLevel(def, level, branchKey) {
+    var m = levelMultipliers(level, branchKey);
+    var br = m.branch;
+    var mods = (br && modsActive(br, level)) ? br.mods : {};
+    var mode = mods.mode || def.mode || 'single';
+    var out = {
+      hp: Math.round(def.hp * m.hpMul),
+      armor: def.armor,
+      atk: def.atk ? +(def.atk * m.atkMul).toFixed(1) : null,
+      atkInterval: def.atkInterval ? +(def.atkInterval * (mods.atkInterval || 1)).toFixed(3) : null,
+      range: (mods.range != null ? mods.range : (def.range || null)),
+      targets: def.targets || null,
+      mode: mode,
+      maxTargets: mods.maxTargets || 0,
+      lineLen: mods.lineLen || 0,
+      /* 溅射：分支可以覆盖，否则取建筑基础值（迫击炮基础就有 1 格溅射） */
+      splash: (mods.splash != null ? mods.splash : (def.splash || 0)),
+      auraRadius: mods.auraRadius != null ? mods.auraRadius : (def.aura ? def.aura.radius : null),
+      auraDR: null,
+      // 金币产出取整（避免 UI 上出现 2.6/s 这种碎数字）
+      income: def.income ? (def.incomeByLevel ? def.incomeByLevel[Math.min(level, def.incomeByLevel.length) - 1] : Math.round(def.income * incomeMultiplier(level))) : null,
+      branch: br ? br.key : null,
+      branchName: br ? br.name : null
+    };
+    // 防御塔减伤：基础 + 每级成长（分支可能直接给一个固定值）
+    if (def.aura) {
+      if (mods.auraDR != null) {
+        out.auraDR = Math.min(0.75, mods.auraDR + Math.max(0, level - DATA.upgrade.branchLevel - 1) * def.aura.drStep);
+      } else {
+        var a = def.aura;
+        var dr = a.dr + Math.max(0, Math.min(level, DATA.upgrade.branchLevel) - 1) * a.drPerLevel;
+        if (level > DATA.upgrade.branchLevel) {
+          dr += (level - DATA.upgrade.branchLevel) * a.drStep;
+          if (level >= DATA.upgrade.maxLevel) dr += a.drFinal;
+        }
+        out.auraDR = Math.min(0.75, dr);
+      }
+    }
+    return out;
+  }
+  function modsActive(br, level) { return !br || level >= br.commitAt; }
+
+  /* 建筑升到下一级要多少钱：越贵的建筑越贵，且逐级递增 */
+  function buildingUpgradeCost(b) {
+    if (!b) return null;
+    if (b.def && b.def.isBase) {
+      var lv0 = b.level || 1;
+      var cur = DATA.baseLevels[lv0 - 1];
+      return (cur && cur.upgradeCost != null) ? cur.upgradeCost : null;
+    }
+    var U = DATA.upgrade;
+    var lv = b.level || 1;
+    if (lv >= (b.def.maxLevel || U.maxLevel)) return null;
+    var base = b.def.cost || 100;
+    var raw = base * (1 + U.costFactor * lv) * Math.pow(1.22, lv);
+    return Math.round(raw / U.costRound) * U.costRound;
+  }
+
+  /* 某个建筑在下一级可选的升级分支（只有 4 级升 5 级时有；没分支返回空数组） */
+  function branchesFor(b) {
+    if (!b || !b.def || b.def.isBase) return [];
+    if ((b.level || 1) !== DATA.upgrade.branchLevel) return [];
+    if (b.branch) return [];
+    var out = [];
+    Object.keys(DATA.branches).forEach(function (k) {
+      if (DATA.branches[k].parent === b.def.key) out.push(DATA.branches[k]);
+    });
+    return out;
+  }
+
+  /* 「升到 lv 级」的累计倍率：1-4 级每级用 lowStep，第 5 级起每级用 highStep */
+  function globalMulOf(lv, lowStep, highStep) {
+    lv = Math.max(0, Math.min(10, lv || 0));
+    var m = 1;
+    for (var l = 1; l <= lv; l++) m *= (1 + (l <= 4 ? lowStep : highStep));
+    return m;
+  }
+
+  /* ------------------------------------------------------------ 工具函数 */
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function rowInGrid(r) { return r >= 1 && r <= ROWS; }
+  function inGrid(r, c) { return r >= 1 && r <= ROWS && c >= 1 && c <= COLS; }
+  function toRef(r, c) { return 'r' + r + 'c' + c; }
+  function fromRef(ref) {
+    var m = /^r(\d+)c(\d+)$/.exec(ref);
+    return m ? { r: +m[1], c: +m[2] } : null;
+  }
+  function forEachCell(rect, fn) {
+    for (var r = rect.r1; r <= rect.r2; r++) for (var c = rect.c1; c <= rect.c2; c++) fn(r, c);
+  }
+  function rectCells(rect) {
+    var out = [];
+    forEachCell(rect, function (r, c) { out.push([r, c]); });
+    return out;
+  }
+  function rectCenter(rect) {
+    return { row: (rect.r1 + rect.r2) / 2, col: (rect.c1 + rect.c2) / 2 };
+  }
+  function dist(a, b) {
+    var dr = a.row - b.row, dc = a.col - b.col;
+    return Math.sqrt(dr * dr + dc * dc);
+  }
+  /* 棋盘上的「格距离」（切比雪夫距离）：斜着相邻也算 1 格。 */
+  function gridDist(a, b) {
+    return Math.max(Math.abs(a.row - b.row), Math.abs(a.col - b.col));
+  }
+  /* 士兵的攻击范围用「上下左右四格」＝曼哈顿距离（斜角打不到） */
+  function cardinalDist(a, b) {
+    return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
+  }
+  function inHalf(team, r, c) {
+    var h = HALF[team];
+    return r >= h[0] && r <= h[1] && c >= 1 && c <= COLS;
+  }
+
+  /* 单位/建筑的「中心点」——用于距离与射程计算 */
+  function centerOf(e) {
+    if (e.kind === 'building') {
+      var x = e.def.size[0], y = e.def.size[1];
+      return { row: e.row + (x - 1) / 2, col: e.col + (y - 1) / 2 };
+    }
+    return { row: e.row, col: e.col };
+  }
+  /* 目标命中范围：大本营 2x2 取「离攻击者最近的格子」更符合直觉（体积大更好打） */
+  function nearestCellOf(e, from) {
+    if (e.kind !== 'building' || (e.def.size[0] === 1 && e.def.size[1] === 1)) {
+      return { row: e.row, col: e.col };
+    }
+    var r2 = e.row + e.def.size[0] - 1, c2 = e.col + e.def.size[1] - 1;
+    return { row: clamp(Math.round(from.row), e.row, r2), col: clamp(Math.round(from.col), e.col, c2) };
+  }
+
+  /* ------------------------------------------------------------ 状态创建 */
+  function createState(opts) {
+    opts = opts || {};
+    var state = {
+      data: DATA,
+      tick: 0,
+      time: 0,
+      over: false,
+      winner: null,
+      events: [],
+      nextId: 1,
+      buildings: [],
+      units: [],
+      projectiles: [],
+      byRef: { red: {}, blue: {} },
+      grid: [],            // grid[r][c] = null | building
+      res: {},             // 当前金币
+      reserve: { red: {}, blue: {} },   // 备用（旧版待命区，保留字段避免外部代码报错）
+      unitCd: { red: {}, blue: {} },    // 每个兵种自己的冷却（士兵时间冷却制）
+      globalUp: { red: {}, blue: {} },  // 总体升级（全局科技）等级
+      spellCd: { red: {}, blue: {} },   // 每个法术自己的冷却
+      deployCd: { red: [], blue: [] },  // 每列的派兵冷却（下标 0..COLS-1，对应 列1..列10）
+      baseLevel: {},       // 大本营等级
+      baseHp: {},          // 大本营当前血量（取自建筑实体）
+      field: {},           // 每方「打兵型」单位的路线图（含通道行）
+      fieldSiege: {},      // 每方「拆建筑型」单位的路线图（会把敌方建筑当目标）
+      entryField: {},      // 每方的「让位图」：同格多个兵时谁先进棋盘
+      stats: {
+        red: { spent: 0, income: 0, kills: 0, produced: 0 },
+        blue: { spent: 0, income: 0, kills: 0, produced: 0 }
+      },
+      ai: { timer: { red: 0, blue: 0 } },   // 每方独立的思考计时器（初值见 createState）
+      aiPreset: { red: 'hard', blue: 'hard' },   // 电脑难度
+      aiTeam: 'red',                             // 哪一方是电脑（玩家侧不做难度特判）
+      buildCooldown: { red: 0, blue: 0 },
+      seed: opts.seed == null ? 12345 : opts.seed,
+      rngState: 0,
+      capWarned: false
+    };
+    state.rngState = state.seed >>> 0;
+    var diff = opts.difficulty || 'hard';
+    state.aiPreset.red = diff; state.aiPreset.blue = diff;
+
+    for (var r = 0; r <= ROWS + 1; r++) {
+      state.grid[r] = [];
+      for (var c = 0; c <= COLS + 1; c++) {
+        state.grid[r][c] = null;
+        if (c === 0 || c === COLS + 1) state.grid[r][c] = { terrain: -1, block: true }; // 棋盘左右边界外
+      }
+    }
+    state.res.red = 260; state.res.blue = 260;
+    state.baseLevel.red = 1; state.baseLevel.blue = 1;
+    state.reserve.red = {}; state.reserve.blue = {};
+    TEAMS.forEach(function (t) {
+      state.deployCd[t] = new Array(COLS + 1).fill(0);
+      state.unitCd[t] = {};
+      state.spellCd[t] = {};
+      DATA.units && Object.keys(DATA.units).forEach(function (k) {
+        state.reserve[t][k] = 0;
+        state.unitCd[t][k] = 0;         // 开局所有兵种都能立刻派
+      });
+      DATA.spells.forEach(function (s) { state.spellCd[t][s.key] = 0; });
+    });
+
+    TEAMS.forEach(function (team) { addBase(state, team); });
+    rebuildFields(state);
+    return state;
+  }
+
+  function rand(state) { // 确定性随机（xorshift）
+    var x = state.rngState;
+    x ^= x << 13; x >>>= 0;
+    x ^= x >> 17;
+    x ^= x << 5; x >>>= 0;
+    state.rngState = x;
+    return x / 4294967296;
+  }
+
+  function addBase(state, team) {
+    var rect = BASE_RECT[team];
+    var lv = state.baseLevel[team];
+    // 大本营自带防御：单体攻击、对地对空，攻击力与「同级别法师塔」相同
+    var mageAtk = DATA.buildings.mage.atk;
+    var def = {
+      key: 'base', name: '大本营', glyph: '营', color: team === RED ? '#d9534f' : '#3d7fd6',
+      size: [2, 2], cost: 0, hp: DATA.baseLevels[lv - 1].hp, armor: 10, tier: 1,
+      isBase: true, maxLevel: DATA.baseLevels.length,
+      atk: mageAtk, atkInterval: DATA.buildings.mage.atkInterval,
+      range: DATA.buildings.mage.range, targets: 'both', mode: 'single',
+      desc: '收入随等级提升；自带防御（对地对空单体，攻击力=同级别法师塔）；被摧毁即失败'
+    };
+    var b = {
+      id: state.nextId++, kind: 'building', team: team, def: def, key: 'base',
+      row: rect.r1, col: rect.c1, refs: rectCells(rect).map(function (p) { return toRef(p[0], p[1]); }),
+      hp: def.hp, hpMax: def.hp, armor: def.armor, level: lv, invested: 0,
+      prodTimer: 0, atkTimer: 0, justDamaged: 0, spawnIdx: 0
+    };
+    state.buildings.push(b);
+    b.refs.forEach(function (ref) {
+      state.byRef[team][ref] = b;
+      var p = fromRef(ref); state.grid[p.r][p.c] = b;
+    });
+    return b;
+  }
+
+  /* ------------------------------------------------------------ 查询工具 */
+  /* 阻挡规则：对 team 而言，只有【敌方建筑】是墙；己方建筑可通行；通道行永远可通行。 */
+  function blockingBuildingAt(state, team, r, c) {
+    if (r < 0 || r > ROWS + 1 || c < 1 || c > COLS) return null;
+    if (!rowInGrid(r)) return null;                    // 行A/行B 是通道，永不被建筑阻挡
+    var b = state.grid[r][c];
+    if (b && (b.team !== team || b.def.isBase)) return b; // 敌方建筑＝墙；大本营自身永远不可进入
+    return null;
+  }
+  /* 空中兵用：只要求「在棋盘内 / 自己的通道行 / 不是大本营格」，建筑一律无视 */
+  function airPassable(state, team, r, c) {
+    if (c < 1 || c > COLS) return false;
+    if (!rowInGrid(r)) return r === CHANNEL_ROW[team];
+    return !isBaseCell(BASE_RECT[OPP[team]], r, c);
+  }
+  /* 某格上是否有「敌军的普通建筑」（= 可以打的墙） */
+  function wallAtTeam(state, team, r, c) {
+    if (!rowInGrid(r) || c < 1 || c > COLS) return null;
+    var b = state.grid[r][c];
+    if (b && b.team !== team && !b.def.isBase) return b;
+    return null;
+  }
+  function isPassable(state, team, r, c) {
+    if (c < 1 || c > COLS) return false;
+    if (r < 0 || r > ROWS + 1) return false;
+    return !blockingBuildingAt(state, team, r, c);
+  }
+  function enemyBase(state, team) {
+    var foe = OPP[team], rect = BASE_RECT[foe];
+    return state.byRef[foe][toRef(rect.r1, rect.c1)];
+  }
+  function ownBase(state, team) { return state.byRef[team][toRef(BASE_RECT[team].r1, BASE_RECT[team].c1)]; }
+  function unitsOf(state, team) { return state.units.filter(function (u) { return u.team === team; }); }
+  function baseLevelOf(state, team) { return state.baseLevel[team]; }
+
+  /* --------------------------------------------------- 行进路线图 (Flow Field)
+   * 规则（按玩家设计）：
+   *   · 地面兵在棋盘内**只沿本列直线推进**，不在棋盘内横移；
+   *   · 横移只发生在棋盘外的通道行（行A/行B）：「正上方被遮挡 → 沿通道行去就近空列」；
+   *   · 因此「建筑是否挡路」是**按列**判断的：一列里只要有一个敌方建筑，
+   *     这条列从该建筑往后就都上不去了；敌兵会停在建筑前开打（这就是「堵」）。
+   *
+   * 实现上不需要通用 BFS：对每一列分别算「该列每格到敌方大本营的纵向距离」即可，
+   * 再让通道行允许左右走。这样天然保证「整行被填满 ⇒ 谁也过不去」，也保证
+   * 「棋盘内不可能绕开墙」。箭头为 null = 该列已被堵死（会原地开打）。
+   * ------------------------------------------------------------------------ */
+  function computeField(state, team, mode) {
+    var N = ROWS + 2;                        // 行 0..11
+    var W = COLS;
+    var INF = 1e9;
+    var goal = BASE_RECT[OPP[team]];
+    var step = DIR[team];                    // 本方推进方向：蓝 +1（向下），红 -1（向上）
+    var chan = CHANNEL_ROW[team];
+
+    var dists = [], dirs = [], block = [];
+    for (var i = 0; i < N; i++) {
+      dists.push(new Array(W + 1).fill(INF));
+      dirs.push(new Array(W + 1).fill(null));
+      block.push(new Array(W + 1).fill(false));
+    }
+    for (var r0 = 0; r0 <= ROWS + 1; r0++) {
+      for (var c0 = 1; c0 <= COLS; c0++) {
+        if (rowInGrid(r0) && blockingBuildingAt(state, team, r0, c0)) block[r0][c0] = true;
+        else if (!rowInGrid(r0) && r0 !== chan) block[r0][c0] = true;   // 敌方通道不算路
+      }
+    }
+
+    // 可通行判定：敌方建筑与大本营挡路；己方建筑不挡路；只有自己的通道行可走
+    function laneOpen(r, c) {
+      if (r < 0 || r > ROWS + 1 || c < 1 || c > COLS) return false;
+      if (!rowInGrid(r)) return r === chan;
+      if (isBaseCell(goal, r, c)) return false;
+      return !blockingBuildingAt(state, team, r, c);
+    }
+    // 「这里是敌军的建筑（不是大本营）」= 可以打的目标
+    function wallAt(r, c) {
+      if (!rowInGrid(r) || c < 1 || c > COLS) return null;
+      var b = blockingBuildingAt(state, team, r, c);
+      return (b && !b.def.isBase) ? b : null;
+    }
+    // 棋盘内只允许纵向（朝敌方推进或原路退回）；通道行允许左右走 —— 这就是「整行堵死谁都过不去」
+    // 目标 = 敌方大本营。0 距离 = 「贴着大本营、射程内能打到它」的那些格子。
+    // 打兵型：眼里没有建筑（建筑=障碍），所以它们会自己绕路。
+    // 拆建筑型（siege）：把敌方建筑也当成 0 距离目标，所以会一路去拆墙。
+    var siegeSide = (mode === 'siege');
+
+    /* 上下左右四格邻居 —— 这就是「可以左拐右拐、前进后退」 */
+    function neighbors(r, c) {
+      return [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
+    }
+
+    /* 这一格能不能站。
+     * 规则：建筑不能踩 —— **但进场行例外**（见 stepTo 的说明）。
+     *   · 敌方建筑：打兵型的兵当障碍绕开；拆建筑型的兵当目标去拆
+     *   · 己方建筑：障碍，兵绕过去
+     *   · 己方进场行上的建筑：**可以穿过**（那是地面兵唯一的入口，
+     *     整排盖满时必须能从中穿过，否则兵永远出不来） */
+    function canStand(r, c) {
+      if (!rowInGrid(r) || c < 1 || c > COLS) return false;
+      if (isBaseCell(goal, r, c)) return false;          // 敌方大本营本身不能站
+      var b = blockingBuildingAt(state, team, r, c);      // 敌方建筑 / 大本营
+      if (b) return siegeSide;                            // 拆建筑型把敌方建筑当目标
+      if (state.grid[r][c]) {
+        // 己方进场行：允许穿过（只对地面兵有意义，空中兵本来就飞越）
+        if (!siegeSide && r === entryRowOf(team) && state.grid[r][c].team === team) return true;
+        return false;                                     // 其它建筑不能踩
+      }
+      return laneOpen(r, c);
+    }
+
+    /* 站在 (r,c) 上，按「格距离」能不能打到敌方大本营（2×2 大本营取最近一格） */
+    function canHitBase(r, c) {
+      if (!rowInGrid(r)) return false;
+      var rr = Math.min(Math.max(r, goal.r1), goal.r2);
+      var cc = Math.min(Math.max(c, goal.c1), goal.c2);
+      return Math.max(Math.abs(r - rr), Math.abs(c - cc)) <= 1;   // 紧贴大本营的一圈
+    }
+
+    /* 站在 (r,c) 上，能不能用「上下左右」的射程打到目标建筑（取其离自己最近的那一格）。
+     * 士兵的射程都是 1 格（近战），所以就是「正上下左右贴着」。 */
+    function canHitAt(r, c, target) {
+      if (!rowInGrid(r)) return false;
+      var rr = Math.min(Math.max(r, target.row), target.row + target.def.size[0] - 1);
+      var cc = Math.min(Math.max(c, target.col), target.col + target.def.size[1] - 1);
+      return Math.abs(r - rr) + Math.abs(c - cc) <= 1;
+    }
+
+    var queue = [], head = 0;
+    // 起点 = 所有「真正能用上下左右 1 格打到敌方大本营」的位置，
+    //   也就是大本营的**正上下左右**那一圈（不含斜角）。
+    //   为什么不能把斜角也算进去：士兵攻击范围是上下左右 1 格，
+    //   站在大本营斜下方其实打不到它，兵会傻站着被打（玩家实测到的问题）。
+    var baseAsTarget = { row: goal.r1, col: goal.c1, def: { size: [goal.r2 - goal.r1 + 1, goal.c2 - goal.c1 + 1], isBase: true } };
+    for (var br = 1; br <= ROWS; br++) {
+      for (var bc = 1; bc <= COLS; bc++) {
+        if (isBaseCell(goal, br, bc)) continue;          // 大本营本身不能站
+        if (wallAt(br, bc)) continue;                    // 建筑格不作起点（下面单独当目标处理）
+        if (!laneOpen(br, bc)) continue;
+        if (!canHitAt(br, bc, baseAsTarget)) continue;    // 必须真的够得着
+        dists[br][bc] = 0;
+        queue.push(br * 100 + bc);
+      }
+    }
+    // 拆建筑型：敌方建筑本身也是 0 距离目标（要打的东西）
+    if (siegeSide) {
+      state.buildings.forEach(function (b) {
+        if (b.team === team || b.def.isBase) return;
+        b.refs.forEach(function (ref) {
+          var p = fromRef(ref);
+          if (dists[p.r][p.c] !== 0) { dists[p.r][p.c] = 0; queue.push(p.r * 100 + p.c); }
+        });
+      });
+    }
+
+    // 四向 BFS：从大本营那一圈向外扩散，绕开建筑（打兵型）
+    while (head < queue.length) {
+      var cur = queue[head++], r = Math.floor(cur / 100), c = cur % 100;
+      if (wallAt(r, c) && !siegeSide) continue;
+      var nb = neighbors(r, c);
+      for (var k = 0; k < nb.length; k++) {
+        var nr = nb[k][0], nc = nb[k][1];
+        if (!canStand(nr, nc)) continue;
+        if (dists[nr][nc] === 0) continue;
+        if (dists[nr][nc] <= dists[r][c] + 1) continue;
+        dists[nr][nc] = dists[r][c] + 1;
+        queue.push(nr * 100 + nc);
+      }
+    }
+
+    /* 方向：走向「距离更小的四邻」；同距离时优先朝敌方那一侧（显得是往前推而不是乱绕） */
+    function dirFor(r4, c4) {
+      var d4 = dists[r4][c4];
+      if (d4 === 0 || d4 >= 1e9) return null;
+      var best4 = null, bestD4 = d4, bestBias = 1e9;
+      var cands = neighbors(r4, c4);
+      for (var ci = 0; ci < cands.length; ci++) {
+        var ar = cands[ci][0], ac = cands[ci][1];
+        if (!rowInGrid(ar) || ac < 1 || ac > COLS) continue;
+        var av;
+        if (siegeSide && wallAt(ar, ac)) av = 0;         // 拆建筑型：前面的墙就是目标
+        else {
+          if (!canStand(ar, ac)) continue;
+          av = dists[ar][ac];
+        }
+        if (av >= bestD4) continue;
+        // 同距离时，越「朝敌方推进」的越优先（避免左右横跳）
+        var bias = (ar - r4) * DIR[team] * -1;           // 朝敌方走 → bias 更小
+        if (av < bestD4 || bias < bestBias) {
+          if (av < bestD4 || best4 === null) { bestD4 = av; bestBias = bias; best4 = { r: ar, c: ac }; }
+          else if (bias < bestBias) { bestBias = bias; best4 = { r: ar, c: ac }; }
+        }
+      }
+      return best4;
+    }
+    for (var r4 = 1; r4 <= ROWS; r4++) {
+      for (var c4 = 1; c4 <= COLS; c4++) {
+        if (!laneOpen(r4, c4)) continue;
+        dirs[r4][c4] = dirFor(r4, c4);
+      }
+    }
+    /* 通道行（行A/行B）：先看能不能直接进场；本列进不去就沿通道横移到「能进场的列」。
+     * 能进场的列 = 那一格不是建筑（**大本营也不行！**）、而且从它有路能走到敌方大本营。 */
+    var myBaseRect = BASE_RECT[team];
+    function notBuilding(r, c) {
+      if (!rowInGrid(r) || c < 1 || c > COLS) return false;
+      if (isBaseCell(myBaseRect, r, c)) return false;   // ★ 己方大本营格不能作为进场格
+      if (isBaseCell(goal, r, c)) return false;         //   敌方大本营格也不行
+      /* 己方进场行上的建筑：地面兵可以穿过去（玩家要在这一行自由布局），
+       * 所以允许把它当成进场格。其它建筑一律不行。 */
+      var b = state.grid[r][c];
+      if (b) {
+        if (b.team === team && r === entryRowOf(team) && !siegeSide) return true;
+        return false;
+      }
+      return true;
+    }
+    for (var c5 = 1; c5 <= COLS; c5++) {
+      var direct = null;
+      var ent = [[chan + step, c5], [chan - step, c5]];   // 进场行 / 棋盘边缘
+      for (var m = 0; m < ent.length; m++) {
+        var ar2 = ent[m][0], ac2 = ent[m][1];
+        if (!notBuilding(ar2, ac2)) continue;
+        if (!laneOpen(ar2, ac2)) continue;
+        if (dists[ar2][ac2] >= 1e9) continue;
+        direct = { r: ar2, c: ac2 };
+        break;
+      }
+      if (direct) { dirs[chan][c5] = direct; continue; }
+      // 本列进不去 → 左右找一列能进的，走过去
+      var pick = null, pickD = null;
+      for (var cc3 = 1; cc3 <= COLS; cc3++) {
+        if (cc3 === c5) continue;
+        var e2 = [[chan + step, cc3], [chan - step, cc3]];
+        var usable = false;
+        for (var m2 = 0; m2 < e2.length; m2++) {
+          var r3 = e2[m2][0], c3 = e2[m2][1];
+          if (!notBuilding(r3, c3)) continue;
+          if (!laneOpen(r3, c3)) continue;
+          if (dists[r3][c3] >= 1e9) continue;
+          usable = true; break;
+        }
+        if (!usable) continue;
+        var dd4 = Math.abs(cc3 - c5);
+        if (pickD === null || dd4 < pickD) { pickD = dd4; pick = cc3; }
+      }
+      dirs[chan][c5] = (pick === null) ? null : { r: chan, c: pick };
+    }
+    return { dist: dists, dir: dirs, goal: goal, block: block };
+  }
+
+  function isBaseCell(rect, r, c) { return r >= rect.r1 && r <= rect.r2 && c >= rect.c1 && c <= rect.c2; }
+
+  /* 让位图：同一格里多个地面兵时，谁先进入棋盘。避免「一堆兵同时挤一个入口都进不去」。 */
+  function computeEntryField(state, team) {
+    var W = COLS, INF = 1e9, dists = [];
+    for (var i = 0; i <= ROWS + 1; i++) dists.push(new Array(W + 1).fill(INF));
+    var queue = [], head = 0;
+    for (var c = 1; c <= COLS; c++) {
+      var r = DIR[team] > 0 ? ROWS : 1;          // 己方半场最靠近前线的行
+      if (!blockingBuildingAt(state, team, r, c)) {
+        dists[r][c] = 0; queue.push((r - 1) * W + (c - 1));
+      }
+    }
+    while (head < queue.length) {
+      var idx = queue[head++], r2 = Math.floor(idx / W) + 1, c2 = (idx % W) + 1;
+      var nb = [[r2 - 1, c2], [r2 + 1, c2], [r2, c2 - 1], [r2, c2 + 1]];
+      for (var k = 0; k < 4; k++) {
+        var nr = nb[k][0], nc = nb[k][1];
+        if (nr < 0 || nr > ROWS + 1 || nc < 1 || nc > COLS) continue;
+        if (dists[nr][nc] !== INF) continue;
+        if (blockingBuildingAt(state, team, nr, nc)) continue;
+        dists[nr][nc] = dists[r2][c2] + 1;
+        queue.push((nr - 1) * W + (nc - 1));
+      }
+    }
+    return dists;
+  }
+
+  function rebuildFields(state) {
+    TEAMS.forEach(function (team) {
+      // 两套路线图：field = 只打兵和大本营的兵走的路；siege = 会拆墙的兵走的路
+      state.field[team] = computeField(state, team, 'field');
+      state.fieldSiege[team] = computeField(state, team, 'siege');
+      state.entryField[team] = computeEntryField(state, team);
+    });
+  }
+
+  /* 取某个单位该走哪张路线图 */
+  function fieldFor(state, u) {
+    return (u.def && u.def.priority === 'siege') ? state.fieldSiege[u.team] : state.field[u.team];
+  }
+
+  /* 某格的「让位优先度」：值越小越先走 */
+  function priorityAt(state, team, r, c) {
+    var d = state.entryField[team][r][c];
+    return d === 1e9 ? 9999 : d;
+  }
+
+  /* ------------------------------------------------------------ 建造/升级 */
+  function canPlace(state, team, key, row, col) {
+    var def = DATA.buildings[key];
+    if (state.over) return { ok: false, why: '对局已结束' };
+    if (!def) return { ok: false, why: '未知建筑' };
+    if (!inGrid(row, col)) return { ok: false, why: '超出棋盘' };
+    if (!inHalf(team, row, col) || !inHalf(team, row + def.size[0] - 1, col + def.size[1] - 1))
+      return { ok: false, why: '只能建在自己半场' };
+    /* 进场行 = 自己这一侧最靠近通道的那一行（蓝方行10 / 红方行1）。
+     * 这一行**允许建造**（玩家的初衷就是在这里自由布局）。
+     * 为了不让"整排盖满"把地面兵永久锁死，移动层做了特殊处理：
+     * 地面兵在进场行上可以"穿过"建筑（见 stepUnit 的进场行通行规则），
+     * 所以布局自由和"兵出得来"两者不冲突。 */
+    // 大本营占位检查
+    var rect = BASE_RECT[team];
+    for (var r = row; r < row + def.size[0]; r++) {
+      for (var c = col; c < col + def.size[1]; c++) {
+        if (state.grid[r][c]) return { ok: false, why: '该格已被占用' };
+        if (r >= rect.r1 && r <= rect.r2 && c >= rect.c1 && c <= rect.c2) return { ok: false, why: '该格已被占用' };
+        // 不能盖在「任何单位」头顶上（自己人也不行）——
+        // 否则那个兵就"卡在建筑里"了。玩家的铁律：地面部队不能站在建筑上。
+        var unitOnIt = state.units.some(function (o) {
+          return o.row === r && o.col === c;
+        });
+        if (unitOnIt) return { ok: false, why: '该格上有单位，先把它调走' };
+      }
+    }
+    if (state.res[team] < def.cost) return { ok: false, why: '金币不足（需要 ' + def.cost + '）' };
+    return { ok: true };
+  }
+
+  function placeBuilding(state, team, key, row, col) {
+    var chk = canPlace(state, team, key, row, col);
+    if (!chk.ok) return chk;
+    var def = DATA.buildings[key];
+    var st = statsForLevel(def, 1);
+    var b = {
+      id: state.nextId++, kind: 'building', team: team, def: def, key: key,
+      row: row, col: col, hp: st.hp, hpMax: st.hp, armor: st.armor, level: 1,
+      invested: def.cost || 0,
+      prodTimer: 0, atkTimer: 0, justDamaged: 0, spawnIdx: 0,
+      refs: rectCells({ r1: row, r2: row + def.size[0] - 1, c1: col, c2: col + def.size[1] - 1 })
+        .map(function (p) { return toRef(p[0], p[1]); })
+    };
+    state.res[team] -= def.cost;
+    state.stats[team].spent += def.cost;
+    b.refs.forEach(function (ref) {
+      state.byRef[team][ref] = b;
+      var p = fromRef(ref); state.grid[p.r][p.c] = b;
+    });
+    state.buildings.push(b);
+    rebuildFields(state);
+    reloadNeighbors(state);     // 新建筑可能落进防御塔的保护范围
+    emit(state, 'build', { team: team, key: key, row: row, col: col });
+    return { ok: true, building: b };
+  }
+
+  /* 「点击建筑就能升级」
+   * 关键规则（按你的要求）：升级**不回血**，只把「升级前后血量的差值」加到当前血量上。
+   * 例：血量 400/500 升到 600 → 血量变成 400+(600-500)=500。 */
+  function upgradeBuilding(state, b, branchKey) {
+    if (state.over) return { ok: false, why: '对局已结束' };
+    if (!b || !b.def) return { ok: false, why: '没有这个建筑' };
+    if (b.def.isBase) return upgradeBase(state, b.team);
+    var U = DATA.upgrade;
+    var lv = b.level || 1;
+    var cap = b.def.maxLevel || U.maxLevel;
+    if (lv >= cap) return { ok: false, why: '已达最高等级（' + cap + ' 级）' };
+
+    // 4→5 级：必须选一个分支
+    var opts = branchesFor(b);
+    if (opts.length > 0) {
+      if (!branchKey) return { ok: false, why: '需要选择升级方向', branches: opts.map(function (o) { return o.key; }) };
+      var found = null;
+      opts.forEach(function (o) { if (o.key === branchKey) found = o; });
+      if (!found) return { ok: false, why: '没有这个升级方向：' + branchKey };
+    } else if (branchKey) {
+      return { ok: false, why: '这一级不需要选方向' };
+    }
+
+    var cost = buildingUpgradeCost(b);
+    if (cost === null) return { ok: false, why: '已达最高等级' };
+    if (state.res[b.team] < cost) return { ok: false, why: '金币不足（需要 ' + cost + '）' };
+
+    state.res[b.team] -= cost;
+    state.stats[b.team].spent += cost;
+    b.invested = (b.invested || 0) + cost;   // 记进累计投入（拆除时按比例返还）
+
+    var oldMax = b.hpMax;
+    b.level = lv + 1;
+    if (branchKey) b.branch = branchKey;
+    var st = statsForLevel(b.def, b.level, b.branch);
+    b.hpMax = st.hp;
+    // 不回血：只补「最大血量的增量」
+    b.hp = Math.min(b.hpMax, Math.max(1, b.hp + Math.max(0, b.hpMax - oldMax)));
+    reloadNeighbors(state);
+    emit(state, 'upgradeBuilding', {
+      team: b.team, key: b.key, level: b.level, branch: b.branch || null, row: b.row, col: b.col
+    });
+    return { ok: true, level: b.level, branch: b.branch || null, building: b };
+  }
+
+  /* 给 UI 用：一次拿到某建筑的全部展示信息（含下一级的数值预览与可选分支） */
+  function buildingInfo(state, b) {
+    var def = b.def;
+    var lvl = b.level || 1;
+    var maxLv = def.isBase ? DATA.baseLevels.length : (def.maxLevel || DATA.upgrade.maxLevel);
+    var st = def.isBase ? null : statsForLevel(def, lvl, b.branch);
+    var nxt = null;
+    if (!def.isBase && lvl < maxLv) nxt = statsForLevel(def, lvl + 1, b.branch);
+    var out = {
+      name: def.name, glyph: def.glyph, desc: def.desc || '',
+      team: b.team, isBase: !!def.isBase, level: lvl, maxLevel: maxLv,
+      hp: Math.max(0, Math.ceil(b.hp)), hpMax: b.hpMax, armor: b.armor,
+      upgradeCost: buildingUpgradeCost(b),
+      branchName: st && st.branchName ? st.branchName : null,
+      branches: branchesFor(b).map(function (o) { return { key: o.key, name: o.name, desc: o.desc, color: o.color }; })
+    };
+    if (def.isBase) {
+      var cur2 = DATA.baseLevels[lvl - 1];
+      var nx2 = DATA.baseLevels[lvl];
+      out.income = cur2.income;
+      out.upgradeCost = (cur2 && cur2.upgradeCost != null) ? cur2.upgradeCost : null;
+      out.nextIncome = nx2 ? nx2.income : null;
+      out.nextHp = nx2 ? nx2.hp : null;
+      out.note = '被摧毁即失败；不受攻击时会自我修复血量';
+      out.spells = DATA.spells.filter(function (s) { return s.unlockBaseLevel <= lvl; })
+        .map(function (s) { return s.name; });
+    } else {
+      out.atk = st.atk; out.range = st.range; out.income = st.income;
+      out.atkInterval = st.atkInterval; out.targets = st.targets; out.mode = st.mode;
+      out.auraDR = st.auraDR; out.auraRadius = st.auraRadius;
+      out.next = nxt;
+      if (nxt && nxt.branchName) out.nextBranchName = nxt.branchName;
+    }
+    return out;
+  }
+
+  function upgradeCost(state, team) {
+    var lv = baseLevelOf(state, team);
+    var cur = DATA.baseLevels[lv - 1];       // 升到 lv+1 的费用记在当前等级那一行
+    return (cur && cur.upgradeCost != null) ? cur.upgradeCost : null;
+  }
+
+  function upgradeBase(state, team) {
+    if (state.over) return { ok: false, why: '对局已结束' };
+    var lv = baseLevelOf(state, team);
+    if (lv >= DATA.baseLevels.length) return { ok: false, why: '已达最高等级' };
+    // 升到 lv+1 的费用记在 baseLevels[lv-1].upgradeCost 上（与 buildingUpgradeCost 保持一致）
+    var cur = DATA.baseLevels[lv - 1];
+    var cost = cur ? cur.upgradeCost : null;
+    if (cost == null) return { ok: false, why: '已达最高等级' };
+    if (state.res[team] < cost) return { ok: false, why: '金币不足（需要 ' + cost + '）' };
+    state.res[team] -= cost;
+    state.stats[team].spent += cost;
+    state.baseLevel[team] = lv + 1;
+    var base = ownBase(state, team);
+    var newHp = DATA.baseLevels[lv].hp;      // 新等级的血量
+    var ratio = base.hp / base.hpMax;
+    base.def = Object.assign({}, base.def, { hp: newHp });
+    base.hpMax = newHp;
+    base.hp = Math.min(newHp, Math.max(base.hp, newHp * ratio)); // 升级补血到至少原比例
+    base.level = lv + 1;
+    emit(state, 'upgrade', { team: team, level: lv + 1 });
+    return { ok: true, level: lv + 1 };
+  }
+
+  /* ---------------------------------------------------------------- 拆除建筑
+   * 返还公式（玩家指定）：
+   *   返还 = 建造+升级累计花费 × 0.8 × (当前血量 / 总血量)
+   * 大本营不能拆。 */
+  function demolishRefund(b) {
+    if (!b || !b.def) return 0;
+    var hpRatio = b.hpMax > 0 ? Math.max(0, Math.min(1, b.hp / b.hpMax)) : 0;
+    return Math.round((b.invested || b.def.cost || 0) * 0.8 * hpRatio);
+  }
+  function canDemolish(state, b) {
+    if (state.over) return { ok: false, why: '对局已结束' };
+    if (!b || !b.def) return { ok: false, why: '没有这个建筑' };
+    if (b.def.isBase) return { ok: false, why: '大本营不能拆除' };
+    return { ok: true };
+  }
+  function demolishBuilding(state, b) {
+    var chk = canDemolish(state, b);
+    if (!chk.ok) return chk;
+    var refund = demolishRefund(b);
+    var team = b.team, key = b.key;
+    state.res[team] += refund;
+    state.stats[team].spent = Math.max(0, state.stats[team].spent - refund);
+    removeBuilding(state, b, { silent: true });
+    emit(state, 'demolish', { team: team, key: key, refund: refund });
+    return { ok: true, refund: refund };
+  }
+
+  /* ------------------------------------------------------------ 总体升级（全局加成）
+   * 四种全局科技，每种 1-10 级：
+   *   1-4 级：每级 +10%（士兵类的两种是 +15%）
+   *   5-9 级：每级 +20%（士兵类的两种是 +30%）
+   *   10 级  ：同样按上面那一档累加
+   * 只影响**己方**的建筑/士兵。 */
+  function globalBonus(state, team) {
+    var g = (state.globalUp[team]) || {};
+    function mul(key, lowStep, highStep) {
+      var lv = Math.max(0, Math.min(10, g[key] || 0));
+      var m = 1;
+      for (var l = 1; l <= lv; l++) m *= (1 + (l <= 4 ? lowStep : highStep));
+      return m;
+    }
+    return {
+      buildingAtk: mul('bAtk', 0.10, 0.20),
+      buildingHp: mul('bHp', 0.10, 0.20),
+      unitAtk: mul('uAtk', 0.15, 0.30),
+      unitHp: mul('uHp', 0.15, 0.30)
+    };
+  }
+  function globalUpgradeCost(state, team, key) {
+    var def = DATA.globalUpgrades[key];
+    if (!def) return null;
+    var lv = (state.globalUp[team] && state.globalUp[team][key]) || 0;
+    if (lv >= 10) return null;
+    return Math.round(def.baseCost * Math.pow(1.45, lv) / 5) * 5;
+  }
+  function upgradeGlobal(state, team, key) {
+    if (state.over) return { ok: false, why: '对局已结束' };
+    var def = DATA.globalUpgrades[key];
+    if (!def) return { ok: false, why: '未知的总体升级' };
+    var lv = (state.globalUp[team] && state.globalUp[team][key]) || 0;
+    if (lv >= 10) return { ok: false, why: '已满级' };
+    var cost = globalUpgradeCost(state, team, key);
+    if (state.res[team] < cost) return { ok: false, why: '金币不足（需要 ' + cost + '）' };
+    state.res[team] -= cost;
+    state.stats[team].spent += cost;
+    state.globalUp[team][key] = lv + 1;
+    // 建筑血量上限会变 → 同步现有建筑的上限（当前血量按比例跟上，不额外回血）
+    if (key === 'bHp') {
+      var m = globalBonus(state, team).buildingHp;
+      state.buildings.forEach(function (b) {
+        if (b.team !== team) return;
+        var baseHp = (b.def.isBase ? DATA.baseLevels[(b.level || 1) - 1].hp
+                                   : statsForLevel(b.def, b.level || 1, b.branch).hp);
+        var newMax = Math.round(baseHp * m);
+        var ratio = b.hpMax > 0 ? b.hp / b.hpMax : 1;
+        b.hpMax = newMax;
+        b.hp = Math.min(newMax, Math.max(1, newMax * ratio));
+      });
+    }
+    emit(state, 'globalUpgrade', { team: team, key: key, level: lv + 1 });
+    return { ok: true, level: lv + 1, cost: cost };
+  }
+  /* 给 UI 用：四种总体升级的当前状态 */
+  function globalUpgradeStatus(state, team) {
+    var out = [];
+    Object.keys(DATA.globalUpgrades).forEach(function (k) {
+      var d = DATA.globalUpgrades[k];
+      var lv = (state.globalUp[team] && state.globalUp[team][k]) || 0;
+      out.push({
+        key: k, name: d.name, glyph: d.glyph, color: d.color, desc: d.desc,
+        level: lv, maxLevel: 10,
+        cost: globalUpgradeCost(state, team, k),
+        effect: d.effectLabel(lv),
+        nextEffect: lv < 10 ? d.effectLabel(lv + 1) : null
+      });
+    });
+    return out;
+  }
+  /* ---------------------------------------------------- 防御塔光环（护盾型）
+   * 防御塔给「保护范围内的己方建筑物」减伤。重叠时取**数值最大的那个**（不叠加）。
+   * 每次建筑增删/升级后重算一遍（棋盘只有 100 格，开销可忽略）。 */
+  function reloadNeighbors(state) {
+    state.buildings.forEach(function (b) { b.dr = 0; });
+    var wards = state.buildings.filter(function (b) { return b.def.aura; });
+    for (var i = 0; i < wards.length; i++) {
+      var w = wards[i];
+      var st = statsForLevel(w.def, w.level || 1, w.branch);
+      var radius = st.auraRadius != null ? st.auraRadius : 1.5;
+      var dr = st.auraDR || 0;
+      if (dr <= 0) continue;
+      for (var j = 0; j < state.buildings.length; j++) {
+        var t = state.buildings[j];
+        if (t === w || t.team !== w.team) continue;
+        if (dist(centerOf(w), centerOf(t)) > radius + 0.85) continue;   // 按格心距离判定
+        if (dr > (t.dr || 0)) t.dr = dr;
+      }
+    }
+    return state;
+  }
+
+  /* ------------------------------------------------------------ 伤害结算 */
+  /* 减伤公式：护甲越高减伤越多，但攻击力足够高时能打穿。与护甲量级无关的特性
+   * 保证了「高攻单位打低甲高伤、低攻单位打高甲几乎无效」的直觉。
+   * 目标若有防御塔光环（b.dr），先按百分比减伤再算护甲。 */
+  function mitigate(atk, armor) {
+    return atk * (1 - armor / (armor + 20));
+  }
+
+  /* 伤害结算：兵打建筑有额外折扣（否则便宜兵能轻松啃掉贵建筑，防守方毫无优势）。
+   * 攻城类的兵对建筑伤害高，普通兵对建筑伤害低。 */
+  /* 士兵对建筑的伤害倍率。
+   * 拆建筑型（攻城兵 / 攻城飞艇 / 攻城车）拿 1.4 的高倍率，
+   * 打兵型（步兵 / 弓箭手 / 飞龙 / 气球兵）拿 0.3~0.5 的低倍率。
+   * 注意：攻城车改成拆建筑型之后，倍率也要跟着给它 1.4，
+   *      否则「只拆建筑」的兵反而拆不动建筑（实测到的 bug）。 */
+  function unitBuildingMul(u) {
+    var m = { siege: 1.4, airship: 1.4, ram: 1.4, heavy: 0.5, infantry: 0.35,
+              archer: 0.3, balloon: 0.5, dragon: 0.5 };
+    return m[u.key] != null ? m[u.key] : 0.5;
+  }
+
+  function damageBuilding(state, b, atk, attacker) {
+    var eff = atk * (1 - (b.dr || 0));
+    if (attacker && attacker.kind === 'unit') eff *= unitBuildingMul(attacker);
+    // 大本营不吃护甲减伤：否则「谁先摧毁对方大本营」这条核心胜负条件几乎打不出来
+    var armor = b.def.isBase ? 0 : b.armor;
+    b.hp -= mitigate(eff, armor);
+    b.justDamaged = state.time;
+    if (b.hp <= 0) {
+      removeBuilding(state, b);
+      return true;
+    }
+    return false;
+  }
+
+  function removeBuilding(state, b, opts) {
+    opts = opts || {};
+    b.refs.forEach(function (ref) {
+      delete state.byRef[b.team][ref];
+      var p = fromRef(ref);
+      if (state.grid[p.r][p.c] === b) state.grid[p.r][p.c] = null;
+    });
+    var i = state.buildings.indexOf(b);
+    if (i >= 0) state.buildings.splice(i, 1);
+    if (b.def.isBase) {
+      // 双方大本营可能在同一帧里一起被打掉（例如决胜时刻同时烧血）。
+      // 这时以「先被记录的那一方为败者」，后面的不再覆盖，避免出现
+      // 「winner 是红方、但红方大本营也已经没了」这种自相矛盾的结果。
+      if (!state.over) {
+        state.over = true;
+        state.winner = OPP[b.team];
+        state.loser = b.team;
+        emit(state, 'gameover', { winner: state.winner, loser: b.team });
+      } else {
+        emit(state, 'destroy', { team: b.team, key: b.key, row: b.row, col: b.col });
+      }
+    } else {
+      emit(state, 'destroy', { team: b.team, key: b.key, row: b.row, col: b.col });
+    }
+    rebuildFields(state);
+    reloadNeighbors(state);     // 防御塔没了，别的建筑就失去减伤
+  }
+
+  function damageUnit(state, u, atk) {
+    u.hp -= mitigate(atk, u.armor);
+    u.justDamaged = state.time;
+    if (u.hp <= 0) {
+      var owner = OPP[u.team];
+      state.stats[owner].kills++;
+      var i = state.units.indexOf(u);
+      if (i >= 0) state.units.splice(i, 1);
+      return true;
+    }
+    return false;
+  }
+
+  /* ------------------------------------------------------------ 出兵 */
+  function spawnUnit(state, team, unitKey, row, col) {
+    var def = DATA.units[unitKey];
+    if (!def) return null;
+    if (unitsOf(state, team).length >= UNIT_CAP) return null;
+    // 出生血量带上「士兵生命」总体升级的加成
+    var unitHp = Math.round(def.hp * globalBonus(state, team).unitHp);
+    var u = {
+      id: state.nextId++, kind: 'unit', team: team, def: def, key: unitKey,
+      row: row, col: col, hp: unitHp, hpMax: unitHp, armor: def.armor,
+      moveAcc: 0, moveProg: 0, nextStep: null, atkTimer: 0, justDamaged: 0, spawnOrder: state.nextId,
+      targetBuilding: null, lastAttackAt: -99
+    };
+    state.units.push(u);
+    state.stats[team].produced++;
+    return u;
+  }
+
+  /* 待命区 +1（兵营产出的兵先进待命区，等玩家/电脑手动派上场） */
+  function addReserve(state, team, unitKey, n) {
+    n = n || 1;
+    if (!state.reserve[team]) state.reserve[team] = {};
+    var cur = state.reserve[team][unitKey] || 0;
+    var room = RESERVE_CAP - reserveCount(state, team);
+    if (room <= 0) return 0;
+    var add = Math.min(n, room);
+    state.reserve[team][unitKey] = cur + add;
+    return add;
+  }
+
+  function reserveCount(state, team) {
+    var t = 0, r = state.reserve[team] || {};
+    Object.keys(r).forEach(function (k) { t += r[k]; });
+    return t;
+  }
+
+  /* -------------------------------------------------- 派兵：士兵时间冷却制
+   * 按你的要求（参考植物大战僵尸）：士兵不再由建筑训练、也没有待命区，
+   * 而是每种兵各自有一个**冷却时间**（步兵 5 秒，越贵越久）。
+   * 冷却好了 + 金币够 → 就能派一个；派完这个兵种重新开始冷却。
+   * 地面兵从棋盘外的行A/行B 出场，空中兵同样从通道行出场。
+   * ------------------------------------------------------------------------ */
+  function channelRow(team) { return CHANNEL_ROW[team]; }
+
+  /* 冷却是否已经走完（浮点累减会留下 1e-14 这种残渣，所以留一点容差） */
+  function isUnitReady(state, team, unitKey) {
+    return (state.unitCd[team][unitKey] || 0) <= 0.001;
+  }
+
+  function canDeploy(state, team, unitKey, col) {
+    var def = DATA.units[unitKey];
+    if (!def) return { ok: false, why: '未知兵种' };
+    if (state.over) return { ok: false, why: '对局已结束' };
+    if (col < 1 || col > COLS) return { ok: false, why: '列超出棋盘' };
+    var cd = state.unitCd[team][unitKey] || 0;
+    if (cd > 0.001) return { ok: false, why: def.name + ' 冷却中（还有 ' + cd.toFixed(1) + ' 秒）' };
+    if (state.res[team] < def.cost) return { ok: false, why: '金币不足（需要 ' + def.cost + '）' };
+    if (state.deployCd[team][col] > 0) return { ok: false, why: '该列刚派过兵，冷却中' };
+    var at = state.units.filter(function (u) {
+      return u.team === team && !rowInGrid(u.row) && u.col === col;
+    }).length;
+    if (at >= CHANNEL_CAP) return { ok: false, why: '该列通道已满（' + CHANNEL_CAP + '）' };
+    return { ok: true };
+  }
+
+  function deployUnit(state, team, unitKey, col) {
+    var chk = canDeploy(state, team, unitKey, col);
+    if (!chk.ok) return chk;
+    var def = DATA.units[unitKey];
+    state.res[team] -= def.cost;
+    state.stats[team].spent += def.cost;
+    state.unitCd[team][unitKey] = def.deployCd;      // 开始冷却
+    state.deployCd[team][col] = 0.4;                 // 同一列短冷却，防止一格瞬间堆满
+    var u = spawnUnit(state, team, unitKey, channelRow(team), col);
+    if (!u) return { ok: false, why: '场上单位已达上限' };
+    emit(state, 'deploy', { team: team, key: unitKey, col: col });
+    return { ok: true, unit: u };
+  }
+
+  /* ------------------------------------------------------------ 法术系统
+   * 随大本营等级逐级解锁：1 级箭雨、2 级火球、3 级火箭、4 级狂暴、5 级冰冻、6 级弱化。
+   * 每个法术独立冷却；选中后点地图上的格子决定落点（范围以格为单位）。
+   * 影响范围：以落点格为中心的半径内，所有格子的单位/建筑。
+   * ------------------------------------------------------------------------ */
+  function spellsAvailable(state, team) {
+    var lv = baseLevelOf(state, team);
+    return DATA.spells.filter(function (s) { return s.unlockBaseLevel <= lv; });
+  }
+
+  /* 落点范围内命中的目标（敌人或自己人，看法术的 affects） */
+  function spellTargets(state, team, spell, row, col) {
+    var foe = OPP[team];
+    var wantTeam = spell.affects === 'ally' ? team : foe;
+    var inRange = function (t) {
+      // 法术范围是「正方形」：aoe = 允许的最大格距离（1×1→0，2×2→1，3×3→2）
+      var d = gridDist({ row: t.row, col: t.col }, { row: row, col: col });
+      return d <= (spell.aoe || 0) + 0.001;
+    };
+    var units = state.units.filter(function (u) { return u.team === wantTeam && inRange(u); });
+    // 大本营也算「建筑」
+    var builds = state.buildings.filter(function (b) { return b.team === wantTeam && inRange(b); });
+    return { units: units, buildings: builds };
+  }
+
+  function canCastSpell(state, team, spellKey, row, col) {
+    var spell = null;
+    DATA.spells.forEach(function (s) { if (s.key === spellKey) spell = s; });
+    if (!spell) return { ok: false, why: '未知法术' };
+    if (state.over) return { ok: false, why: '对局已结束' };
+    if (baseLevelOf(state, team) < spell.unlockBaseLevel)
+      return { ok: false, why: '需要大本营 ' + spell.unlockBaseLevel + ' 级' };
+    if ((state.spellCd[team][spellKey] || 0) > 0)
+      return { ok: false, why: spell.name + ' 冷却中（还有 ' + state.spellCd[team][spellKey].toFixed(1) + ' 秒）' };
+    if (!inGrid(row, col)) return { ok: false, why: '落点必须在棋盘内' };
+    return { ok: true, spell: spell };
+  }
+
+  function castSpell(state, team, spellKey, row, col) {
+    var chk = canCastSpell(state, team, spellKey, row, col);
+    if (!chk.ok) return chk;
+    var spell = chk.spell;
+    var hit = spellTargets(state, team, spell, row, col);
+    var hits = 0;
+    if (spell.dmg > 0) {
+      hit.units.forEach(function (u) { damageUnit(state, u, spell.dmg); hits++; });
+      hit.buildings.forEach(function (b) {
+        b.hp -= spell.dmg;
+        b.justDamaged = state.time;      // 挨打了，重置自愈计时
+        if (b.hp <= 0) removeBuilding(state, b);
+        hits++;
+      });
+    }
+    if (spell.frozen) {
+      hit.units.forEach(function (u) { u.frozenUntil = state.time + spell.frozen; hits++; });
+      hit.buildings.forEach(function (b) { b.frozenUntil = state.time + spell.frozen; hits++; });
+    }
+    if (spell.atkSpeedMul) {
+      hit.units.forEach(function (u) { u.rageUntil = state.time + (spell.duration || 8); hits++; });
+      hit.buildings.forEach(function (b) { b.rageUntil = state.time + (spell.duration || 8); hits++; });
+    }
+    if (spell.weakenMul) {
+      hit.units.forEach(function (u) { u.weakenUntil = state.time + (spell.duration || 5); u.weakenMul = spell.weakenMul; hits++; });
+      hit.buildings.forEach(function (b) { b.weakenUntil = state.time + (spell.duration || 5); b.weakenMul = spell.weakenMul; hits++; });
+    }
+    state.spellCd[team][spellKey] = spell.cooldown;
+    state.events.push({
+      type: 'spell', t: state.time, team: team, key: spell.key,
+      row: row, col: col, hits: hits, radius: spell.aoe || 0
+    });
+    return { ok: true, spell: spell, hits: hits };
+  }
+
+  /* 给 UI 用：法术栏状态 */
+  function spellStatus(state, team) {
+    var lv = baseLevelOf(state, team);
+    return DATA.spells.map(function (s) {
+      return {
+        key: s.key, name: s.name, glyph: s.glyph, color: s.color, desc: s.desc,
+        radius: s.radius, cooldown: s.cooldown,
+        unlockBaseLevel: s.unlockBaseLevel,
+        unlocked: lv >= s.unlockBaseLevel,
+        cd: Math.max(0, state.spellCd[team][s.key] || 0),
+        ready: lv >= s.unlockBaseLevel && (state.spellCd[team][s.key] || 0) <= 0
+      };
+    });
+  }
+  /* ---------------------------------------------------------- 目标选择 */
+  /* 本单位「该打谁」：按 priority 分组（射程过滤交给 pickFromGroups）。
+   *   siege → 只列敌方建筑，再大本营
+   *   field → 只列敌兵（受对空限制），再大本营
+   * 注意：这两组都不含「挡路的墙」—— 墙由 pickTarget 里的 blockedBy 单独处理。 */
+  function candidateSets(state, u) {
+    var enemy = OPP[u.team];
+    var canHitAir = u.def.targets === 'both';
+    var foeUnits = state.units.filter(function (o) {
+      if (o.team !== enemy) return false;
+      if (o.def.air && !canHitAir) return false;
+      return true;
+    });
+    var foeBuildings = state.buildings.filter(function (b) { return b.team === enemy && !b.def.isBase; });
+    var foeBase = enemyBase(state, u.team);
+    if (u.def.priority === 'siege') {
+      return { groups: [foeBuildings, [foeBase]] };
+    }
+    return { groups: [foeUnits, [foeBase]] };
+  }
+
+  /* 射程内、且属于自己该打的目标 —— 返回最近的一个 */
+  function pickFromGroups(state, u, sets, from) {
+    for (var g = 0; g < sets.groups.length; g++) {
+      var list = sets.groups[g], best = null, bestScore = null;
+      for (var i = 0; i < list.length; i++) {
+        var t = list[i];
+        if (!t || (t.hp !== undefined && t.hp <= 0)) continue;
+        var cell = nearestCellOf(t, from);
+        // 士兵的攻击范围 = 「上下左右四格」（曼哈顿距离），斜角打不到
+        var d = cardinalDist(from, cell);
+        if (d > u.def.range + 0.001) continue;
+        var score = d * 1000 + t.hp * 0.001 + t.id * 1e-6; // 近的优先，其次血少的
+        if (bestScore === null || score < bestScore) { bestScore = score; best = t; }
+      }
+      if (best) return best;
+    }
+    return null;
+  }
+
+  /* 目标选择：优先「挡在前进路上的那面墙」，其次打自己该打的目标。
+   * 注意：**只有攻城类（siege）会拆墙** —— 按你的规格，步兵/重甲/弓箭手这类
+   * "只打士兵和大本营"的兵遇到建筑就是被挡住，不会去拆它（拆墙是攻城兵的活）。 */
+  function pickTarget(state, u) {
+    var from = centerOf(u);
+    if (u.blockedBy && u.def.priority === 'siege') {
+      var wall = u.blockedBy;
+      if (wall.hp > 0 && state.buildings.indexOf(wall) >= 0) {
+        if (gridDist(from, nearestCellOf(wall, from)) <= u.def.range + 0.001) return wall;
+      }
+    }
+    return pickFromGroups(state, u, candidateSets(state, u), from);
+  }
+
+  /* 「附近有没有要打的东西」——比射程宽 2 格。
+   * 用途：满足「有目标才前进、没目标就停下」这条规则，同时不会让兵站在场中央发愣：
+   * 附近没有敌人、建筑或大本营时就不再往前走，直接在原地待命。 */
+  function hasTargetNear(state, u, pad) {
+    pad = pad == null ? 2 : pad;
+    var enemy = OPP[u.team];
+    var canHitAir = u.def.targets === 'both';
+    var from = centerOf(u);
+    var reach = u.def.range + pad;
+    var inR = function (t) { return gridDist(from, nearestCellOf(t, from)) <= reach + 0.001; };
+    var foes = state.units.filter(function (o) {
+      if (o.team !== enemy) return false;
+      if (o.def.air && !canHitAir) return false;
+      return inR(o);
+    });
+    if (foes.length) return true;
+    var builds = state.buildings.filter(function (b) {
+      if (b.team !== enemy) return false;
+      if (b.def.isBase && u.def.priority !== 'siege' && u.def.priority !== 'field') return false;
+      return inR(b);
+    });
+    return builds.length > 0;
+  }
+
+  /* 「贴着敌方大本营的那一行」（打击行）与「这一行上能不能直接打到它」 */
+  function strikeRowOf(team) {
+    var goal = BASE_RECT[OPP[team]];
+    var step = DIR[team];
+    return (step > 0 ? goal.r2 : goal.r1) + step;
+  }
+  function adjacentToBaseOf(team, r, c) {
+    var goal = BASE_RECT[OPP[team]];
+    if (r !== strikeRowOf(team)) return false;
+    return c >= goal.c1 - 1 && c <= goal.c2 + 1;
+  }
+
+  /* 「贴着本单位、射程内的敌方建筑」——空中拆建筑兵用它决定什么时候停下拆楼 */
+  function adjacentWallOf(state, u) {
+    var enemy = OPP[u.team];
+    var from = { row: u.row, col: u.col };
+    var best = null, bestD = null;
+    state.buildings.forEach(function (b) {
+      if (b.team !== enemy || b.def.isBase) return;
+      var d = cardinalDist(from, nearestCellOf(b, from));
+      if (d > u.def.range + 0.001) return;
+      if (bestD === null || d < bestD) { bestD = d; best = b; }
+    });
+    return best;
+  }
+
+  /* 「进入棋盘的第一行」：通道行往场内走一格（红方 0→1，蓝方 11→10） */
+  function entryRowOf(team) { return CHANNEL_ROW[team] - DIR[team]; }
+
+  /* ------------------------------------------------------------------ 移动唯一入口
+   * 地面兵的所有位移都必须经过这里。
+   * 铁律：建筑不能踩进去 —— **但有一条例外**：
+   *
+   *   ★ 进场行（蓝行10 / 红行1）允许穿过 ★
+   *
+   * 为什么必须开这个例外：
+   *   · 玩家的初衷就是要在自己半场自由布局，包括进场行
+   *   · 而进场行是地面兵唯一的入口。如果它被盖满就视为"不可通行"，
+   *     路线图会整片断开，所有地面兵永久锁在通道里（实测到的死锁）
+   *   · 唯一自洽的解法：进场行当成"己方的通道"——兵可以从中穿过，
+   *     但不会停在那里（一进场就继续往场内走）
+   *
+   * 返回 true = 真的移动了。 */
+  function inEntryRow(team, r) { return r === entryRowOf(team); }
+
+  function stepTo(state, u, toRow, toCol) {
+    if (toRow === u.row && toCol === u.col) return false;
+    if (rowInGrid(toRow)) {
+      var b = state.grid[toRow][toCol];
+      // 进场行上的建筑：只允许「地面兵穿过」，其他建筑一律拒绝
+      if (b && !(u.def && !u.def.air && inEntryRow(u.team, toRow))) return false;
+      if (isBaseCell(BASE_RECT[OPP[u.team]], toRow, toCol)) return false;   // 敌方大本营
+    } else if (toRow !== CHANNEL_ROW[u.team]) {
+      return false;                                               // 棋盘外只允许自己的通道行
+    }
+    if (toCol < 1 || toCol > COLS) return false;
+    u.row = toRow; u.col = toCol;
+    return true;
+  }
+
+  /* 某个兵站在 (r,c) 时，正前方那一格是不是敌方建筑（＝要拆的墙）。
+   * 方向必须用 DIR[team]（红方 -1 → 往行号减小…… 等等：红方的 DIR 表示"朝敌方推进"，
+   * 但红方在行0、大本营在行9，所以红方实际是往行号【增大】走。
+   * 统一用 computeField 里的约定：向前 = r + DIR[team]。 */
+  function wallAheadOf(state, u, r, c) {
+    if (!rowInGrid(r)) return null;
+    var ahead = r + DIR[u.team];
+    if (!rowInGrid(ahead)) return null;
+    return wallAtTeam(state, u.team, ahead, c);
+  }
+
+  /* 「有没有该打的目标在射程内」—— 决定这个兵该停下还是继续推进 */
+  function hasAnyTarget(state, u) {
+    if (pickTarget(state, u)) return true;
+    if (u.blockedBy && u.def.priority === 'siege' && u.blockedBy.hp > 0 &&
+        state.buildings.indexOf(u.blockedBy) >= 0) {
+      var d = gridDist(centerOf(u), nearestCellOf(u.blockedBy, centerOf(u)));
+      if (d <= u.def.range + 0.001) return true;
+    }
+    return false;
+  }
+
+  /* 有没有「除大本营之外」的目标（敌方士兵或建筑）在射程内。
+   * 用途：决定通道行上的兵要不要真的进场 —— 按玩家规则，对面没目标就在行A/行B 屯兵，
+   * 否则所有兵都会无脑冲去啃大本营，行A/行B 永远空着。 */
+  function hasNonBaseTarget(state, u) {
+    var enemy = OPP[u.team];
+    var canHitAir = u.def.targets === 'both';
+    var from = centerOf(u);
+    var inR = function (t) { return gridDist(from, nearestCellOf(t, from)) <= u.def.range + 0.001; };
+    var foes = state.units.filter(function (o) {
+      if (o.team !== enemy) return false;
+      if (o.def.air && !canHitAir) return false;
+      return inR(o);
+    });
+    if (foes.length) return true;
+    if (u.def.priority === 'siege') {
+      var walls = state.buildings.filter(function (b) {
+        return b.team === enemy && !b.def.isBase && inR(b);
+      });
+      if (walls.length) return true;
+    }
+    return false;
+  }
+
+  /* 攻城兵 / 被墙挡住的兵：优先打「挡在前进路上的那面墙」，其次打自己该打的目标。
+   * （实现见上面的 pickTarget / hasAnyTarget，此处不再重复定义。） */
+
+  /* 一个建筑的「战斗数值」：普通塔走等级/分支表；
+   * 大本营的防御力定义为「同级别法师塔的伤害 + 4×4 的射程」。 */
+  function combatStatsOf(b) {
+    if (b.def && b.def.isBase) {
+      var m = statsForLevel(DATA.buildings.mage, b.level || 1);
+      return { atk: m.atk, atkInterval: m.atkInterval,
+               range: DATA.baseDefenseRange,   // 4×4
+               targets: 'both', mode: 'single', maxTargets: 0, lineLen: 0, splash: 0 };
+    }
+    return statsForLevel(b.def, b.level || 1, b.branch);
+  }
+
+  /* 塔的候选目标（射程内、且对空/对地允许） */
+  function towerCandidates(state, b) {
+    var enemy = OPP[b.team];
+    var from = { row: b.row, col: b.col };   // 用塔自己的格子（大本营 2×2 的中心点在 9.5 行，不好算距离）
+    var st = combatStatsOf(b);
+    var range = st.range || 1;
+    return state.units.filter(function (o) {
+      if (o.team !== enemy) return false;
+      if (st.targets === 'air' && !o.def.air) return false;
+      if (st.targets === 'ground' && o.def.air) return false;
+      // 用「目标离塔最近的那一格」判距离：大本营 2×2，体积大也该更好打，
+      // 不能因为中心点在 9.5 行就把它旁边贴脸的单位算成 1.5 格。
+      return gridDist(from, nearestCellOf(o, from)) <= range + 0.001;
+    });
+  }
+
+  /* 按攻击模式结算「这一次攻击打到了谁」。
+   *   single     ：一个目标
+   *   multi3     ：最多 3 个目标（大电塔）
+   *   group      ：群攻 —— 打到目标所在格子里的所有敌人（迫击炮/特斯拉）
+   *   line       ：白魔法塔 —— 沿攻击方向贯穿 3 格
+   *   allInRange ：脉冲塔 —— 射程内所有敌人
+   */
+  function towerHitList(state, b, st, primary) {
+    var from = centerOf(b);
+    var cands = towerCandidates(state, b);
+    var mode = st.mode || 'single';
+    if (mode === 'allInRange') return cands;
+    if (mode === 'multi3') {
+      return cands.sort(function (x, y) { return dist(from, centerOf(x)) - dist(from, centerOf(y)); })
+        .slice(0, st.maxTargets || 3);
+    }
+    if (mode === 'group' || mode === 'line') {
+      var list = [];
+      var fr = Math.round(from.row), fc = Math.round(from.col);
+      if (mode === 'group') {
+        // 群攻：同一格子里的敌人全都挨打；另外按「格距离」给周围一圈溅射
+        var splash = st.splash || 0;
+        cands.forEach(function (o) {
+          if (o.row === primary.row && o.col === primary.col) { list.push(o); return; }
+          /* 溅射用**格距离**（切比雪夫），不是欧氏距离：
+           * 欧氏下斜角是 1.414，splash=1 会漏掉四个斜方向，
+           * 看起来像"3×3 只打了十字"。 */
+          if (splash > 0 && gridDist({ row: o.row, col: o.col },
+                                     { row: primary.row, col: primary.col }) <= splash) list.push(o);
+        });
+      } else {
+        // 直线贯穿：从塔出发、朝目标方向连续的 3 格
+        var dr = Math.sign(primary.row - fr), dc = Math.sign(primary.col - fc);
+        if (dr === 0 && dc === 0) dc = 1;
+        if (dr !== 0 && dc !== 0) { if (Math.abs(primary.row - fr) >= Math.abs(primary.col - fc)) dc = 0; else dr = 0; }
+        var steps = st.lineLen || 3;
+        for (var s = 1; s <= steps; s++) {
+          var rr = fr + dr * s, cc = fc + dc * s;
+          cands.forEach(function (o) { if (o.row === rr && o.col === cc) list.push(o); });
+        }
+      }
+      if (list.indexOf(primary) < 0) list.push(primary);
+      return list;
+    }
+    return [primary];
+  }
+
+  function pickTowerTarget(state, b) {
+    var cands = towerCandidates(state, b);
+    var from = centerOf(b);
+    var best = null, bestScore = null;
+    for (var i = 0; i < cands.length; i++) {
+      var u = cands[i];
+      var score = dist(from, centerOf(u)) * 1000 + u.hp * 0.001 + u.id * 1e-6;
+      if (bestScore === null || score < bestScore) { bestScore = score; best = u; }
+    }
+    return best;
+  }
+
+  /* 被冰冻：冻结期间不能移动、不能攻击。
+   * 冰冻法术的时长写在法术的 frozen 字段里（4 秒），统一用 frozenUntil 判定。 */
+  function isFrozen(state, e) {
+    return !!(e && e.frozenUntil && state.time < e.frozenUntil);
+  }
+
+  /* ================================ 平滑移动 ================================
+   * 地面兵/空中兵的位移统一走这里，保证「速度均匀」。
+   *
+   * 以前的做法：moveAcc 攒满 1 格才 commit 一次位移 → 视觉上「走一格停一下」。
+   * 现在的做法：
+   *   · 目标格一旦确定就记在 u.nextStep 上
+   *   · moveProg 表示「走到 nextStep 的进度」（0~1），每 tick 按速度均匀累加
+   *   · 进度满 1 才真正把 u.row/u.col 改成 nextStep，然后归零继续下一格
+   *   · 渲染层用 u.row/u.col + u.nextStep + moveProg 做亚格插值
+   *     → 视觉上是匀速滑过去的，不再有停顿感
+   *
+   * 返回：'moving' = 正在途中（本 tick 没跨格）
+   *       'moved'  = 本 tick 跨了一格
+   *       'blocked'= 目标格走不进去（已清空进度）
+   * ========================================================================= */
+  function smoothMove(state, u, target) {
+    if (!target) { u.moveProg = 0; u.nextStep = null; u.stepDir = null; return 'idle'; }
+    if (!u.nextStep || u.nextStep.r !== target.r || u.nextStep.c !== target.c) {
+      u.nextStep = { r: target.r, c: target.c };
+    }
+    u.stepDir = { r: target.r - u.row, c: target.c - u.col };   // 记住方向，跨格后沿用
+    u.moveProg = (u.moveProg || 0) + u.def.speed * DT;
+    u.moveAcc = u.moveProg;
+    if (u.moveProg >= 1) {
+      if (!stepTo(state, u, target.r, target.c)) {
+        u.moveProg = 0; u.moveAcc = 0; u.nextStep = null; u.stepDir = null;
+        return 'blocked';
+      }
+      u.moveProg -= 1;
+      u.moveAcc = u.moveProg;
+      /* ★ 跨格后立刻沿用同一方向，把 nextStep 指向「新格的下一格」★
+       * 否则跨格那一 tick 渲染位置会吸附回整格（画面上顿一下）。
+       * 如果下一格不可走（要转向/停了），就清空，下一 tick 重新算。 */
+      if (u.moveProg > 0.0001 && u.stepDir) {
+        var nr = u.row + u.stepDir.r, nc = u.col + u.stepDir.c;
+        var canGo = true;
+        if (!rowInGrid(nr)) { canGo = (nr === CHANNEL_ROW[u.team]); }
+        else { canGo = !state.grid[nr][nc]; }
+        if (canGo && nc >= 1 && nc <= COLS) {
+          u.nextStep = { r: nr, c: nc };
+        } else {
+          u.nextStep = null; u.stepDir = null;
+        }
+      } else {
+        u.moveProg = 0; u.nextStep = null; u.stepDir = null;
+      }
+      return 'moved';
+    }
+    return 'moving';
+  }
+  /* ------------------------------------------------------------ 单位移动 */
+  /* 返回 {type:'move'|'attack'|'enter'|'blocked', ...} —— 便于渲染层做动画/特效 */
+  function stepUnit(state, u) {
+    // 被冰冻 → 完全不能动（也不能攻击，攻击那边也会再挡一次）
+    if (isFrozen(state, u)) return { type: 'frozen', reason: '被冰冻，无法行动' };
+    var team = u.team, dirRow = DIR[team];
+    var field = fieldFor(state, u);   // 打兵型 / 拆建筑型 各走各的路线图
+    var inChannel = !rowInGrid(u.row);
+
+    /* ============================================================================
+     * 空中单位的移动（玩家要求：**飞行部队无视建筑**）
+     *
+     * 三条规则，按优先级：
+     *   ① 射程内有目标 → 停下开打
+     *   ② 拆建筑型（攻城飞艇）旁边有敌方建筑 → 停下拆
+     *   ③ 否则一路飞向敌方大本营
+     *
+     * 关键设计（这轮返工重写的核心）：
+     *   · **飞越** 建筑 = 允许。空中兵经过建筑格不减速、不改道。
+     *   · **停留** 在建筑格 = 不允许。落脚点必须是空格，否则继续往前飞。
+     *   · **绝不跳格**。每帧最多前进 1 格（横 1 或纵 1），渲染层看到的是连续移动。
+     *
+     * 怎么同时做到「飞越」和「不跳格」：
+     *   每帧算出「理想前进方向」后，只走 **1 格**；
+     *   如果那 1 格是建筑，就照走（这就是飞越），但**标记为"未落地"**；
+     *   下一帧继续沿同一方向走，直到踩到空格才算真正停下。
+     *   "未落地"状态记在 u.airPass 上，保证方向和目标不被中途改掉。
+     * ========================================================================== */
+    if (u.def.air) {
+      u.blockedBy = null;
+      var airGoal = BASE_RECT[OPP[team]];
+      var myRectA = BASE_RECT[team];
+
+      // ① 射程内有目标就停下开打
+      if (hasAnyTarget(state, u)) { u.airPass = null; return { type: 'attack', reason: '有目标，停下开打' }; }
+      // ② 拆建筑型的空中兵：旁边有敌方建筑就停下拆
+      if (u.def.priority === 'siege') {
+        var adjWallA = adjacentWallOf(state, u);
+        if (adjWallA) { u.airPass = null; u.blockedBy = adjWallA; return { type: 'attack', reason: '拆建筑' }; }
+      }
+      // ③ 已经贴到敌方大本营（上下左右 1 格）→ 停下打
+      var adjBaseA = rowInGrid(u.row) && (
+        (u.row === airGoal.r1 - 1 && u.col >= airGoal.c1 && u.col <= airGoal.c2) ||
+        (u.row === airGoal.r2 + 1 && u.col >= airGoal.c1 && u.col <= airGoal.c2) ||
+        (u.col === airGoal.c1 - 1 && u.row >= airGoal.r1 && u.row <= airGoal.r2) ||
+        (u.col === airGoal.c2 + 1 && u.row >= airGoal.r1 && u.row <= airGoal.r2));
+      if (adjBaseA) { u.airPass = null; return { type: 'attack', reason: '抵达大本营，开打' }; }
+
+      var isBuildingCellA = function (r, c) {
+        if (!rowInGrid(r) || c < 1 || c > COLS) return true;
+        if (state.grid[r][c]) return true;
+        return isBaseCell(myRectA, r, c) || isBaseCell(airGoal, r, c);
+      };
+
+      /* 计算本帧要走的「1 格方向」。返回 {r,c} 或 null。 */
+      var stepDir = function () {
+        /* 还在通道（棋盘外）→ 直接向前进场。
+         * 关键：空中兵**不做横向找空列**。
+         * 以前为了让空中兵避开进场行上的建筑，会先在 B 行左右横移去找空列，
+         * 玩家看到的就是"在 B 行左右瞬移/来回跳"。空中兵本来就能飞越建筑，
+         * 所以正确做法是：**就在本列正上方进场**，一路飞过去。 */
+        if (!rowInGrid(u.row)) {
+          return { r: entryRowOf(team), c: u.col };
+        }
+        /* 已经在棋盘内：先横向对齐到大本营的列，再纵向推进。
+         * 注意：**不要**因为"当前踩在大本营格上"就往回弹 ——
+         * 空中兵本来就能飞越建筑，从自家大本营上方飞过去是正常的；
+         * 加了弹回逻辑会让它在 c4/c5 之间来回横跳（实测到的 bug）。
+         * 只要保证「不会停在大本营格上」就够了：到了攻击位就停，中途是一直飞的。 */
+        var wantCol = Math.min(Math.max(u.col, airGoal.c1), airGoal.c2);
+        if (u.col < wantCol) return { r: u.row, c: u.col + 1 };
+        if (u.col > wantCol) return { r: u.row, c: u.col - 1 };
+        var wantRow = (airGoal.r1 > u.row) ? airGoal.r1 - 1 : airGoal.r2 + 1;
+        if (u.row === wantRow) return null;
+        return { r: u.row + (wantRow > u.row ? 1 : -1), c: u.col };
+      };
+
+      var d1 = stepDir();
+      if (!d1) { u.airPass = null; return { type: 'wait', reason: '已在攻击位' }; }
+      // 越界保护
+      if (d1.c < 1 || d1.c > COLS) { u.airPass = null; return { type: 'wait', reason: '飞到边界' }; }
+      if (d1.r < 0 || d1.r > ROWS + 1) { u.airPass = null; return { type: 'wait', reason: '飞到边界' }; }
+      // 不能飞进敌方大本营那一格（那是要打的，不是要站的）
+      if (rowInGrid(d1.r) && isBaseCell(airGoal, d1.r, d1.c)) {
+        u.airPass = null;
+        return { type: 'wait', reason: '大本营就在眼前' };
+      }
+
+      // 空中兵同样走平滑移动（直接改 u.row/u.col，不经过 stepTo —— 它无视建筑）
+      if (!u.nextStep || u.nextStep.r !== d1.r || u.nextStep.c !== d1.c) {
+        u.nextStep = { r: d1.r, c: d1.c };
+      }
+      u.moveProg = (u.moveProg || 0) + u.def.speed * DT;
+      u.moveAcc = u.moveProg;
+      if (u.moveProg >= 1) {
+        u.moveProg -= 1;
+        u.moveAcc = u.moveProg;
+        u.row = d1.r; u.col = d1.c;            // ★ 每次只前进 1 格，绝不跳格
+        return { type: rowInGrid(u.row) ? 'move' : 'enter', row: u.row, col: u.col };
+      }
+      return { type: 'move', row: u.row, col: u.col, moving: true };
+    }
+
+
+    // 2) 地面兵统一走这里（棋盘内 / 通道行都用同一套路线图，四向绕行）
+    //    规则（按玩家要求）：
+    //      · 目标是敌方大本营 → 朝它走，路线由 BFS 实时算，建筑一放就自动改道
+    //      · 半路遇到能打的敌兵（在射程内）→ 停下对峙
+    //      · 被建筑挡住但还有路能绕到大本营 → 绕过去（左拐右拐、前进后退都允许）
+    //      · 真的被彻底堵死（到不了大本营）→ 停下
+    //      · 攻城兵例外：它把敌方建筑当目标，会上去拆
+    u.blockedBy = null;
+    if (hasAnyTarget(state, u)) return { type: 'attack', reason: '有目标，停下开打' };
+    var cellDist = (rowInGrid(u.row) && field.dist[u.row]) ? field.dist[u.row][u.col] : 1e9;
+
+    /* 兜底自救（放在「被堵死」判定之前，否则走不到这里）：
+     *
+     * 这里要处理两种情况：
+     *  A. 单位出生在己方建筑格里（兵本来就能和建筑重叠）→ 必须能走出去
+     *  B. 单位在通道行（行11/行0）但路线图整片断开 → 必须能横向找到能进场的列
+     *     （否则玩家把自己家进场行封死时，兵会永远卡在通道里 —— 实测到的 bug）
+     *
+     * 注意方向稳定性：一旦选定一个脱困方向，**同一格上连续多次必须选同一方向**，
+     * 否则两个方案来回比较会形成「左右反复跳」（实测到的 bug）。
+     * 做法：把「候选方向」按固定顺序（先朝敌方，再横移）排好，取第一个可行即可。 */
+    var inChannelNow = !rowInGrid(u.row);
+    if (cellDist >= 1e9) {
+      var esc2 = null;
+      /* 在通道里：优先找「本列能不能进」→ 不能就左右找最近的能进场列（只走 1 格）。
+       * 用固定的偏向（先左后右、距离近优先），保证每次算出来的方向一样。 */
+      if (inChannelNow) {
+        // 本列的进场格能不能走？
+        var entR = entryRowOf(team);
+        var canEnterCol = function (c) {
+          if (c < 1 || c > COLS) return false;
+          if (state.grid[entR][c]) return false;
+          if (isBaseCell(BASE_RECT[team], entR, c)) return false;
+          if (isBaseCell(BASE_RECT[OPP[team]], entR, c)) return false;
+          return field.dist[entR][c] < 1e9;
+        };
+        if (canEnterCol(u.col)) {
+          // 理论上不会走到这里（能进就有 dist），但保险起见
+          esc2 = { r: entR, c: u.col };
+        } else {
+          var bestC = null, bestD = 999;
+          for (var dc = 1; dc <= COLS; dc++) {
+            // 先查左边再查右边，同距离取左（保证方向稳定）
+            var cl = u.col - dc, cr = u.col + dc;
+            if (cl >= 1 && canEnterCol(cl) && dc < bestD) { bestD = dc; bestC = cl; }
+            if (bestC === null && cr <= COLS && canEnterCol(cr) && dc < bestD) { bestD = dc; bestC = cr; }
+          }
+          if (bestC !== null) esc2 = { r: u.row, c: u.col + (bestC > u.col ? 1 : -1) };
+        }
+      } else {
+        // 在棋盘内但这一格不可达 → 找有方向的邻格（固定顺序：朝敌方优先）
+        var dirs4 = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        var toward = DIR[team] > 0 ? -1 : 1;   // 蓝方向上、红方向下
+        var ordered = [
+          [toward, 0], [0, -1], [0, 1], [-toward, 0]
+        ];
+        for (var ei = 0; ei < ordered.length; ei++) {
+          var er = u.row + ordered[ei][0], ec = u.col + ordered[ei][1];
+          if (!rowInGrid(er) || ec < 1 || ec > COLS) continue;
+          var eb = state.grid[er][ec];
+          if (eb && eb.team !== team && u.def.priority !== 'siege') continue;
+          if (!field.dir[er] || !field.dir[er][ec]) continue;
+          if (field.dist[er][ec] >= 1e9) continue;
+          esc2 = { r: er, c: ec };
+          break;
+        }
+      }
+      if (esc2) {
+        var rEsc = smoothMove(state, u, esc2);
+        if (rEsc === 'blocked') return { type: 'blocked', reason: '脱困失败' };
+        return { type: 'move', row: u.row, col: u.col, reason: '脱困' };
+      }
+    }
+
+    // 彻底被堵死（这一格对大本营来说不可达）
+    if (rowInGrid(u.row) && cellDist >= 1e9) {
+      var wAhead = wallAheadOf(state, u, u.row, u.col);
+      u.blockedBy = wAhead || null;
+      if (wAhead && u.def.priority === 'siege') return { type: 'attack', reason: '拆墙' };
+      return { type: 'blocked', reason: '被建筑彻底挡住，到不了敌方大本营' };
+    }
+    /* ★ 通道行（行B / 行A）的横向换列 ★
+     * 玩家把自家入口附近整排盖满时，路线图会整片断开。
+     * 这时兵不能呆在原地干等（实测：会站一整局），要沿通道左右移动，
+     * 找到一个「进场格是空的」的列再进场。
+     * 方向规则：**先查左边一格，再查右边一格** —— 顺序固定，
+     * 保证同一个兵的决策稳定，不会左右反复跳（实测过这种 bug）。 */
+    if (!rowInGrid(u.row)) {
+      var entRow2 = entryRowOf(team);
+      /* 这一列能不能进场：
+       *   · 空的 → 能
+       *   · 己方进场行上的建筑 → 也能（地面兵可以穿过去，玩家要在这行自由布局）
+       *   · 双方大本营格 / 其它建筑 → 不能 */
+      var colOk2 = function (c) {
+        if (c < 1 || c > COLS) return false;
+        if (!rowInGrid(entRow2)) return false;
+        if (isBaseCell(BASE_RECT[team], entRow2, c)) return false;
+        if (isBaseCell(BASE_RECT[OPP[team]], entRow2, c)) return false;
+        var b = state.grid[entRow2][c];
+        if (!b) return true;
+        return (b.team === team);   // 己方建筑（进场行）可以穿
+      };
+      if (!colOk2(u.col)) {
+        var nx2 = null;
+        if (colOk2(u.col - 1)) nx2 = u.col - 1;
+        else if (colOk2(u.col + 1)) nx2 = u.col + 1;
+        if (nx2 === null) return { type: 'wait', reason: '整行入口都被建筑堵住' };
+        var rLane = smoothMove(state, u, { r: u.row, c: nx2 });
+        if (rLane === 'blocked') return { type: 'wait', reason: '通道横移受阻' };
+        return { type: 'move', row: u.row, col: u.col, reason: '通道内换列' };
+      }
+      // 本列可进 → 直接进场
+      var rIn = smoothMove(state, u, { r: entRow2, c: u.col });
+      if (rIn === 'blocked') return { type: 'wait', reason: '进场受阻' };
+      if (rIn === 'moved') return { type: 'enter', row: u.row, col: u.col };
+      return { type: 'move', row: u.row, col: u.col };
+    }
+    var ct = (field.dir[u.row] && field.dir[u.row][u.col]) || null;
+    // 路线图指向敌方建筑（只可能是攻城兵：他把建筑当目标）
+    if (ct && wallAtTeam(state, team, ct.r, ct.c)) {
+      u.blockedBy = wallAtTeam(state, team, ct.r, ct.c);
+      if (u.def.priority === 'siege') return { type: 'attack', reason: '拆墙' };
+      return { type: 'blocked', building: u.blockedBy };
+    }
+    if (!ct) {
+      // 没有下一步：要么已经贴着大本营（能打就打），要么真的没路
+      if (hasNonBaseTarget(state, u)) return { type: 'attack', reason: '原地开打' };
+      var wNear = wallAheadOf(state, u, u.row, u.col);
+      if (wNear && u.def.priority === 'siege') { u.blockedBy = wNear; return { type: 'attack', reason: '拆墙' }; }
+      /* 兜底自救：单位有可能出生在「己方大本营那一格」上（单位本来就能和建筑重叠），
+       * 而大本营格在路线图里是没有方向的 —— 这时它会永远站着不动（实测到的 bug）。
+       * 自救规则：只要能走到一个「有方向的邻格」就走出去。
+       *   · 邻格是敌方建筑 → 只有拆建筑型能站上去（打兵型不行）
+       *   · 邻格是己方建筑 → 一律放行（自己的兵本来就该能走自己家）
+       *   · 然后检查那一格在路线图里有没有方向，有就说明有出路。 */
+      var esc = null;
+      var dirs4 = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+      for (var ei = 0; ei < dirs4.length; ei++) {
+        var er = u.row + dirs4[ei][0], ec = u.col + dirs4[ei][1];
+        if (!rowInGrid(er) || ec < 1 || ec > COLS) continue;
+        var eb = state.grid[er][ec];
+        if (eb && eb.team !== team && u.def.priority !== 'siege') continue;   // 打兵型不能站敌建筑
+        if (!field.dir[er] || !field.dir[er][ec]) continue;                   // 那一格也没方向 → 死路
+        if (field.dist[er][ec] >= 1e9) continue;
+        // 优先往敌方方向走
+        if (!esc || (DIR[team] > 0 ? (er < esc.r) : (er > esc.r))) esc = { r: er, c: ec };
+      }
+      if (esc) ct = esc;    // 找到出口，继续往下走「前进」流程
+      else return { type: 'wait', reason: '没有去路，原地待命' };
+    }
+    // 前进（同格多兵时按让位优先度排队）
+    var rivalsC = state.units.filter(function (o) {
+      return o !== u && o.team === team && !o.def.air && o.row === ct.r && o.col === ct.c;
+    });
+    var myPc = priorityAt(state, team, u.row, u.col);
+    if (!rivalsC.some(function (o) { return priorityAt(state, team, o.row, o.col) < myPc; })) {
+      // 连续移动：目标格提前锁定，进度按速度均匀累积（见 smoothMove 的注释）
+      var rFwd = smoothMove(state, u, ct);
+      if (rFwd === 'blocked') return { type: 'blocked', reason: '那一格是建筑' };
+      return { type: 'move', row: u.row, col: u.col, moving: rFwd === 'moving' };
+    }
+    u.moveProg = 0; u.nextStep = null;
+    return { type: 'move', row: u.row, col: u.col };
+  }
+
+  /* ------------------------------------------------------------ 主循环 */
+  function update(state, dt) {
+    if (state.over) return state;
+    dt = dt || DT;
+    state.time += dt;
+    state.tick++;
+
+    // 0) 决胜时刻：5 分钟后双方大本营一起持续掉血（且越来越快），
+    //    避免两边都堆满兵互相僵持、永远打不完。先被烧掉的一方输。
+    //    可以用 state.suddenDeath = false 关掉（玩家想要超长对局时）。
+    if (state.suddenDeath !== false && state.time > SUDDEN_DEATH_AT) {
+      var extra = (state.time - SUDDEN_DEATH_AT) / 90;          // 每过 1.5 分钟加剧一档
+      TEAMS.forEach(function (team) {
+        if (state.over) return;
+        var base = ownBase(state, team);
+        if (base) { base.hp -= SUDDEN_DEATH_DPS * (1 + extra) * dt; base.justDamaged = state.time; }
+      });
+      TEAMS.forEach(function (team) {
+        if (state.over) return;
+        var base = ownBase(state, team);
+        if (base && base.hp <= 0) removeBuilding(state, base);
+      });
+      if (state.over) return state;
+    }
+
+    // 1) 收入：大本营固定收入 + 金矿等其他资源建筑（等级越高产出越多）
+    TEAMS.forEach(function (team) {
+      var inc = DATA.baseLevels[state.baseLevel[team] - 1].income;
+      state.buildings.forEach(function (b) {
+        if (b.team === team && b.def.income) inc += statsForLevel(b.def, b.level || 1, b.branch).income;
+      });
+      state.res[team] += inc * dt;
+      state.stats[team].income += inc * dt;
+      // 派兵冷却
+      for (var c = 1; c <= COLS; c++) {
+        if (state.deployCd[team][c] > 0) state.deployCd[team][c] = Math.max(0, state.deployCd[team][c] - dt) < 0.001 ? 0 : Math.max(0, state.deployCd[team][c] - dt);
+      }
+    });
+
+    // 1.5) 建筑自我修复：停火 8 秒后回血
+    //   大本营 1%/秒；其他建筑是大本营的一半（0.5%/秒）
+    //   注意：不停被攻击的建筑必须先进入 8 秒停火期才会回血 ——
+    //   damageBuilding 每次都刷新 justDamaged 时间戳，所以持续挨打的建筑不会回血，
+    //   否则「一群攻城兵打不掉一面墙」会变成常态。
+    state.buildings.forEach(function (b) {
+      var isBase = !!b.def.isBase;
+      var cfg = isBase ? DATA.selfHeal : DATA.buildingSelfHeal;
+      if (state.time - (b.justDamaged != null ? b.justDamaged : -999) < cfg.delay) return;
+      if (b.hp < b.hpMax) {
+        b.hp = Math.min(b.hpMax, b.hp + b.hpMax * cfg.perSecond * dt);
+      }
+    });
+
+    // 1.6) 法术冷却 + 士兵冷却（时间冷却制：冷却好了才能再派这个兵种）
+    TEAMS.forEach(function (team) {
+      var cd = state.spellCd[team];
+      Object.keys(cd).forEach(function (k) { if (cd[k] > 0) cd[k] = Math.max(0, cd[k] - dt) < 0.001 ? 0 : Math.max(0, cd[k] - dt); });
+      var uc = state.unitCd[team];
+      Object.keys(uc).forEach(function (k) { if (uc[k] > 0) uc[k] = Math.max(0, uc[k] - dt) < 0.001 ? 0 : Math.max(0, uc[k] - dt); });
+    });
+
+    // 2) 建筑产兵已改为「士兵时间冷却制」：士兵不再由建筑训练，
+    //    而是各自有冷却（步兵 5 秒，越贵越久），冷却好了就能花金币派出去。
+    //    所以这里不再有训练逻辑。
+
+    // 3) 单位移动
+    for (var i = 0; i < state.units.length; i++) {
+      var u = state.units[i];
+      if (u.hp <= 0) continue;
+      stepUnit(state, u);
+    }
+
+    // 4) 单位攻击（移动完再打，避免刚进门就打）
+    for (var j = 0; j < state.units.length; j++) {
+      var u2 = state.units[j];
+      if (u2.hp <= 0) continue;
+      if (isFrozen(state, u2)) continue;      // 被冰冻：不能攻击
+      u2.atkTimer += dt;
+      var t = pickTarget(state, u2);
+      if (!t) { u2.targetBuilding = null; continue; }
+      u2.targetBuilding = t.kind === 'building' ? t.id : null;
+      var interval2 = u2.def.atkInterval;
+      if (u2.rageUntil && state.time < u2.rageUntil) interval2 *= 0.5;  // 狂暴：攻速翻倍
+      if (u2.atkTimer < interval2) continue;
+      u2.atkTimer = 0;
+      var atk2 = u2.def.atk * globalBonus(state, u2.team).unitAtk;
+      if (u2.weakenUntil && state.time < u2.weakenUntil) atk2 *= (u2.weakenMul != null ? u2.weakenMul : 0.2);
+      applyHit(state, u2, t, atk2);
+    }
+
+    // 5) 建筑攻击（塔）—— 攻击力/攻速/射程随等级与分支变化，并按攻击模式结算
+    state.buildings.forEach(function (b) {
+      if (!b.def.atk) return;
+      if (isFrozen(state, b)) return;          // 被冰冻：建筑不能攻击
+      var wst = combatStatsOf(b);   // 大本营在这里会自动取「同级别法师塔」的数值
+
+      /* ★ 每帧更新「瞄准点」★
+       * 玩家要求：建筑的炮口要跟着敌人转向。
+       * 以前的实现只在**开火那一刻**才找目标，所以渲染层根本不知道炮口该朝哪。
+       * 现在每帧都挑一次目标（只为了记录方位，不产生伤害），
+       * 渲染层据此计算角度并平滑旋转炮口。 */
+      var aimTgt = pickTowerTarget(state, b);
+      if (aimTgt) {
+        b.aimRow = aimTgt.row;
+        b.aimCol = aimTgt.col;
+        b.aimAt = state.time;      // 最后有目标的时间（渲染层用来决定是否转动）
+      }
+
+      b.atkTimer += dt;
+      var interval = wst.atkInterval || b.def.atkInterval;
+      var boosted = (b.rageUntil && state.time < b.rageUntil) ? 0.5 : 1;   // 狂暴：攻速翻倍
+      if (b.atkTimer < interval * boosted) return;
+      var tgt = aimTgt;            // 复用这一帧已经算好的目标
+      if (!tgt) return;
+      b.atkTimer = 0;
+      // 弱化：伤害降低
+      var weak = (b.weakenUntil && state.time < b.weakenUntil) ? (b.weakenMul != null ? b.weakenMul : 0.2) : 1;
+      var gb = globalBonus(state, b.team);
+      var st = { atk: wst.atk * weak * gb.buildingAtk };
+      var hits = towerHitList(state, b, wst, tgt);
+      var pst = projStyle(b);
+      hits.forEach(function (o) {
+        if (o.hp <= 0) return;
+        state.projectiles.push({
+          id: state.nextId++, from: centerOf(b), to: centerOf(o), targetId: o.id,
+          kind: 'unit', atk: st.atk, ttl: pst.life, team: b.team,
+          proj: pst, arc: pst.arc, born: state.time,
+          fromKey: b.key, fromId: b.id          // 供渲染/调试区分来源
+        });
+        damageUnit(state, o, st.atk);
+      });
+    });
+
+    // 6) 弹道淡出
+    for (var k = state.projectiles.length - 1; k >= 0; k--) {
+      state.projectiles[k].ttl -= dt;
+      var p = state.projectiles[k];
+      if (p.targetId) {
+        var tt = state.units.filter(function (o) { return o.id === p.targetId; })[0];
+        if (tt) { p.to = centerOf(tt); p.ttl = Math.max(p.ttl, 0); }
+      }
+      if (p.ttl <= 0) state.projectiles.splice(k, 1);
+    }
+
+    // 7) 清理死亡单位（damageUnit 已经移除，这里兜底）
+    state.units = state.units.filter(function (o) { return o.hp > 0; });
+
+    // 8) 事件日志上限
+    if (state.events.length > 200) state.events.splice(0, state.events.length - 200);
+    if (state.time > MAX_SIM_SECONDS) { state.over = true; state.winner = 'draw'; emit(state, 'gameover', { winner: 'draw' }); }
+    return state;
+  }
+
+  function applyHit(state, attacker, target, atkOverride) {
+    var atk = atkOverride != null ? atkOverride : attacker.def.atk;
+    var pst2 = projStyle(attacker);
+    var srcKey = (attacker.def && attacker.def.key) || attacker.key;
+    if (target.kind === 'building') {
+      damageBuilding(state, target, atk, attacker);
+      state.projectiles.push({
+        id: state.nextId++, from: centerOf(attacker), to: centerOf(target), targetId: target.id,
+        kind: 'building', atk: atk, ttl: pst2.life, team: attacker.team,
+        proj: pst2, arc: pst2.arc, born: state.time,
+        fromKey: srcKey, fromId: attacker.id
+      });
+    } else {
+      damageUnit(state, target, atk);
+      // 打兵也要有可视弹道（「子弹要看得见」）
+      state.projectiles.push({
+        id: state.nextId++, from: centerOf(attacker), to: centerOf(target), targetId: target.id,
+        kind: 'unit', atk: atk, ttl: pst2.life, team: attacker.team,
+        proj: pst2, arc: pst2.arc, born: state.time,
+        fromKey: srcKey, fromId: attacker.id
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ 弹道外观
+   * 按攻击者类型决定「这一发看起来是什么」，供渲染层画飞行中的投射物。
+   * 返回 { type, color, size, arc, life }：
+   *   type  'ball' 炮弹/炸弹 | 'arrow' 箭矢 | 'bolt' 弩矢 | 'orb' 法术球
+   *         'shell' 高抛炮弹 | 'spark' 电花 | 'slash' 近战刀光 | 'crit' 重型
+   *   arc   抛物线高度系数（0 = 直线）
+   *   life  飞行时长（秒）—— 让玩家能看清「子弹飞过去」的过程
+   * ------------------------------------------------------------------ */
+  var PROJ_STYLE = {
+    // 建筑
+    cannon: { type: 'ball', color: '#ffd27a', size: 0.13, arc: 0.10, life: 0.26 },
+    arrow: { type: 'arrow', color: '#d8ffb0', size: 0.11, arc: 0.05, life: 0.22 },
+    mage: { type: 'orb', color: '#c79bff', size: 0.15, arc: 0.0, life: 0.30 },
+    /* 迫击炮：高高抛上天再砸下来。
+     * arc 0.85 = 抛物线顶点接近 1 格高，life 0.70s 让"上天→落下"看得清。
+     * aoe = 溅射半径（渲染层据此画落点预警圈和爆炸范围）。 */
+    mortar: { type: 'shell', color: '#ffb070', size: 0.15, arc: 0.85, life: 0.70, aoe: 1 },
+    tesla: { type: 'spark', color: '#8ff0e0', size: 0.13, arc: 0.0, life: 0.24 },
+    ward: null,
+    base: { type: 'orb', color: '#9fd4ff', size: 0.14, arc: 0.0, life: 0.28 },
+    // 兵种
+    archer: { type: 'arrow', color: '#d8ffb0', size: 0.10, arc: 0.04, life: 0.20 },
+    balloon: { type: 'ball', color: '#ff9ac0', size: 0.12, arc: 0.22, life: 0.32 },
+    airship: { type: 'ball', color: '#b0a0e0', size: 0.13, arc: 0.30, life: 0.34 },
+    dragon: { type: 'orb', color: '#ff8a4a', size: 0.15, arc: 0.06, life: 0.30 },
+    infantry: { type: 'slash', color: '#dff0ff', size: 0.16, arc: 0, life: 0.16 },
+    heavy: { type: 'slash', color: '#cfe0f0', size: 0.18, arc: 0, life: 0.18 },
+    siege: { type: 'slash', color: '#ffd0a0', size: 0.14, arc: 0, life: 0.16 },
+    ram: { type: 'crit', color: '#ffcf8a', size: 0.20, arc: 0, life: 0.22 }
+  };
+
+  function projStyle(attacker) {
+    /* 用 def.key 而不是实例的 key：
+     * 分支升级后实例的 key 可能被改成分支名（如 'bigmortar'），
+     * 而弹道外观是按**基础类型**决定的（巨炮也是炮弹，只是更大）。
+     * 这样分支塔不会退化成默认外观（实测到的 bug）。 */
+    var key = (attacker.def && attacker.def.key) || attacker.key;
+    var s = PROJ_STYLE[key];
+    if (!s) s = { type: 'ball', color: '#dfe8f5', size: 0.11, arc: 0.05, life: 0.22 };
+    return { type: s.type, color: s.color, size: s.size, arc: s.arc,
+             life: s.life, aoe: s.aoe || 0 };
+  }
+
+  function emit(state, type, payload) {
+    state.events.push(Object.assign({ type: type, t: state.time }, payload || {}));
+  }
+
+  /* ------------------------------------------------------------ 电脑对手 */
+  /* 规则很朴素，但能完整打完一局：先补经济 → 有威胁就派兵 → 造塔防守 → 有钱就升基地。 */
+  /* ============================================================================
+   * 电脑对手（AI）
+   * 三档难度：靠「思考频率 / 是否犯错 / 是否穷尽算力」区分
+   *   normal 普通：思考慢、会犯错、留余钱 —— 真人大概 60% 能赢
+   *   hard   困难：思考快、几乎不犯错     —— 真人要打得好才能赢
+   *   hell   地狱：满算力、针对克制、卡冷却连波，真人几乎赢不了
+   * ========================================================================== */
+  var AI_PRESETS = {
+    normal: {
+      key: 'normal', name: '普通',
+      thinkEvery: 2.4, mistakeRate: 0.55, reserve: 10,
+      upgradeBudget: 0.20, maxMines: 1, maxTowers: 2, aceTarget: 1, wardCap: 0,
+      spellEager: 0.30, smartDeploy: false, smartTower: false, allIn: false,
+      adaptive: false,                       // 不按形势调整（永远中庸）→ 该退时不退
+      enemyBaseHeal: 1.0, enemyBaseHealDelay: 12   // 普通：电脑大本营 12 秒后才回血（给玩家留活路）
+    },
+    hard: {
+      key: 'hard', name: '困难',
+      thinkEvery: 1.0, mistakeRate: 0.12, reserve: 15,
+      upgradeBudget: 0.75, maxMines: 4, maxTowers: 5, aceTarget: 4, wardCap: 1,
+      spellEager: 0.55, smartDeploy: true, smartTower: true, allIn: false,
+      adaptive: true,                        // 会算实力对比
+      enemyBaseHeal: 1.0, enemyBaseHealDelay: 10
+    },
+    hell: {
+      key: 'hell', name: '地狱',
+      thinkEvery: 0.5, mistakeRate: 0, reserve: 0,
+      upgradeBudget: 1.0, maxMines: 8, maxTowers: 10, aceTarget: 10, wardCap: 3,
+      spellEager: 0.8, smartDeploy: true, smartTower: true, allIn: false,
+      adaptive: true,                        // 算得最细 + 集中兵力打弱点
+      enemyBaseHeal: 1.0, enemyBaseHealDelay: 6    // 地狱：回血最快，靠硬实力赢
+    }
+  };
+  function aiPresetOf(state, team) {
+    var k = (state.aiPreset && state.aiPreset[team]) || 'hard';
+    return AI_PRESETS[k] || AI_PRESETS.hard;
+  }
+
+  /* 实时局势分析：敌方兵种构成 / 主攻列 / 我方压力 */
+  function analyzeBoard(state, team) {
+    var foe = OPP[team];
+    var info = {
+      ground: 0, air: 0, siegeType: 0, ranged: 0, total: 0,
+      inMyHalf: 0, pressure: 0, laneCount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      myGround: 0, myAir: 0, towers: 0, mines: 0, wards: 0,
+      foeBaseHp: 1, myBaseHp: 1, mainLane: 1
+    };
+    state.units.forEach(function (u) {
+      if (u.team === foe) {
+        info.total++;
+        if (u.def.air) info.air++; else info.ground++;
+        if (u.def.priority === 'siege') info.siegeType++;
+        if (u.def.range > 1.5) info.ranged++;
+        if (inHalf(team, u.row, u.col)) { info.inMyHalf++; info.pressure += u.def.atk; }
+        if (u.col >= 1 && u.col <= COLS) info.laneCount[u.col]++;
+      } else {
+        if (u.def.air) info.myAir++; else info.myGround++;
+      }
+    });
+    state.buildings.forEach(function (b) {
+      if (b.team !== team) return;
+      if (b.def.atk && !b.def.isBase) info.towers++;   // 大本营不算「塔」
+      if (b.key === 'mine') info.mines++;
+      if (b.key === 'ward') info.wards++;
+    });
+    var myB = ownBase(state, team), foeB = enemyBase(state, team);
+    if (myB) info.myBaseHp = myB.hp / myB.hpMax;
+    if (foeB) info.foeBaseHp = foeB.hp / foeB.hpMax;
+    var mx = -1;
+    for (var c = 1; c <= COLS; c++) if (info.laneCount[c] > mx) { mx = info.laneCount[c]; info.mainLane = c; }
+    return info;
+  }
+
+  /* ============================================================================
+   * 战略层：局势评估 → 阶段划分 → 决定「这一步该把钱花在哪」
+   *
+   * 对齐过的总体思路：
+   *   前期（经济期）    ：优先经济发展，防御只留最低限度，不主动进攻
+   *   中期（巩固期）    ：补齐防线、升级主力建筑、继续扩经济
+   *   中后期（形势判断期）：不再有固定套路，按「我和对手谁更强」实时决定
+   *                        · 对手强   → 不主动出击，缩回来堆防御 + 囤资源 + 升科技
+   *                        · 势均力敌 → 经济、升级、找机会进攻三件事按收益分配
+   *                        · 对手弱   → 抓时机主动出击，集中兵力打弱点
+   *
+   * 难度决定「算得多细」：
+   *   普通：只看阶段、不算双方实力对比（该退时不退，容易被抓）
+   *   困难：会算实力对比，反应稍慢、分配比例较固定
+   *   地狱：算得很细（经济/兵力/防御/科技四项），并且会集中兵力打弱点
+   * ========================================================================== */
+
+  /* 评估双方实力：经济、收入、兵力、科技、防御，各算一个综合分 */
+  function assessPower(state, team) {
+    var foe = OPP[team];
+    function side(t) {
+      var income = 0, towers = 0, mineLv = 0, bLevel = baseLevelOf(state, t);
+      state.buildings.forEach(function (b) {
+        if (b.team !== t) return;
+        var inf = buildingInfo(state, b);
+        if (inf.income) income += inf.income;
+        if (b.def.atk) towers += (b.level || 1);
+        if (b.key === 'mine') mineLv += (b.level || 1);
+      });
+      var army = 0, armyValue = 0, airUnits = 0;
+      state.units.forEach(function (u) {
+        if (u.team !== t || u.hp <= 0) return;
+        army++;
+        armyValue += u.def.cost * (u.hp / u.hpMax);   // 残血单位价值打折
+        if (u.def.air) airUnits++;
+      });
+      var g = globalBonus(state, t);
+      var tech = g.buildingAtk * g.buildingHp * g.unitAtk * g.unitHp;
+      var base = ownBase(state, t);
+      var baseHpPct = base ? (base.hp / base.hpMax) : 0;
+      var score = income * 3 + armyValue * 0.02 + towers * 8 + bLevel * 6 +
+                  Math.log(tech) * 10 + baseHpPct * 30 + mineLv * 2;
+      return { income: income, towers: towers, army: army, armyValue: armyValue,
+               airUnits: airUnits, bLevel: bLevel, tech: tech, baseHpPct: baseHpPct,
+               mineLv: mineLv, score: score };
+    }
+    var me = side(team), you = side(foe);
+    var ratio = you.score > 0.01 ? me.score / you.score : 2;
+    var stance = ratio >= 1.25 ? 'ahead' : (ratio <= 0.8 ? 'behind' : 'even');
+    return { me: me, foe: you, ratio: ratio, stance: stance };
+  }
+
+  /* 当前阶段 */
+  function assessPhase(state, team, P, pw) {
+    if (state.time < 55) return 'economy';
+    if (state.time < 130 && pw.me.towers < 3) return 'economy';
+    if (pw.me.towers < P.maxTowers && (state.time < 220 || pw.me.baseHpPct > 0.75)) return 'consolidate';
+    return 'adapt';
+  }
+
+  /* 按阶段 + 形势，算出各类支出的意愿权重 */
+  function planSpending(state, team, P, pw, phase) {
+    var w;
+    if (phase === 'economy') {
+      w = { economy: 3.0, defense: 1.2, upgrade: 0.8, army: 0.4, tech: 0.5 };
+    } else if (phase === 'consolidate') {
+      w = { economy: 1.6, defense: 2.0, upgrade: 1.8, army: 0.9, tech: 1.0 };
+    } else {
+      if (pw.stance === 'behind') {
+        w = { economy: 2.0, defense: 2.5, upgrade: 1.8, army: 0.5, tech: 1.6 };
+      } else if (pw.stance === 'ahead') {
+        w = { economy: 0.6, defense: 0.8, upgrade: 1.0, army: 2.5, tech: 1.0 };
+      } else {
+        w = { economy: 1.2, defense: 1.4, upgrade: 1.5, army: 1.2, tech: 1.2 };
+      }
+    }
+    // 普通档不按形势调整（永远中庸）→ 该退的时候不退，玩家好打
+    if (!P.adaptive) w = { economy: 1.4, defense: 1.4, upgrade: 1.2, army: 1.2, tech: 0.8 };
+    // 求生本能（所有难度都生效）：大本营快没了先自保
+    if (pw.me.baseHpPct < 0.4) { w.defense *= 2.5; w.army *= 0.4; w.economy *= 0.6; }
+    // 对面大本营快没了 → 全力收尾
+    if (pw.foe.baseHpPct < 0.35) { w.army *= 3; w.defense *= 0.5; w.economy *= 0.3; }
+    /* 关键：前期（经济期）也要看形势 —— 玩家明确要求
+     * 「对手较强，我先发展经济和建设防御，不主动出击」。
+     * 否则电脑前期被压着打还闷头发展，直接被推平，看起来就很蠢。 */
+    if (P.adaptive && pw.stance === 'behind' && (phase === 'economy' || phase === 'consolidate')) {
+      w.defense = Math.max(w.defense * 2.0, 2.2);   // 先立防线
+      w.army = 0.3;                                 // 完全不主动出击
+      w.tech = Math.max(w.tech, 1.0);
+    }
+    // 前期被压得很惨（兵都进家门了）→ 连经济都要让位给防御
+    if (P.adaptive && pw.me.baseHpPct < 0.75 && (phase === 'economy' || phase === 'consolidate')) {
+      w.defense = Math.max(w.defense * 1.6, 2.5);
+      w.economy *= 0.5;
+      w.army = Math.min(w.army, 0.4);
+    }
+    return w;
+  }
+
+  function aiThink(state, team) {
+    if (state.over) return;
+    var base = ownBase(state, team);
+    if (!base) return;
+    var P = aiPresetOf(state, team);
+    var lvl = baseLevelOf(state, team);
+    var A = analyzeBoard(state, team);
+    var pw = assessPower(state, team);                  // 双方实力对比
+    var phase = assessPhase(state, team, P, pw);        // 当前阶段
+    var W = planSpending(state, team, P, pw, phase);    // 支出意愿权重
+    var spendable = Math.max(0, state.res[team] - P.reserve);
+    var sloppy = P.mistakeRate > 0 && rand(state) < P.mistakeRate;
+
+    state.aiPlan = state.aiPlan || {};
+    state.aiPlan[team] = {
+      phase: phase, stance: pw.stance, ratio: Number(pw.ratio.toFixed(2)),
+      weights: W, myScore: Number(pw.me.score.toFixed(1)), foeScore: Number(pw.foe.score.toFixed(1))
+    };
+
+    /* 决胜阶段（all-in）：全力推家，不再攒钱
+     *
+     * 重要教训（实测抓到的 bug）：一开始把 allIn 写成「一旦触发就永久生效」，
+     * 结果地狱档触发后就永远放弃经济和防御，被困难档用经济差活活拖死
+     * （地狱 vs 困难 胜率只有 38%，难度阶梯整个反了）。
+     * 改成**限时冲锋**：冲一波 45 秒，到点回去补经济和防线，条件再满足还能再冲。
+     * 这样「推家」和「发育」是交替的，而不是二选一。 */
+    var PUSH_TIME = 45;
+    state.aiPush = state.aiPush || {};
+    var pushUntil = state.aiPush[team] || 0;
+
+    var myUnits = A.myGround + A.myAir;
+    var pushReady = false;
+    // 「一波推平」的终局条件：对面大本营已经残了，不收就浪费机会
+    var finishable = (pw.foe.baseHpPct < 0.5);
+    if (P.allIn) {
+      if (finishable) pushReady = true;
+      // 注意：不能写「时间 > 250 就永久冲锋」——实测发现那样电脑会把钱全砸进攻，
+      // 大本营永远停在 Lv1、塔停在 Lv3，反而谁也打不过。冲锋必须短促。
+      else if (lvl >= DATA.baseLevels.length && state.time > 120) pushReady = true;
+      else if (A.towers >= 4 && myUnits >= 5 && pw.stance !== 'behind') pushReady = true;
+    } else if (P.adaptive && pw.stance === 'ahead' && pw.foe.baseHpPct < 0.6 && myUnits >= 4) {
+      pushReady = true;   // 困难档：确认领先且对面大本营已掉血
+    }
+    // 只有「没在冲锋中」才开启新的冲锋
+    if (pushReady && state.time >= pushUntil) {
+      state.aiPush[team] = state.time + PUSH_TIME;
+      pushUntil = state.aiPush[team];
+    }
+    var allIn = (state.time < pushUntil);
+    if (allIn) spendable = state.res[team];
+
+    /* 攒兵 vs 冲锋：冲锋结束后进入「攒兵期」，攒够 PUSH_EVERY 秒再冲一波。
+     * 攒兵期【不主动派兵】，只做经济/防御/升级 —— 把钱和冷却都攒起来，
+     * 冲锋号一响再集中放出去。
+     * 为什么必须这样：实测发现电脑是「每 5 秒冷却好一个兵就单独送上去」，
+     * 被对方防线逐个吃掉（地狱档场上峰值 31 个兵、累计出兵 68 次，还是输给普通档）。
+     * 集中一波 >> 分 20 波送。 */
+    var PUSH_EVERY = 40;
+    var massing = (!allIn && P.allIn && state.time >= pushUntil - PUSH_EVERY && state.time < pushUntil);
+
+    /* ---------- 0) 经济：金矿是收入来源，优先级高于一切消费 ----------
+     * 教训（实测抓到的死循环）：电脑的金币每次涨到 ~110 就被「补兵/补塔」花掉，
+     * 而金矿要 150 —— 于是它一整局都建不出第二座矿，收入永远锁在 5 金/秒。
+     * 所以这里定成**硬优先**：矿不够时必须攒钱，攒的过程中不派兵、不补塔。 */
+    var mineCost = DATA.buildings.mine.cost;
+    var incomeStarved = (A.mines < P.maxMines && W.economy >= 0.8 && !allIn);
+    if (incomeStarved) {
+      // ① 钱够了 → 立刻建矿（不看任何其它条件）
+      if (spendable >= mineCost + 10) {
+        var spotM0 = findSpot(state, team, 'mine', 'rear');
+        if (spotM0 && placeBuilding(state, team, 'mine', spotM0.row, spotM0.col).ok) return;
+      }
+      // ② 钱还差点 → 这一步什么都不买，专门攒钱（只有「快被推平」时才破例去补防御）
+      var urgent = (pw.me.baseHpPct < 0.7 || A.inMyHalf >= 3);
+      if (!urgent) {
+        // 连金矿升级也先等着，先把新矿建出来
+        return;
+      }
+    } else if (A.mines < P.maxMines && W.economy >= 0.8 && !allIn && spendable >= mineCost + 10) {
+      var spotM1 = findSpot(state, team, 'mine', 'rear');
+      if (spotM1 && placeBuilding(state, team, 'mine', spotM1.row, spotM1.col).ok) return;
+    }
+    var mineB = state.buildings.filter(function (b) { return b.team === team && b.key === 'mine'; })[0];
+    if (!allIn && mineB && (mineB.level || 1) < 5 && W.economy >= 0.9) {
+      var mc = buildingUpgradeCost(mineB);
+      if (mc != null && spendable * P.upgradeBudget >= mc && upgradeBuilding(state, mineB).ok) return;
+    }
+
+    /* ---------- 0.5) 大本营升级：一个必须专门攒钱的硬目标 ----------
+     * 实测教训（这次抓到的最大问题）：电脑的金币峰值就是开局那 260，
+     * 而升大本营要 320 —— 于是它**一整局都升不了大本营**（实测 320 秒内峰值 263）。
+     * 后果：收入一直卡在 3/秒、法术一直解锁不了、大本营一直 3200 血。
+     *
+     * 做法：前两座金矿立起来之后，「升大本营」升格为最高优先级的攒钱目标，
+     * 钱没攒够的这段时间**冻结一切其它消费**（铺塔/防御塔/升级/出兵），
+     * 只有「家快被推平」才破例。 */
+    var baseUpCost = (lvl < DATA.baseLevels.length) ? DATA.baseLevels[lvl - 1].upgradeCost : null;
+    // 只攒到 Lv3（前两级便宜、收益高：收入 3→4→5）。再往上 550/850/1250 太贵，
+    // 一直攒会把塔和兵全饿死（实测：整局只有 2 座塔）。
+    // 要求「金矿已经铺到本档上限」而不是硬写 2 —— 普通档上限只有 1 座，
+    // 写死 >= 2 会让 baseGoal 永假，于是它既不升大本营也不建塔（实测死锁）。
+    var mineDone = (A.mines >= Math.min(2, P.maxMines));
+    var baseGoal = (baseUpCost != null && lvl < 3 && mineDone && !allIn && P.upgradeBudget >= 0.5);
+    if (baseGoal && state.res[team] >= baseUpCost) { if (upgradeBase(state, team).ok) return; }
+    /* 攒钱方式：不是「冻结一切消费」（那样会一直囤着不花，实测发现金币涨到 200+ 却
+     * 连塔都不补），而是留一笔**专项储备金** —— 手上始终保底攒着够升大本营的钱，
+     * 超出的部分照常花。同时要求收入够高（≥12/秒，约 4 座金矿），
+     * 否则前期攒 320 会让前线完全停摆。 */
+    // 底线：手上至少要有一支能打的部队（3 座攻击塔），否则先补塔再谈攒钱。
+    // 实测教训：不留底线的话，电脑会一路把大本营升到 Lv5，
+    // 却一座攻击塔都没有（输出为 0，等于不设防）。
+    var needTowersFirst = (A.towers < 3);
+    var wantSaveForBase = (baseGoal && !needTowersFirst && W.economy >= 0.8 &&
+                           pw.me.income >= 12 && state.res[team] < baseUpCost);
+    if (wantSaveForBase) spendable = Math.max(0, state.res[team] - baseUpCost);
+    var savingForBase = (state.res[team] < baseUpCost && spendable <= 0 && baseGoal);
+
+    /* 主力塔（等级最高的攻击塔）—— 后面「先精修还是先铺开」要用到，所以提前算 */
+    var ace = null;
+    state.buildings.forEach(function (b) {
+      if (b.team !== team || b.def.isBase || !b.def.atk) return;
+      if (!ace || (b.level || 1) > (ace.level || 1)) ace = b;
+    });
+
+    /* ---------- 1) 威胁响应（最高优先级）----------
+     * 阵地战逻辑：敌人已经打进我家半场时，先解决眼前的问题，
+     * 而不是按部就班发展经济。
+     *   ① 眼前有能打到的敌人 → 立刻丢法术（冰冻/火球/弱化都能救场）
+     *   ② 塔不够 → 立刻补塔（防线不破才谈得上发展）
+     * 这一段是「困难/地狱」才有的反应；普通档反应迟钝（所以好打）。 */
+    var threatNow = (A.inMyHalf >= 2);
+    if (P.adaptive && threatNow) {
+      if (rand(state) < 0.8) { if (aiCastSpell(state, team)) return; }
+      var towerCapT = Math.round(P.maxTowers * 1.6) + 2;      // 紧急时允许超建
+      if (A.towers < towerCapT) {
+        var pickT = aiPickTower(state, team, A, false, P);
+        var costT = DATA.buildings[pickT].cost;
+        if (spendable >= costT) {
+          var spotT = findSpot(state, team, pickT, 'front');
+          if (spotT && placeBuilding(state, team, pickT, spotT.row, spotT.col).ok) return;
+        }
+      }
+    }
+
+    /* ---------- 1.5) 防线：按敌方构成针对性补塔 ----------
+     * 塔数量上限跟着「防御权重」走，否则权重再高、撞到 maxTowers 也建不出来。
+     *
+     * 关键修正（实测抓到的"铺大饼"问题）：电脑曾经把 8 座金矿赚来的近 2 万金币
+     * 全铺成 8 座「一级防御塔」，而它的输出塔只有 Lv3、大本营还是 Lv1 ——
+     * 结果谁也打不过（地狱 vs 普通 只有 38%）。
+     * 所以：先保证有 3 座能打的塔，**之后必须先把手上的塔升上去，才允许继续铺新的**。
+     * 广铺低级塔 < 精修高级塔（等级 5-10 每级 ×1.3，Lv10 的攻击是 Lv1 的 8 倍）。 */
+    var towerWant = Math.max(1, Math.round(P.maxTowers * Math.min(1.7, W.defense / 1.5)));
+    // 底线：至少要有 min(2, 上限) 座攻击塔。注意不能写死 3 ——
+    // 普通档上限只有 2 座，写死 3 会导致它永远达不到底线，结果一座塔都不建（实测 bug）。
+    var needBaseLine = (A.towers < Math.min(2, P.maxTowers));
+    var aceLvNow = ace ? (ace.level || 1) : 0;
+    var wantWide = (aceLvNow >= P.aceTarget) || sloppy;     // 主塔升满了才继续铺新的
+    if (!allIn && !savingForBase && A.towers < towerWant && (needBaseLine || wantWide)) {
+      var pickKey = aiPickTower(state, team, A, sloppy, P);
+      if (spendable >= DATA.buildings[pickKey].cost + 10) {
+        var zone = (A.inMyHalf > 0 || pw.stance === 'behind') ? 'front' : 'mid';
+        var spot0 = findSpot(state, team, pickKey, zone);
+        if (!spot0) spot0 = findSpot(state, team, pickKey, 'mid');
+        if (spot0 && placeBuilding(state, team, pickKey, spot0.row, spot0.col).ok) return;
+      }
+    }
+    // 防御塔（减伤光环）：劣势时值得建，但**必须有上限**。
+    // 实测教训：曾经把 52% 的钱（2588 金）全铺成防御塔，而升级只花了 6% ——
+    // 防御塔一点输出都没有，铺再多也打不赢。所以最多 1~3 座。
+    var wardCap = P.wardCap || 0;   // 硬上限，不再按权重浮动（否则弱档反而铺最多）
+    var wardNow = state.buildings.filter(function (b) { return b.team === team && b.key === 'ward'; }).length;   // 直接数，别信 A.wards
+    // 攒钱升大本营期间也不铺防御塔（否则钱永远攒不到 320）
+    var urgentWard = (A.inMyHalf >= 3 || pw.me.baseHpPct < 0.5);
+    if (!allIn && (!savingForBase || urgentWard) && A.towers >= 2 && wardNow < wardCap
+        && spendable >= DATA.buildings.ward.cost) {
+      var spotW0 = findSpot(state, team, 'ward', 'defend');
+      if (spotW0 && placeBuilding(state, team, 'ward', spotW0.row, spotW0.col).ok) return;
+    }
+
+    /* ---------- 2) 主塔养成：推到难度允许的等级，分支按局势选 ---------- */
+    if (!savingForBase && ace && (ace.level || 1) < P.aceTarget && W.upgrade >= 1.0) {
+      var aceCost = buildingUpgradeCost(ace);
+      if (aceCost != null && spendable * P.upgradeBudget >= aceCost) {
+        var opts = branchesFor(ace);
+        var br = null;
+        if (opts.length) br = sloppy ? opts[Math.floor(rand(state) * opts.length)].key : aiPickBranch(ace, opts, A);
+        if (upgradeBuilding(state, ace, br).ok) return;
+      }
+    }
+
+    /* ---------- 3) 大本营升级：解锁法术 + 提高收入 ---------- */
+    if (lvl < DATA.baseLevels.length && A.towers >= 2) {
+      var upCost0 = DATA.baseLevels[lvl - 1].upgradeCost;
+      var wantBase = (P.key === 'hell') ? 1.0 : (P.key === 'hard' ? 1.15 : 1.6);
+      if (upCost0 != null && spendable >= upCost0 * wantBase && upgradeBase(state, team).ok) return;   // 兜底
+    }
+
+    /* ---------- 4) 总体升级（全局科技）：劣势先补血，快赢堆攻击 ---------- */
+    var gOrder = (allIn || W.tech < 0.8) ? [] : aiGlobalPriority(A);
+    for (var gi = 0; gi < gOrder.length; gi++) {
+      var gcost = globalUpgradeCost(state, team, gOrder[gi]);
+      if (gcost != null && spendable * P.upgradeBudget >= gcost) {
+        if (upgradeGlobal(state, team, gOrder[gi]).ok) return;
+      }
+    }
+
+    /* ---------- 5) 其他建筑升级 ---------- */
+    if (!savingForBase && W.upgrade >= 1.2 && rand(state) > (P.key === 'normal' ? 0.45 : 0.1)) {
+      if (aiUpgradeAny(state, team, spendable * P.upgradeBudget)) return;
+    }
+
+    /* ---------- 6) 法术 ---------- */
+    if (rand(state) < P.spellEager) {
+      if (aiCastSpell(state, team)) return;
+    }
+
+    // 塔的地板：连 1~2 座攻击塔都没有时，优先攒钱建塔，不许把金币全变成步兵
+    // （实测：普通档 100 秒内连出 7 个步兵，一座塔都没建）
+    var aaNow = 0, goNow = 0;
+    state.buildings.forEach(function (b) {
+      if (b.team !== team || !b.def.atk || b.def.isBase) return;
+      if (b.def.targets === 'both') aaNow++; else goNow++;
+    });
+    var towerFloor = Math.min(2, P.maxTowers);
+    var needTowerFirst = (A.towers < towerFloor || aaNow === 0 || goNow === 0);
+    if (needTowerFirst) {
+      var pkT = aiPickTower(state, team, A, sloppy, P);
+      var costT = DATA.buildings[pkT].cost;
+      if (state.res[team] >= costT) {          // 用真实金币判断，不用 spendable
+        var spT = findSpot(state, team, pkT, 'front');
+        if (!spT) spT = findSpot(state, team, pkT, 'mid');
+        if (!spT) spT = findSpot(state, team, pkT, 'defend');
+        if (spT && placeBuilding(state, team, pkT, spT.row, spT.col).ok) return;
+      }
+      // 钱不够建塔 → 这一轮不干别的，专门攒钱（家里快被推平时破例）
+      if (state.res[team] < costT && !emergency) return;
+    }
+    /* ---------- 7) 派兵：按形势决定「派不派」----------
+     * 教训：如果判定成「兵不够就一直派」，电脑会把每一分钱变成步兵，
+     * 永远攒不到钱补第二座金矿和塔（实测卡死在「1 塔 1 矿 + 无限步兵」）。
+     * 所以军费硬上限 40%，且前期经济权重低时几乎不出兵。 */
+    var armyCap = allIn ? spendable : Math.floor(spendable * 0.4);
+    var myArmy = A.myGround + A.myAir;
+    var armyFloor = (P.key === 'hell') ? 3 : (P.key === 'hard' ? 2 : 1);
+    var hasBasics = A.towers >= 2 && A.mines >= 2;
+    var rich = state.res[team] >= 300;
+    var canSpare = state.res[team] >= DATA.buildings.cannon.cost + 40;
+    var aggression = allIn ? 1 : (W.army / 1.5);
+    // 攒兵期不主动派兵（只保留「家里快被推平」时的紧急补兵）
+    var emergency = (A.inMyHalf >= 3 || pw.me.baseHpPct < 0.5);
+    var wantTroops = !massing && (allIn || !hasBasics || rich
+      || (myArmy < armyFloor * Math.max(0.5, aggression))
+      || (phase === 'adapt' && pw.stance === 'ahead' && myArmy < 8));
+    if (massing && emergency) wantTroops = true;    // 攒兵期也不能看着家被拆
+    // 正在攒钱升大本营时不出兵（除非家里快被推平）
+    if (baseGoal && !emergency && state.res[team] < baseUpCost) wantTroops = false;
+    if (wantTroops && canSpare && aiDeploySmart(state, team, A, P, sloppy, armyCap)) return;
+
+    /* ---------- 8) 钱花不掉：升级建筑，最后才考虑加防御塔 ---------- */
+    if (spendable >= 120 && aiUpgradeAny(state, team, spendable)) return;
+    var wardNow8 = state.buildings.filter(function (b) { return b.team === team && b.key === 'ward'; }).length;
+    if (spendable >= DATA.buildings.ward.cost && A.towers >= 2 && wardNow8 < (P.wardCap || 0)) {
+      var spotW = findSpot(state, team, 'ward', 'defend');
+      if (spotW && placeBuilding(state, team, 'ward', spotW.row, spotW.col).ok) return;
+    }
+  }
+
+
+  /* 分支怎么选：看局势 —— 对面兵多选群攻/攻速，单体肉多选爆发 */
+  function aiPickBranch(b, opts, A) {
+    var byKey = {};
+    opts.forEach(function (o) { byKey[o.key] = o; });
+    var want = null;
+    if (b.def.key === 'cannon') want = (A.ground + A.air >= 4) ? 'twin' : 'bigcannon';
+    else if (b.def.key === 'arrow') want = (A.air >= 2) ? 'rapid' : 'crossbow';
+    else if (b.def.key === 'mage') want = (A.ground + A.air >= 5) ? 'white' : 'black';
+    else if (b.def.key === 'mortar') want = (A.inMyHalf >= 3) ? 'bigmortar' : 'missile';
+    else if (b.def.key === 'tesla') want = (A.ground + A.air >= 6) ? 'pulse' : 'bigtesla';
+    else if (b.def.key === 'ward') want = (A.inMyHalf >= 2) ? 'bunker' : 'crystal';
+    if (want && byKey[want]) return want;
+    return opts[0].key;
+  }
+
+  /* 总体升级优先级：劣势先补血，快赢就堆攻击 */
+  function aiGlobalPriority(A) {
+    if (A.myBaseHp < 0.6 || A.inMyHalf >= 3) return ['bHp', 'uHp', 'uAtk', 'bAtk'];
+    if (A.foeBaseHp < 0.5) return ['uAtk', 'bAtk', 'uHp', 'bHp'];
+    return ['uAtk', 'uHp', 'bAtk', 'bHp'];
+  }
+
+  /* 针对性选塔：按敌方构成（困难/地狱档才动脑，普通档随机）
+   *
+   * ★ 强制保证「对地 + 对空」两种都有 ★
+   * 实测问题：只按"当前有没有空中威胁"来选塔，会导致电脑清一色造炮塔（只对地），
+   * 玩家一旦出气球兵/飞龙/攻城飞艇就能直接打穿 —— 这不叫防御，叫单边。
+   * 所以先做配比检查：只要某一边为 0，就优先补那一边。 */
+  function aiPickTower(state, team, A, sloppy, P) {
+    /* 先算现有构成 —— 即使是最笨的档，也要保证「对空 / 对地」两边都不为 0，
+     * 否则玩家出空中单位就能单方面打穿（实测：普通档清一色炮塔）。 */
+    var aaN = 0, goN = 0;
+    state.buildings.forEach(function (b) {
+      if (b.team !== team || !b.def.atk || b.def.isBase) return;
+      if (b.def.targets === 'both') aaN++; else goN++;
+    });
+    if (aaN === 0) return 'arrow';      // 还没对空 → 必补对空
+    if (goN === 0) return 'cannon';     // 还没对地 → 必补对地
+    if (sloppy || !P.smartTower) {
+      var all = ['cannon', 'arrow', 'mage', 'mortar', 'tesla'];
+      return all[Math.floor(rand(state) * all.length)];
+    }
+    // 现有塔的「对空 / 只对地」构成（直接数建筑，最可靠）
+    var antiAir = 0, groundOnly = 0;
+    state.buildings.forEach(function (b) {
+      if (b.team !== team || !b.def.atk || b.def.isBase) return;
+      if (b.def.targets === 'both') antiAir++; else groundOnly++;
+    });
+    // 目标配比：每种各 2 座（上限低时就各 1 座）
+    var wantEach = Math.max(1, Math.min(2, Math.floor((P.maxTowers || 4) / 2)));
+    // ① 完全没对空 → 必须先补对空
+    if (antiAir === 0) return A.air >= 2 ? 'tesla' : 'arrow';
+    // ② 完全没对地 → 补对地
+    if (groundOnly === 0) return A.ground >= 5 ? 'mortar' : 'cannon';
+    // ③ 某一类明显偏少 → 补那一类
+    if (antiAir < wantEach && antiAir < groundOnly) return A.air >= 2 ? 'tesla' : 'arrow';
+    if (groundOnly < wantEach && groundOnly < antiAir) return A.ground >= 5 ? 'mortar' : 'mage';
+    // ③ 两边都够 → 按当前威胁强化
+    var air = A.air, ground = A.ground;
+    if (air >= 2) return rand(state) < 0.5 ? 'arrow' : 'tesla';
+    if (air >= 1 && ground >= 2) return 'arrow';
+    if (ground >= 5) return rand(state) < 0.6 ? 'mortar' : 'tesla';
+    if (ground >= 3) return rand(state) < 0.5 ? 'mortar' : 'mage';
+    if (ground >= 1) return rand(state) < 0.6 ? 'mage' : 'arrow';
+    // ④ 完全没威胁时也要保持均衡（轮着造，不要清一色）
+    return antiAir <= groundOnly ? 'arrow' : 'cannon';
+  }
+
+  /* 电脑升级建筑：优先升塔、等级高的优先（集中养成而不是摊大饼） */
+  function aiUpgradeAny(state, team, budget) {
+    var targets = state.buildings.filter(function (b) {
+      return b.team === team && !b.def.isBase && (b.level || 1) < DATA.upgrade.maxLevel;
+    });
+    if (!targets.length) return false;
+    targets.sort(function (a, b) {
+      var ta = a.def.atk ? 0 : 1, tb = b.def.atk ? 0 : 1;
+      if (ta !== tb) return ta - tb;
+      return (b.level || 1) - (a.level || 1);
+    });
+    var b0 = targets[0];
+    var cost = buildingUpgradeCost(b0);
+    if (cost == null || budget < cost) return false;
+    var opts = branchesFor(b0);
+    var branch = opts.length ? opts[Math.floor(rand(state) * opts.length)].key : null;
+    return upgradeBuilding(state, b0, branch).ok;
+  }
+
+  /* 电脑放法术：伤害型丢敌人最密处，狂暴丢自己最密处 */
+  function aiCastSpell(state, team) {
+    var avail = spellsAvailable(state, team).filter(function (s) {
+      return (state.spellCd[team][s.key] || 0) <= 0;
+    });
+    if (!avail.length) return false;
+    var bestFoe = null, bestFoeN = 0, bestMine = null, bestMineN = 0;
+    for (var r = 1; r <= ROWS; r++) {
+      for (var c = 1; c <= COLS; c++) {
+        var n = 0, m = 0;
+        state.units.forEach(function (u) {
+          var d = dist({ row: u.row, col: u.col }, { row: r, col: c });
+          if (d > 1.5) return;
+          if (u.team === OPP[team]) n++; else m++;
+        });
+        if (n > bestFoeN) { bestFoeN = n; bestFoe = { r: r, c: c }; }
+        if (m > bestMineN) { bestMineN = m; bestMine = { r: r, c: c }; }
+      }
+    }
+    for (var i = 0; i < avail.length; i++) {
+      var sp = avail[i];
+      if (sp.affects === 'ally') {
+        if (bestMine && bestMineN >= 3 && castSpell(state, team, sp.key, bestMine.r, bestMine.c).ok) return true;
+      } else if (bestFoe && bestFoeN >= 2 && castSpell(state, team, sp.key, bestFoe.r, bestFoe.c).ok) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /* 派兵：按敌方构成做克制选择，并且**保持兵种搭配**
+   *   · 普通档：只会出步兵 + 攻城兵（玩家容易对付）
+   *   · 困难/地狱档：先看敌人构成决定"该补什么"，再挑「场上数量最少的那种」
+   *   · budget = 这次最多愿意花多少钱（由 aiThink 按经济状况决定） */
+  function aiDeploySmart(state, team, A, P, sloppy, budget) {
+    var gold = state.res[team];
+    var canUse = (budget == null) ? gold : Math.min(gold, budget);
+    // 「CD 好了」与「买得起」分开判断：CD 好的兵种才算候选，钱不够时只影响能不能真出兵
+    var offCd = function (k) {
+      return DATA.units[k] && isUnitReady(state, team, k);
+    };
+    var afford = function (k) {
+      return DATA.units[k] && DATA.units[k].cost <= canUse;
+    };
+    // 场上各兵种数量（用来判断"该补哪一种了"）
+    var onField = {};
+    unitsOf(state, team).forEach(function (u) {
+      onField[u.key] = (onField[u.key] || 0) + 1;
+    });
+    var want = [];
+    if (sloppy || !P.smartDeploy) {
+      want = ['infantry', 'siege'].filter(offCd);
+    } else {
+      var wantAntiAir = A.air >= 1;
+      var wantTank = A.ground >= 4 || A.ranged >= 2;
+      var wantBuilding = A.siegeType >= 2 || A.towers >= 3 || A.foeBaseHp < 0.85;
+      if (wantAntiAir && offCd('archer')) want.push('archer');
+      if (wantAntiAir && offCd('balloon')) want.push('balloon');
+      if (wantTank && offCd('heavy')) want.push('heavy');
+      if (wantBuilding && offCd('siege')) want.push('siege');
+      if (wantBuilding && offCd('airship')) want.push('airship');
+      ['infantry', 'ram', 'archer', 'balloon', 'siege', 'heavy', 'airship', 'dragon'].forEach(function (k) {
+        if (offCd(k) && want.indexOf(k) < 0) want.push(k);
+      });
+    }
+    if (!want.length) return false;
+
+    // ① 保持兵种搭配：场上一个都没有的兵种排最前；都出现过时，数量少的优先
+    want.sort(function (a, b) { return (onField[a] || 0) - (onField[b] || 0); });
+    // ② 场上只有一种兵（比如清一色步兵）→ 强制先出别的兵种
+    var distinct = Object.keys(onField).length;
+    if (distinct <= 1 && want.length > 1) {
+      var only = Object.keys(onField)[0];
+      var others = want.filter(function (k) { return k !== only; });
+      var same = want.filter(function (k) { return k === only; });
+      if (others.length) want = others.concat(same);
+    }
+    // ③ 钱不够就先出买得起的（但保持上面的搭配顺序）
+    var picks = want.filter(afford);
+    if (!picks.length) picks = want.filter(function (k) { return DATA.units[k].cost <= gold; });
+    if (!picks.length) return false;
+
+    var cols = [];
+    for (var c = 1; c <= COLS; c++) cols.push(c);
+    cols.sort(function (a, b) {
+      var fa = frontBlocked(state, team, a) ? 1 : 0, fb = frontBlocked(state, team, b) ? 1 : 0;
+      if (fa !== fb) return fa - fb;
+      // 避开敌人主力列；同分时随机，避免每局都从同一列出兵
+      var la = A.laneCount[a], lb = A.laneCount[b];
+      if (la !== lb) return la - lb;
+      return rand(state) < 0.5 ? -1 : 1;
+    });
+    for (var oi = 0; oi < picks.length; oi++) {
+      for (var ci = 0; ci < cols.length; ci++) {
+        if (deployUnit(state, team, picks[oi], cols[ci]).ok) return true;
+      }
+    }
+    return false;
+  }
+
+  /* 该列在我方半场靠前的位置是否已经被己方建筑挡住（派兵前参考一下） */
+  function frontBlocked(state, team, col) {
+    var rows = DIR[team] > 0 ? [6, 7, 8, 9, 10] : [5, 4, 3, 2, 1];
+    for (var i = 0; i < rows.length; i++) {
+      var b = state.grid[rows[i]][col];
+      if (b && b.team === team) return true;
+    }
+    return false;
+  }
+
+  /* 找空位：'front' = 靠近前线，'defend' = 靠大本营（最后方），'rear' = 后方（金矿专用），'mid' = 中间
+   * 坐标约定：蓝方 行6(前线) → 行10(后方)；红方 行5(前线) → 行1(后方)。
+   * 注意：红方的「后方」是行号**小**，蓝方的「后方」是行号**大**。 */
+  function findSpot(state, team, key, zone) {
+    var def = DATA.buildings[key];
+    if (!def) return null;
+    var isBlue = DIR[team] > 0;          // 蓝方朝行号增大方向进攻，所以大本营在行9-10
+    var rows;
+    if (zone === 'front') rows = isBlue ? [6, 7, 8] : [5, 4, 3];
+    else if (zone === 'defend') rows = isBlue ? [9, 10, 8, 7] : [2, 1, 3, 4];   // 紧贴大本营
+    else if (zone === 'rear') rows = isBlue ? [10, 9, 8] : [1, 2, 3];           // 最后方（金矿）
+    else rows = isBlue ? [6, 7, 8, 9, 10] : [5, 4, 3, 2, 1];
+    var cols = [];
+    for (var c = 1; c <= COLS; c++) cols.push(c);
+    for (var i = cols.length - 1; i > 0; i--) {
+      var j = Math.floor(rand(state) * (i + 1));
+      var tmp = cols[i]; cols[i] = cols[j]; cols[j] = tmp;
+    }
+    for (var ri = 0; ri < rows.length; ri++) {
+      for (var ci = 0; ci < cols.length; ci++) {
+        var r = rows[ri], cc = cols[ci];
+        if (inHalf(team, r, cc) && canPlace(state, team, key, r, cc).ok) return { row: r, col: cc };
+      }
+    }
+    return null;
+  }
+
+
+  function aiUpdate(state, team, dt) {
+    state.ai.timer[team] += dt;
+    if (state.ai.timer[team] < DATA.ai.thinkEvery) return;
+    state.ai.timer[team] = 0;
+    aiThink(state, team);
+  }
+
+  /* ------------------------------------------------------------ 导出 */
+  return {
+    ROWS: ROWS, COLS: COLS, RED: RED, BLUE: BLUE, TEAMS: TEAMS, OPP: OPP, DIR: DIR,
+    CHANNEL_ROW: CHANNEL_ROW, BASE_RECT: BASE_RECT, HALF: HALF, TILE: TILE,
+    DATA: DATA, DT: DT, TICK_HZ: TICK_HZ, UNIT_CAP: UNIT_CAP,
+    RESERVE_CAP: RESERVE_CAP, CHANNEL_CAP: CHANNEL_CAP,
+    createState: createState, update: update, aiUpdate: aiUpdate, aiThink: aiThink,
+    canPlace: canPlace, placeBuilding: placeBuilding, upgradeBase: upgradeBase,
+    upgradeCost: upgradeCost, spawnUnit: spawnUnit, rebuildFields: rebuildFields,
+    statsForLevel: statsForLevel, buildingUpgradeCost: buildingUpgradeCost,
+    upgradeBuilding: upgradeBuilding, buildingInfo: buildingInfo,
+    branchesFor: branchesFor, branches: DATA.branches, incomeMultiplier: incomeMultiplier,
+    reloadNeighbors: reloadNeighbors,
+    spellsAvailable: spellsAvailable, canCastSpell: canCastSpell, castSpell: castSpell,
+    spellStatus: spellStatus, spellTargets: spellTargets, isUnitReady: isUnitReady,
+    towerHitList: towerHitList, towerCandidates: towerCandidates, combatStatsOf: combatStatsOf,
+    stepUnit: stepUnit, hasNonBaseTarget: hasNonBaseTarget,
+    candidateSets: candidateSets, pickTarget: pickTarget, hasAnyTarget: hasAnyTarget,
+    canDeploy: canDeploy, deployUnit: deployUnit, reserveCount: reserveCount,
+    addReserve: addReserve, channelRow: channelRow, mitigate: mitigate,
+    enemyBase: enemyBase, ownBase: ownBase, unitsOf: unitsOf, baseLevelOf: baseLevelOf,
+    inGrid: inGrid, inHalf: inHalf, toRef: toRef, fromRef: fromRef, rectCells: rectCells,
+    rectCenter: rectCenter, centerOf: centerOf, nearestCellOf: nearestCellOf, dist: dist,
+    clamp: clamp, gridDist: gridDist, isPassable: isPassable, airPassable: airPassable,
+    blockingBuildingAt: blockingBuildingAt, wallAtTeam: wallAtTeam,
+    removeBuilding: removeBuilding, computeField: computeField, findSpot: findSpot,
+    AI_PRESETS: AI_PRESETS, analyzeBoard: analyzeBoard, aiDeploySmart: aiDeploySmart,
+    assessPower: assessPower, assessPhase: assessPhase, planSpending: planSpending,
+    levelMultipliers: levelMultipliers, damageBuilding: damageBuilding,
+    demolishBuilding: demolishBuilding, demolishRefund: demolishRefund, canDemolish: canDemolish,
+    globalBonus: globalBonus, globalUpgradeCost: globalUpgradeCost, upgradeGlobal: upgradeGlobal,
+    globalUpgradeStatus: globalUpgradeStatus, globalUpgrades: DATA.globalUpgrades,
+    fieldFor: fieldFor,
+    forEachCell: forEachCell, rand: rand
+  };
+});
+
+</script>
+<script>
+(function () {
+  'use strict';
+  var C = window.GameCore;
+  var canvas = document.getElementById('cv');
+  var ctx = canvas.getContext('2d');
+  var goldEl = document.getElementById('gold');
+  var rateEl = document.getElementById('rate');
+  var enemyEl = document.getElementById('enemyinfo');
+  var hintEl = document.getElementById('hint');
+  var overEl = document.getElementById('over');
+  var overText = document.getElementById('overtext');
+  var overSub = document.getElementById('oversub');
+  var overStats = document.getElementById('overstats');
+  var startEl = document.getElementById('start');
+  var diffsEl = document.getElementById('diffs');
+  var difficulty = 'normal';   // 默认普通
+  var startedAt = -1;
+  var visLast = {};   // 单位 id → 上一帧画到的位置（用于限速抹平转向跳变）
+
+  /* 渲染插值（配合逻辑层的亚格进度）：
+   *
+   * 逻辑层给每个单位提供：
+   *   u.row/u.col   = 当前所在格
+   *   u.nextStep    = 正在走向的下一格（可能为 null）
+   *   u.moveProg    = 走到 nextStep 的进度（0~1，按速度均匀累积）
+   *
+   * 绘制位置 = 当前格 + (nextStep - 当前格) × moveProg
+   *
+   * 这个位置**每 tick 都在变化**（moveProg 每 tick 按 speed×DT 匀速推进），
+   * 所以画面上是连续滑动的，不会「走一格停一下」。
+   *
+   * 注意：**不要**在这里再额外加一份进度（曾经加过 acc/DT 的补偿，
+   * 结果视觉速度比逻辑速度更快、跨格瞬间还会跳一下 —— 实测发现的 bug）。
+   * 20Hz 的更新对 1 格/秒左右的移动已经足够平滑。
+   */
+  function lerpPos(u) {
+    var prog = (typeof u.moveProg === 'number') ? u.moveProg : 0;
+    if (prog < 0) prog = 0;
+    if (prog > 1) prog = 1;
+    var tr, tc;
+    if (u.nextStep && prog > 0) {
+      tr = u.row + (u.nextStep.r - u.row) * prog;
+      tc = u.col + (u.nextStep.c - u.col) * prog;
+    } else {
+      tr = u.row; tc = u.col;
+    }
+    /* 转向那一 tick 会有一段"直角"位移（纵向 + 横向同时变），
+     * 单帧距离约是平时的 √2 倍。这里只做**减速**（绝不加速）：
+     * 如果这一帧要走太远，就少走一点，下一帧自然追上——
+     * 视觉上是转弯时略微放缓，比"拐角处猛地一跳"自然得多。 */
+    var prev = visLast[u.id];
+    if (prev) {
+      var spd = (u.def && u.def.speed) ? u.def.speed : 0.8;
+      var maxStep = Math.max(0.03, spd * C.DT * 1.05);   // 1.05 = 只给 5% 余量
+      var dr = tr - prev.r, dc = tc - prev.c;
+      var dist = Math.abs(dr) + Math.abs(dc);
+      if (dist > maxStep) {
+        var k2 = maxStep / dist;
+        tr = prev.r + dr * k2;
+        tc = prev.c + dc * k2;
+      }
+    }
+    visLast[u.id] = { r: tr, c: tc };
+    return { row: tr, col: tc };
+  }
+  function cellRectF(row, col) {
+    var s2 = layout.cell;
+    return { x: layout.ox + (col - 1) * s2, y: layout.oy + row * s2, s: s2 };
+  }
+  var hoverCell = null;   // 鼠标当前悬停的格子（用于范围预览）
+  var bcardsEl = document.getElementById('bcards');
+  var ucardsEl = document.getElementById('ucards');
+  var scardsEl = document.getElementById('scards');
+  var gcardsEl = document.getElementById('gcards');
+  var paneBuild = document.getElementById('paneBuild');
+  var paneGlobal = document.getElementById('paneGlobal');
+  var tabBuild = document.getElementById('tabBuild');
+  var tabGlobal = document.getElementById('tabGlobal');
+  var detailEl = document.getElementById('detail');
+  var btnPath = document.getElementById('btnpath');
+  var autoDeployEl = document.getElementById('autodeploy');
+  var suddenEl = document.getElementById('sudden');
+
+  var ME = 'blue', FOE = 'red';
+  var BUILD_ORDER = ['mine', 'cannon', 'arrow', 'mage', 'mortar', 'tesla', 'ward'];
+  var UNIT_ORDER = ['infantry', 'heavy', 'siege', 'ram', 'archer', 'balloon', 'airship', 'dragon'];
+
+  var state = null;
+  var sel = null;                 // {kind:'building'|'unit'|'spell', key}
+  var showPath = false;
+  var selectedBuilding = null;
+  var selectedUnit = null;
+  var layout = { cell: 30, ox: 0, oy: 0 };
+  var lastDetailRefresh = 0;
+
+  /* 难度选择卡片 */
+  var DIFF_INFO = {
+    normal: { name: '普通', pct: '真人胜率约 60%', desc: '电脑反应慢、会犯错，适合熟悉玩法', color: '#7ef0a0' },
+    hard:   { name: '困难', pct: '真人胜率约 25%', desc: '电脑会针对你的兵种出牌，几乎不犯错', color: '#ffd479' },
+    hell:   { name: '地狱', pct: '真人胜率约 0.1%', desc: '满算力 AI：克制作战 + 全力推家，别指望赢', color: '#ff7a7a' }
+  };
+  function buildDiffCards() {
+    diffsEl.innerHTML = '';
+    Object.keys(DIFF_INFO).forEach(function (k) {
+      var d = DIFF_INFO[k];
+      var el = document.createElement('div');
+      el.className = 'diff' + (k === difficulty ? ' on' : '');
+      el.innerHTML = '<div class="dn" style="color:' + d.color + '">' + d.name + '</div>' +
+        '<div class="dp">' + d.pct + '</div><div class="dd">' + d.desc + '</div>';
+      el.onclick = function () { difficulty = k; buildDiffCards(); };
+      diffsEl.appendChild(el);
+    });
+  }
+
+  function newGame() {
+    state = C.createState({ difficulty: difficulty });
+    state.aiTeam = FOE;               // 红方是电脑（大本营自愈等难度特判走这一边）
+    sel = null;
+    selectedUnit = null;
+    selectedBuilding = null;
+    startedAt = -1;
+    overEl.classList.remove('show');
+    detailEl.classList.remove('show');
+    detailEl.innerHTML = '';
+    buildCards();
+    render();
+  }
+
+  /* 开始游戏：先把开局界面收起来，再重置一局 */
+  function startGame() {
+    startEl.classList.add('hide');
+    newGame();
+    startedAt = 0;
+  }
+
+  /* ---------------------------------------------------------------- 布局 */
+  function computeLayout() {
+    var wrap = document.getElementById('board-wrap');
+    var W = wrap.clientWidth, H = wrap.clientHeight;
+    var rows = C.ROWS + 2;
+    var cell = Math.max(14, Math.min(Math.floor(H / rows), Math.floor(W / (C.COLS + 2))));
+    layout.cell = cell;
+    layout.ox = (W - cell * C.COLS) / 2;
+    layout.oy = (H - cell * rows) / 2;
+  }
+  function cellRect(row, col) {
+    var s = layout.cell;
+    return { x: layout.ox + (col - 1) * s, y: layout.oy + row * s, s: s };
+  }
+  function pointToCell(px, py) {
+    var s = layout.cell;
+    var col = Math.floor((px - layout.ox) / s) + 1;
+    var row = Math.floor((py - layout.oy) / s);
+    if (col < 1 || col > C.COLS || row < 0 || row > C.ROWS + 1) return null;
+    return { row: row, col: col };
+  }
+
+  /* ---------------------------------------------------------------- 绘制 */
+  function drawRoundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ================================================================ 弹道系统
+   * 每种攻击者都有专属的「飞行物」，从发射者飞向目标，带抛物线弧。
+   *
+   * 视觉分类（对应逻辑层 projStyle）：
+   *   ball   炮弹/炸弹  —— 圆球 + 拖尾，落地小爆
+   *   arrow  箭矢        —— 细长箭头 + 速度线
+   *   bolt   弩矢        —— 更粗更快的箭头
+   *   orb    法术球      —— 发光球 + 光晕
+   *   shell  高抛炮弹    —— 大弧线 + 落点阴影预警
+   *   spark  电花        —— 锯齿闪电
+   *   slash  近战刀光    —— 短促弧形闪光
+   *   crit   重击        —— 大字刀光 + 震屏感
+   *
+   * 生命期：逻辑层给 ttl（0.13~0.18s），我们用 born 到 now 的进度 0→1 插值。
+   */
+  function drawProjectiles() {
+    if (!state.projectiles || !state.projectiles.length) { fxImpacts = null; return; }
+    var now = state.time;
+
+    state.projectiles.forEach(function (p) {
+      var st = p.proj || { type: 'ball', color: '#dfe8f5', size: 0.11, arc: 0.05, life: 0.22 };
+      // 飞行进度（0=发射，1=命中）—— 用逻辑层给的 life，不同弹道速度不同
+      var life = st.life || p.ttl || 0.22;
+      var t = (now - (p.born != null ? p.born : now)) / life;
+      if (!isFinite(t)) t = 1;
+      t = t < 0 ? 0 : (t > 1 ? 1 : t);
+
+      var a = cellRect(p.from.row, p.from.col);
+      var b = cellRect(p.to.row, p.to.col);
+      var x0 = a.x + a.s / 2, y0 = a.y + a.s / 2;
+      var x1 = b.x + b.s / 2, y1 = b.y + b.s / 2;
+      // 贝塞尔：中点抬升（arc 越大越明显）
+      var mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+      var lift = (st.arc || 0) * Math.max(a.s, Math.abs(y0 - y1), Math.abs(x0 - x1));
+      var cx = mx, cy = my - lift;
+      var ix = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * cx + t * t * x1;
+      var iy = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cy + t * t * y1;
+
+      var size = (st.size || 0.12) * a.s;
+
+      // ---- 拖尾（越靠后越淡）
+      if (st.type !== 'slash' && st.type !== 'crit') {
+        var trailN = 5;
+        for (var k = 1; k <= trailN; k++) {
+          var tt = Math.max(0, t - k * 0.035);
+          var tx = (1 - tt) * (1 - tt) * x0 + 2 * (1 - tt) * tt * cx + tt * tt * x1;
+          var ty = (1 - tt) * (1 - tt) * y0 + 2 * (1 - tt) * tt * cy + tt * tt * y1;
+          var al = 0.42 * (1 - k / (trailN + 1));
+          ctx.beginPath();
+          ctx.arc(tx, ty, size * (0.85 - k * 0.11), 0, Math.PI * 2);
+          ctx.fillStyle = hexA(st.color, al);
+          ctx.fill();
+        }
+      }
+
+      ctx.save();
+      if (st.type === 'arrow' || st.type === 'bolt') {
+        /* ---- 箭矢：细长杆 + 两片箭羽 + 尖箭头（箭塔射的是箭，不是炮弹） */
+        var adx = (x1 - x0), ady = (y1 - y0);
+        var alen0 = Math.max(1, Math.hypot(adx, ady));
+        var aux = adx / alen0, auy = ady / alen0;
+        var avx = -auy, avy = aux;
+        var alen = size * (st.type === 'bolt' ? 4.2 : 3.6);
+        // 箭杆
+        ctx.strokeStyle = '#c8a870';
+        ctx.lineWidth = Math.max(1.4, size * 0.34);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(ix - aux * alen, iy - auy * alen);
+        ctx.lineTo(ix + aux * size * 0.26, iy + auy * size * 0.26);
+        ctx.stroke();
+        // 箭羽 ×2
+        ctx.fillStyle = st.color;
+        for (var fw = -1; fw <= 1; fw += 2) {
+          ctx.beginPath();
+          ctx.moveTo(ix - aux * alen, iy - auy * alen);
+          ctx.lineTo(ix - aux * alen * 0.60 + avx * fw * size * 0.62,
+                     iy - auy * alen * 0.60 + avy * fw * size * 0.62);
+          ctx.lineTo(ix - aux * alen * 0.48, iy - auy * alen * 0.48);
+          ctx.closePath(); ctx.fill();
+        }
+        // 箭头
+        var atx = ix + aux * size * 0.76, aty = iy + auy * size * 0.76;
+        ctx.beginPath();
+        ctx.moveTo(atx, aty);
+        ctx.lineTo(ix - aux * size * 0.22 + avx * size * 0.46,
+                   iy - auy * size * 0.22 + avy * size * 0.46);
+        ctx.lineTo(ix - aux * size * 0.22 - avx * size * 0.46,
+                   iy - auy * size * 0.22 - avy * size * 0.46);
+        ctx.closePath();
+        ctx.fillStyle = '#eafbd8'; ctx.fill();
+        ctx.strokeStyle = 'rgba(40,60,30,.55)'; ctx.lineWidth = 1; ctx.stroke();
+      } else if (st.type === 'shell') {
+        /* ---- 迫击炮弹：高高抛上天 → 砸下来 → 范围爆炸
+         *      落点有虚线预警圈 + 十字准星，越接近落地越亮 */
+        var aoe = st.aoe || 0;
+        var aoePx = (aoe + 0.5) * b.s;
+        var warnA = 0.30 + 0.60 * t;
+
+        ctx.beginPath();
+        ctx.ellipse(x1, y1, aoePx, aoePx * 0.56, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,150,80,' + (0.05 + 0.11 * t) + ')';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,182,112,' + warnA + ')';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        var cbx = aoePx * 0.88, cby = aoePx * 0.50;
+        ctx.strokeStyle = 'rgba(255,204,148,' + (0.20 + 0.55 * t) + ')';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(x1 - cbx, y1); ctx.lineTo(x1 - cbx * 0.32, y1);
+        ctx.moveTo(x1 + cbx * 0.32, y1); ctx.lineTo(x1 + cbx, y1);
+        ctx.moveTo(x1, y1 - cby); ctx.lineTo(x1, y1 - cby * 0.32);
+        ctx.moveTo(x1, y1 + cby * 0.32); ctx.lineTo(x1, y1 + cby);
+        ctx.stroke();
+
+        // 弹体尾焰光晕
+        var glowR = size * (2.0 - 0.5 * t);
+        var gg = ctx.createRadialGradient(ix, iy, 0, ix, iy, glowR);
+        gg.addColorStop(0, 'rgba(255,200,130,.55)');
+        gg.addColorStop(1, 'rgba(255,140,60,0)');
+        ctx.fillStyle = gg;
+        ctx.beginPath(); ctx.arc(ix, iy, glowR, 0, Math.PI * 2); ctx.fill();
+
+        // 弹体
+        var shellR = size * (1.05 + 0.30 * (1 - t));
+        var g4 = ctx.createRadialGradient(ix - shellR * 0.32, iy - shellR * 0.32, shellR * 0.10,
+                                          ix, iy, shellR);
+        g4.addColorStop(0, '#ffffff');
+        g4.addColorStop(0.34, '#ffd9a0');
+        g4.addColorStop(1, '#b8541c');
+        ctx.beginPath(); ctx.arc(ix, iy, shellR, 0, Math.PI * 2);
+        ctx.fillStyle = g4; ctx.fill();
+        ctx.strokeStyle = 'rgba(40,20,10,.60)';
+        ctx.lineWidth = Math.max(1, shellR * 0.20); ctx.stroke();
+
+        // 落地爆炸
+        if (t > 0.78) {
+          var f3 = (t - 0.78) / 0.22;
+          ctx.beginPath();
+          ctx.ellipse(x1, y1, aoePx * (0.35 + f3 * 1.55), aoePx * 0.56 * (0.35 + f3 * 1.55),
+                      0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,192,112,' + (0.45 * (1 - f3)) + ')';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,236,190,' + (0.9 * (1 - f3)) + ')';
+          ctx.lineWidth = 3 * (1 - f3) + 1;
+          ctx.stroke();
+          // 中心白闪
+          ctx.beginPath();
+          ctx.arc(x1, y1, aoePx * 0.30 * (1 - f3), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,240,' + (0.8 * (1 - f3)) + ')';
+          ctx.fill();
+        }
+      } else if (st.type === 'spark') {
+        // ---- 电弧
+        ctx.strokeStyle = st.color;
+        ctx.lineWidth = Math.max(1.6, size * 0.30);
+        ctx.shadowColor = st.color; ctx.shadowBlur = size * 2.2;
+        ctx.beginPath();
+        var segs = 6;
+        for (var g2 = 0; g2 <= segs; g2++) {
+          var f2 = g2 / segs;
+          var px2 = x0 + (x1 - x0) * f2, py2 = y0 + (y1 - y0) * f2;
+          if (g2 > 0 && g2 < segs) {
+            px2 += (Math.random() - 0.5) * size * 1.9;
+            py2 += (Math.random() - 0.5) * size * 1.9;
+          }
+          g2 === 0 ? ctx.moveTo(px2, py2) : ctx.lineTo(px2, py2);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      } else if (st.type === 'slash' || st.type === 'crit') {
+        // ---- 近战刀光
+        var big = st.type === 'crit';
+        ctx.strokeStyle = st.color;
+        ctx.lineWidth = Math.max(2, size * (big ? 0.55 : 0.40));
+        ctx.lineCap = 'round';
+        var ang0 = Math.PI * (0.15 + 0.5 * t);
+        var span = big ? Math.PI * 0.85 : Math.PI * 0.55;
+        ctx.beginPath();
+        ctx.arc(x1, y1, size * (big ? 1.5 : 1.15), ang0, ang0 + span);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,.75)';
+        ctx.lineWidth = Math.max(1, size * 0.18);
+        ctx.beginPath();
+        ctx.arc(x1, y1, size * (big ? 1.5 : 1.15), ang0, ang0 + span * 0.5);
+        ctx.stroke();
+      } else if (st.type === 'orb') {
+        /* ---- 法术球：发光核 + 光晕 + 旋转符文环（法师塔射的是法球） */
+        var grd = ctx.createRadialGradient(ix, iy, 0, ix, iy, size * 2.5);
+        grd.addColorStop(0, 'rgba(255,255,255,.98)');
+        grd.addColorStop(0.32, hexA(st.color, 0.95));
+        grd.addColorStop(1, hexA(st.color, 0));
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(ix, iy, size * 2.5, 0, Math.PI * 2); ctx.fill();
+        // 旋转符文环
+        ctx.strokeStyle = 'rgba(255,255,255,.62)';
+        ctx.lineWidth = Math.max(1, size * 0.17);
+        ctx.beginPath();
+        ctx.arc(ix, iy, size * 1.10, t * 7.5, t * 7.5 + Math.PI * 1.35);
+        ctx.stroke();
+        ctx.strokeStyle = hexA(st.color, 0.85);
+        ctx.lineWidth = Math.max(1, size * 0.14);
+        ctx.beginPath();
+        ctx.arc(ix, iy, size * 0.76, -t * 9, -t * 9 + Math.PI * 1.1);
+        ctx.stroke();
+        // 核心
+        ctx.beginPath(); ctx.arc(ix, iy, size * 0.62, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff'; ctx.fill();
+      } else {
+        // ---- ball：圆炮弹
+        var g3 = ctx.createRadialGradient(ix - size * 0.3, iy - size * 0.3, size * 0.1,
+                                          ix, iy, size);
+        g3.addColorStop(0, '#ffffff');
+        g3.addColorStop(0.45, st.color);
+        g3.addColorStop(1, hexA(st.color, 0.85));
+        ctx.beginPath(); ctx.arc(ix, iy, size, 0, Math.PI * 2);
+        ctx.fillStyle = g3; ctx.fill();
+        ctx.strokeStyle = 'rgba(20,24,36,.55)';
+        ctx.lineWidth = Math.max(1, size * 0.16); ctx.stroke();
+      }
+
+      // ---- 命中闪光（shell 自己画爆炸，这里跳过）
+      if (t > 0.72 && st.type !== 'shell') {
+        var f = (t - 0.72) / 0.28;
+        var r1 = size * (1.0 + f * 2.6);
+        ctx.beginPath();
+        ctx.arc(x1, y1, r1, 0, Math.PI * 2);
+        ctx.strokeStyle = hexA(st.color, (1 - f) * 0.85);
+        ctx.lineWidth = Math.max(1, size * 0.30 * (1 - f));
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+  }
+  var fxImpacts = null;
+
+  // #rrggbb + alpha → rgba()
+  function hexA(hex, a) {
+    if (!hex) return 'rgba(255,255,255,' + a + ')';
+    if (hex[0] !== '#') return hex;
+    var h = hex.slice(1);
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  /* ================================================================ 建筑炮口
+   * 玩家要求：建筑的发射口要跟着敌人转向。
+   *
+   * 逻辑层每帧把「当前瞄准的格子」写进 b.aimRow / b.aimCol，
+   * 这里换算成角度并**平滑插值**（避免瞬间甩头），然后画一根炮管。
+   *
+   * 不同建筑画不同形状：
+   *   cannon  粗短炮管
+   *   arrow   细长箭管 + 箭头
+   *   mage    法杖 + 发光球
+   *   mortar  超短粗管（高抛）
+   *   tesla   双叉电极 + 电光
+   *   base    中等炮管（大本营自卫）
+   *   ward    没有攻击 → 不画
+   */
+  var turretAng = {};        // 每个建筑的当前视觉角度
+  var TURRET_STYLE = {
+    cannon: { len: 0.40, wid: 0.17, col: '#39476b', hi: '#8ea6d4', tip: '#1c2436' },
+    arrow: { len: 0.46, wid: 0.11, col: '#2f5c3c', hi: '#8ec98c', tip: '#d8ffb0' },
+    mage: { len: 0.40, wid: 0.12, col: '#4a3a70', hi: '#a98ce0', tip: '#e0c4ff' },
+    mortar: { len: 0.30, wid: 0.24, col: '#5c3a52', hi: '#c08cb4', tip: '#1c1424' },
+    tesla: { len: 0.34, wid: 0.16, col: '#2c5c50', hi: '#8ff0e0', tip: '#d8fff8' },
+    base: { len: 0.38, wid: 0.16, col: '#33425e', hi: '#9fd4ff', tip: '#1c2436' }
+  };
+
+  function drawBuildingTurret(b, r, w, h, s) {
+    // 能不能攻击
+    var canAtk = b.def.isBase || (b.def.atk && b.def.atk > 0);
+    if (!canAtk) return;
+    var key = b.def.isBase ? 'base' : (b.def.key || 'cannon');
+    var st = TURRET_STYLE[key] || TURRET_STYLE.cannon;
+
+    var cx = r.x + w / 2, cy = r.y + h / 2;
+
+    // 目标角度
+    var tgtAng = null;
+    var fresh = b.aimRow != null && (state.time - (b.aimAt == null ? -99 : b.aimAt)) < 2.0;
+    if (fresh) {
+      var ac = cellRect(b.aimRow, b.aimCol);
+      var dx = (ac.x + ac.s / 2) - cx;
+      var dy = (ac.y + ac.s / 2) - cy;
+      if (Math.abs(dx) + Math.abs(dy) > 0.5) tgtAng = Math.atan2(dy, dx);
+    }
+
+    // 平滑插值（走最短角路径）
+    var cur = turretAng[b.id];
+    if (cur == null) cur = tgtAng != null ? tgtAng : Math.atan2(-1, 1.4);
+    if (tgtAng != null) {
+      var diff = tgtAng - cur;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      cur += diff * 0.22;
+    }
+    turretAng[b.id] = cur;
+
+    var L = s * st.len, Wd = s * st.wid;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(cur);
+
+    // 炮管外轮廓
+    ctx.fillStyle = '#10151f';
+    drawRoundRect(-Wd * 0.28, -Wd * 0.62, L + Wd * 0.30, Wd * 1.24, Wd * 0.42);
+    ctx.fill();
+    // 炮管主体
+    ctx.fillStyle = st.col;
+    drawRoundRect(-Wd * 0.20, -Wd * 0.50, L + Wd * 0.18, Wd, Wd * 0.36);
+    ctx.fill();
+    // 上缘高光
+    ctx.fillStyle = st.hi;
+    ctx.globalAlpha = 0.75;
+    drawRoundRect(-Wd * 0.10, -Wd * 0.42, L * 0.92, Wd * 0.30, Wd * 0.14);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // 炮口
+    ctx.fillStyle = st.tip;
+    drawRoundRect(L - Wd * 0.30, -Wd * 0.60, Wd * 0.62, Wd * 1.20, Wd * 0.28);
+    ctx.fill();
+    // 炮口内孔
+    ctx.fillStyle = 'rgba(0,0,0,.75)';
+    drawRoundRect(L - Wd * 0.20, -Wd * 0.30, Wd * 0.30, Wd * 0.60, Wd * 0.14);
+    ctx.fill();
+
+    // tesla 额外两道电极
+    if (key === 'tesla') {
+      ctx.strokeStyle = st.hi;
+      ctx.lineWidth = Math.max(1.2, s * 0.035);
+      ctx.beginPath();
+      ctx.moveTo(L * 0.55, -Wd * 0.85); ctx.lineTo(L * 0.98, -Wd * 0.45);
+      ctx.moveTo(L * 0.55, Wd * 0.85); ctx.lineTo(L * 0.98, Wd * 0.45);
+      ctx.stroke();
+    }
+    // arrow 额外箭头
+    if (key === 'arrow') {
+      ctx.fillStyle = st.tip;
+      ctx.beginPath();
+      ctx.moveTo(L + Wd * 0.72, 0);
+      ctx.lineTo(L - Wd * 0.10, -Wd * 0.62);
+      ctx.lineTo(L - Wd * 0.10, Wd * 0.62);
+      ctx.closePath(); ctx.fill();
+    }
+    // mage 额外发光球
+    if (key === 'mage') {
+      var gr = ctx.createRadialGradient(L + Wd * 0.30, 0, 0, L + Wd * 0.30, 0, Wd * 1.5);
+      gr.addColorStop(0, 'rgba(255,255,255,.95)');
+      gr.addColorStop(0.4, st.tip);
+      gr.addColorStop(1, 'rgba(160,120,230,0)');
+      ctx.fillStyle = gr;
+      ctx.beginPath(); ctx.arc(L + Wd * 0.30, 0, Wd * 1.5, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+
+    // 转轴（画在旋转外，避免被拉伸）
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.max(2, s * 0.085), 0, Math.PI * 2);
+    ctx.fillStyle = '#1a2130'; ctx.fill();
+    ctx.strokeStyle = st.hi; ctx.lineWidth = Math.max(1, s * 0.022); ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx - s * 0.020, cy - s * 0.022, Math.max(1, s * 0.034), 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
+  }
+
+  function render() {
+    if (!state) return;
+    var dpr = window.devicePixelRatio || 1;
+    var W = canvas.clientWidth, H = canvas.clientHeight;
+    if (canvas.width !== Math.floor(W * dpr) || canvas.height !== Math.floor(H * dpr)) {
+      canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    computeLayout();
+    var s = layout.cell;
+
+    // 1 地面
+    for (var row = 0; row <= C.ROWS + 1; row++) {
+      for (var col = 1; col <= C.COLS; col++) {
+        var r = cellRect(row, col);
+        var team = row <= 5 ? 'red' : (row >= 6 ? 'blue' : null);
+        var base = '#1a2130';
+        if (row === 0 || row === C.ROWS + 1) base = '#232c40';
+        else if (team === 'red') base = '#2a2029';
+        else if (team === 'blue') base = '#1f2738';
+        ctx.fillStyle = base;
+        ctx.fillRect(r.x, r.y, s, s);
+        ctx.strokeStyle = '#2a3348'; ctx.lineWidth = 1;
+        ctx.strokeRect(r.x + .5, r.y + .5, s - 1, s - 1);
+      }
+    }
+    ctx.fillStyle = '#5b6b8a';
+    ctx.font = Math.max(9, s * 0.32) + 'px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    var rA = cellRect(0, 1), rB = cellRect(C.ROWS + 1, 1);
+    ctx.fillText('行A 红方通道', rA.x + 3, rA.y + s / 2);
+    ctx.fillText('行B 蓝方通道（派兵点这里）', rB.x + 3, rB.y + s / 2);
+
+    // 1.5 放置提示 / 法术范围预览
+    if (sel && !state.over) {
+      if (sel.kind === 'building') {
+        for (var hr = 1; hr <= C.ROWS; hr++) {
+          for (var hc = 1; hc <= C.COLS; hc++) {
+            if (!C.canPlace(state, ME, sel.key, hr, hc).ok) continue;
+            var q = cellRect(hr, hc);
+            ctx.fillStyle = 'rgba(110,220,140,.20)';
+            ctx.fillRect(q.x, q.y, s, s);
+          }
+        }
+      } else if (sel.kind === 'unit') {
+        for (var dc2 = 1; dc2 <= C.COLS; dc2++) {
+          if (!C.canDeploy(state, ME, sel.key, dc2).ok) continue;
+          var q2 = cellRect(C.CHANNEL_ROW[ME], dc2);
+          ctx.fillStyle = 'rgba(110,200,255,.30)';
+          ctx.fillRect(q2.x, q2.y, s, s);
+        }
+      }
+      if (sel.kind === 'spell') {
+        // 法术落点：把所有可放格子淡淡标出来
+        var sp = null;
+        C.DATA.spells.forEach(function (x) { if (x.key === sel.key) sp = x; });
+        if (sp) {
+          for (var sr = 1; sr <= C.ROWS; sr++) {
+            for (var sc = 1; sc <= C.COLS; sc++) {
+              if (!C.canCastSpell(state, ME, sel.key, sr, sc).ok) continue;
+              var q3 = cellRect(sr, sc);
+              ctx.fillStyle = 'rgba(255,190,110,.10)';
+              ctx.fillRect(q3.x, q3.y, s, s);
+            }
+          }
+        }
+      }
+    }
+
+    // 最近一次法术的落点范围（画一圈）
+    for (var ei = state.events.length - 1, shown = 0; ei >= 0 && shown < 3; ei--) {
+      var ev = state.events[ei];
+      if (ev.type !== 'spell') continue;
+      shown++;
+      if (state.time - ev.t > 0.8) continue;
+      var a = 1 - (state.time - ev.t) / 0.8;
+      var c0 = cellRect(ev.row, ev.col);
+      var rad = (ev.radius + 0.5) * s;
+      ctx.strokeStyle = 'rgba(255,200,120,' + (0.85 * a).toFixed(2) + ')';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(c0.x + s / 2, c0.y + s / 2, rad, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 2 建筑
+    state.buildings.forEach(function (b) {
+      var r = cellRect(b.row, b.col);
+      var w = s * b.def.size[1], h = s * b.def.size[0];
+      var hurt = (state.time - (b.justDamaged || -99)) < 0.18;
+      var color = b.def.color;
+      var name = b.def.name;
+      if (b.branch && C.branches[b.branch]) { color = C.branches[b.branch].color; name = C.branches[b.branch].name; }
+      ctx.fillStyle = hurt ? '#ffffff' : color;
+      drawRoundRect(r.x + 1, r.y + 1, w - 2, h - 2, 3);
+      ctx.fill();
+      // 冰冻/弱化的视觉标记
+      if (b.frozenUntil && state.time < b.frozenUntil) { ctx.fillStyle = 'rgba(160,230,255,.45)'; ctx.fillRect(r.x + 1, r.y + 1, w - 2, h - 2); }
+      else if (b.weakenUntil && state.time < b.weakenUntil) { ctx.fillStyle = 'rgba(200,150,220,.35)'; ctx.fillRect(r.x + 1, r.y + 1, w - 2, h - 2); }
+      else if (b.rageUntil && state.time < b.rageUntil) { ctx.fillStyle = 'rgba(255,210,120,.35)'; ctx.fillRect(r.x + 1, r.y + 1, w - 2, h - 2); }
+      // 有炮口的建筑：汉字缩小并移到下方，把中央让给旋转炮口
+      var hasTurret = b.def.isBase || (b.def.atk && b.def.atk > 0);
+      ctx.fillStyle = hurt ? 'rgba(0,0,0,.55)' : 'rgba(0,0,0,.38)';
+      ctx.font = 'bold ' + Math.max(9, s * (hasTurret ? 0.27 : 0.40)) + 'px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(b.def.glyph, r.x + w / 2, r.y + h / 2 + (hasTurret ? s * 0.29 : -s * 0.08));
+
+      // ★ 跟着目标旋转的炮口
+      drawBuildingTurret(b, r, w, h, s);
+
+      ctx.fillStyle = '#ffd479';
+      ctx.font = 'bold ' + Math.max(8, s * 0.26) + 'px sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('Lv' + (b.level || 1), r.x + 3, r.y + 2);
+      if (b.dr > 0) {   // 有防御塔加护
+        ctx.strokeStyle = 'rgba(140,220,255,.75)'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(r.x + 2, r.y + 2, w - 4, h - 4);
+      }
+      var ratio = Math.max(0, b.hp / b.hpMax);
+      if (ratio < 0.999 || hurt) {
+        var bw = w - 4;
+        ctx.fillStyle = 'rgba(0,0,0,.72)';
+        ctx.fillRect(r.x + 2, r.y + h - 5, bw, 4);
+        ctx.fillStyle = ratio > .5 ? '#54d96b' : ratio > .25 ? '#ffcc44' : '#ff5f5f';
+        ctx.fillRect(r.x + 2, r.y + h - 5, bw * ratio, 4);
+      }
+      if (selectedBuilding === b) {
+        ctx.strokeStyle = '#6fd3ff'; ctx.lineWidth = 2;
+        ctx.strokeRect(r.x + 1, r.y + 1, w - 2, h - 2);
+      }
+    });
+
+    // 3.6 鼠标悬停时的「作用范围预览」（放置建筑 / 施放法术时跟着鼠标走）
+    if (hoverCell && sel && !state.over) {
+      var hc = hoverCell;
+      if (sel.kind === 'building') {
+        var bdef = C.DATA.buildings[sel.key];
+        if (bdef) {
+          var hr = cellRect(hc.row, hc.col);
+          var hx = hr.x + s * bdef.size[1] / 2, hy = hr.y + s * bdef.size[0] / 2;
+          // 建筑落点轮廓
+          ctx.strokeStyle = 'rgba(126,240,160,.95)'; ctx.lineWidth = 2;
+          ctx.strokeRect(hr.x + 1, hr.y + 1, s * bdef.size[1] - 2, s * bdef.size[0] - 2);
+          // 攻击范围（红圈）
+          var hst = C.statsForLevel(bdef, 1);
+          if (hst && hst.range) {
+            var hr2 = (hst.range + 0.5) * s;
+            ctx.fillStyle = 'rgba(255,120,90,.13)';
+            ctx.beginPath(); ctx.arc(hx, hy, hr2, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,140,110,.9)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(hx, hy, hr2, 0, Math.PI * 2); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,200,175,.95)';
+            ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            ctx.fillText('攻击范围 ' + (hst.range * 2 + 1) + '×' + (hst.range * 2 + 1), hx, hy - hr2 - 3);
+          }
+          // 保护范围（蓝虚线，防御塔专用）
+          if (bdef.aura) {
+            var ha = (bdef.aura.radius + 0.5) * s;
+            ctx.fillStyle = 'rgba(110,200,255,.13)';
+            ctx.beginPath(); ctx.arc(hx, hy, ha, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(130,215,255,.95)'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.arc(hx, hy, ha, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(185,232,255,.95)';
+            ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            ctx.fillText('保护范围 ' + (bdef.aura.radius * 2 + 1) + '×' + (bdef.aura.radius * 2 + 1) +
+              '，减伤 ' + Math.round(bdef.aura.dr * 100) + '%', hx, hy + ha + 3);
+          }
+          // 能不能建在这里
+          var hok = C.canPlace(state, ME, sel.key, hc.row, hc.col).ok;
+          ctx.fillStyle = hok ? 'rgba(110,230,140,.22)' : 'rgba(255,90,90,.25)';
+          ctx.fillRect(hr.x + 1, hr.y + 1, s * bdef.size[1] - 2, s * bdef.size[0] - 2);
+          if (bdef.size[0] === 1 && bdef.size[1] === 1) {
+            var q = cellRect(hc.row, hc.col);
+            ctx.fillStyle = hok ? 'rgba(110,230,140,.22)' : 'rgba(255,90,90,.25)';
+            ctx.fillRect(q.x + 1, q.y + 1, s - 2, s - 2);
+          }
+        }
+      } else if (sel.kind === 'spell') {
+        var sp = null;
+        C.DATA.spells.forEach(function (x) { if (x.key === sel.key) sp = x; });
+        if (sp) {
+          var aoe = sp.aoe || 0;
+          // 法术作用范围：以落点为中心的 (2a+1)×(2a+1) 方格
+          for (var ar = hc.row - aoe; ar <= hc.row + aoe; ar++) {
+            for (var ac = hc.col - aoe; ac <= hc.col + aoe; ac++) {
+              if (ac < 1 || ac > C.COLS || ar < 1 || ar > C.ROWS) continue;
+              var q2 = cellRect(ar, ac);
+              ctx.fillStyle = (ar === hc.row && ac === hc.col)
+                ? 'rgba(255,210,120,.40)' : 'rgba(255,190,110,.20)';
+              ctx.fillRect(q2.x + 1, q2.y + 1, s - 2, s - 2);
+            }
+          }
+          var q3 = cellRect(hc.row, hc.col);
+          ctx.strokeStyle = 'rgba(255,210,120,.95)'; ctx.lineWidth = 2;
+          ctx.strokeRect(q3.x + 1, q3.y + 1, s - 2, s - 2);
+          var size = aoe * 2 + 1;
+          ctx.fillStyle = 'rgba(255,225,160,.98)';
+          ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillText(sp.name + '：' + size + '×' + size, q3.x + s / 2, q3.y - 3);
+        }
+      }
+    }
+    if (selectedBuilding && state.buildings.indexOf(selectedBuilding) >= 0) {
+      var sb = selectedBuilding;
+      var sr = cellRect(sb.row, sb.col);
+      var cx0 = sr.x + s * sb.def.size[1] / 2;
+      var cy0 = sr.y + s * sb.def.size[0] / 2;
+      var stb = C.combatStatsOf(sb);
+      if (stb && stb.range) {
+        var rr0 = (stb.range + 0.5) * s;
+        ctx.fillStyle = 'rgba(255,120,90,.13)';
+        ctx.beginPath(); ctx.arc(cx0, cy0, rr0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,140,110,.9)'; ctx.lineWidth = 2; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(cx0, cy0, rr0, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,195,165,.95)';
+        ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText('攻击范围 ' + (stb.range * 2 + 1) + '×' + (stb.range * 2 + 1), cx0, cy0 - rr0 - 3);
+      }
+      var aus = C.statsForLevel(sb.def, sb.level || 1, sb.branch);
+      if (aus && aus.auraRadius != null) {
+        var ar0 = (aus.auraRadius + 0.5) * s;
+        ctx.fillStyle = 'rgba(110,200,255,.13)';
+        ctx.beginPath(); ctx.arc(cx0, cy0, ar0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(130,215,255,.95)'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.arc(cx0, cy0, ar0, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(185,232,255,.95)';
+        ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.fillText('保护范围 ' + (aus.auraRadius * 2 + 1) + '×' + (aus.auraRadius * 2 + 1) +
+          '，减伤 ' + Math.round((aus.auraDR || 0) * 100) + '%', cx0, cy0 + ar0 + 3);
+      }
+      var brs0 = C.branchesFor(sb);
+      if (brs0.length) {
+        ctx.fillStyle = 'rgba(255,225,150,.95)';
+        ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.fillText('可升级：' + brs0.map(function (x) { return x.name; }).join(' / '), cx0, cy0 + s * 1.1 + 16);
+      }
+    }
+
+    if (showPath) {
+      var f = state.field[ME];
+      ctx.strokeStyle = 'rgba(120,200,255,.5)'; ctx.lineWidth = 1.5;
+      for (var rr = 0; rr <= C.ROWS + 1; rr++) {
+        for (var cc = 1; cc <= C.COLS; cc++) {
+          var t = f.dir[rr][cc];
+          if (!t) continue;
+          var a2 = cellRect(rr, cc), b2 = cellRect(t.r, t.c);
+          ctx.beginPath();
+          ctx.moveTo(a2.x + s / 2, a2.y + s / 2);
+          ctx.lineTo(b2.x + s / 2, b2.y + s / 2);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // 3 地面兵 —— 用「外圈阵营色 + 朝向箭头」区分敌我
+    function teamRing(u) { return u.team === ME ? '#5aa9ff' : '#ff6b6b'; }
+    function drawTeamMark(cx, cy, radius, u) {
+      // 外圈：己方蓝环 / 敌方红环
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + 2.2, 0, Math.PI * 2);
+      ctx.strokeStyle = teamRing(u); ctx.lineWidth = 2.4; ctx.stroke();
+      // 朝向小三角：己方朝下（往敌方推），敌方朝上
+      var dir = u.team === ME ? 1 : -1;
+      var tip = radius + 5.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + dir * tip);
+      ctx.lineTo(cx - 3.2, cy + dir * (tip - 3.6));
+      ctx.lineTo(cx + 3.2, cy + dir * (tip - 3.6));
+      ctx.closePath();
+      ctx.fillStyle = teamRing(u); ctx.fill();
+    }
+    var byCell = {};
+    var ipos = {};                 // id → 插值后的浮点格坐标
+    state.units.forEach(function (u) {
+      if (u.def.air) return;
+      var p = lerpPos(u);
+      ipos[u.id] = p;
+      /* 分桶用**真实逻辑格**（u.row/u.col），不要用插值后的坐标。
+       * 之前用 Math.round(插值坐标) 分桶，单位在相邻两格之间移动时 key 会来回变，
+       * 「同格多兵偏移」随之闪来闪去 —— 看起来就是"左右来回跳"（实测到的 bug）。
+       * 逻辑格在一格之内是稳定的，所以分桶稳定。 */
+      var k = u.row + '_' + u.col;
+      (byCell[k] = byCell[k] || []).push(u);
+    });
+    Object.keys(byCell).forEach(function (k) {
+      var list = byCell[k];
+      var p = k.split('_'), r = cellRect(+p[0], +p[1]);
+      // 只有一只兵时按插值坐标平滑绘制；多兵同格时按格子画（保证偏移稳定）
+      if (list.length === 1 && ipos[list[0].id]) {
+        var ip = ipos[list[0].id];
+        r = cellRectF(ip.row, ip.col);
+      }
+      // 同一格里有敌我双方时，己方画在左半、敌方画在右半，一眼分得开
+      var hasBoth = list.some(function (u) { return u.team === ME; }) &&
+                    list.some(function (u) { return u.team !== ME; });
+      list.forEach(function (u, i) {
+        var off = (i % 2) * s * 0.22 - (i > 1 ? s * 0.18 : 0);
+        if (hasBoth) off = (u.team === ME ? -1 : 1) * s * 0.16;
+        var cx = r.x + s / 2 + off;
+        var cy = r.y + s / 2 + (hasBoth ? 0 : (i > 1 ? off : 0));
+        var hurt = (state.time - (u.justDamaged || -99)) < 0.18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.30, 0, Math.PI * 2);
+        ctx.fillStyle = hurt ? '#fff' : u.def.color;
+        ctx.fill();
+        ctx.strokeStyle = '#0d111a'; ctx.lineWidth = 1.5; ctx.stroke();
+        drawTeamMark(cx, cy, s * 0.30, u);
+      });
+      var mx = 0;
+      list.forEach(function (u) { mx = Math.max(mx, u.hp / u.hpMax); });
+      if (mx < 0.999) {
+        ctx.fillStyle = 'rgba(0,0,0,.72)';
+        ctx.fillRect(r.x + 2, r.y + s - 5, s - 4, 4);
+        ctx.fillStyle = mx > .5 ? '#54d96b' : mx > .25 ? '#ffcc44' : '#ff5f5f';
+        ctx.fillRect(r.x + 2, r.y + s - 5, (s - 4) * mx, 4);
+      }
+      if (list.length > 1) {
+        var mine = list.filter(function (u) { return u.team === ME; }).length;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + Math.max(8, s * 0.3) + 'px sans-serif';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+        ctx.fillText((mine === list.length ? '我' : mine === 0 ? '敌' : '') + 'x' + list.length, r.x + s - 2, r.y + 2);
+      }
+    });
+
+    // 4 空中兵（同样带阵营环 + 朝向箭头，另外加一圈虚线表示「飞行」，并显示血条）
+    state.units.forEach(function (u) {
+      if (!u.def.air) return;
+      var ipA = lerpPos(u);
+      var r = cellRectF(ipA.row, ipA.col);
+      var acx = r.x + s / 2, acy = r.y + s * 0.42;
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.beginPath(); ctx.ellipse(acx, r.y + s * 0.84, s * 0.22, s * 0.1, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath(); ctx.arc(acx, acy, s * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = u.def.color; ctx.fill();
+      ctx.strokeStyle = '#0d111a'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.globalAlpha = 1;
+      drawTeamMark(acx, acy, s * 0.3, u);
+      // 飞行标记：外面再加一圈细虚线
+      ctx.beginPath();
+      ctx.arc(acx, acy, s * 0.42, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 1;
+      ctx.setLineDash([2, 3]); ctx.stroke(); ctx.setLineDash([]);
+      // 血条：空中兵也要能看到血量（画在格子下沿）
+      var airRatio = Math.max(0, Math.min(1, u.hp / u.hpMax));
+      var bwA = s - 4;
+      ctx.fillStyle = 'rgba(0,0,0,.75)';
+      ctx.fillRect(r.x + 2, r.y + s - 6, bwA, 4);
+      ctx.fillStyle = airRatio > .5 ? '#54d96b' : airRatio > .25 ? '#ffcc44' : '#ff5f5f';
+      ctx.fillRect(r.x + 2, r.y + s - 6, bwA * airRatio, 4);
+      // 血量数字（格子够大才写，免得糊成一团）
+      if (s >= 26) {
+        ctx.fillStyle = 'rgba(0,0,0,.6)';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+        ctx.fillText(Math.ceil(u.hp) + '/' + u.hpMax, r.x + 3, r.y + s - 7);
+      }
+    });
+
+    // 5 弹道 / 命中特效
+    drawProjectiles();
+
+    // UI
+    goldEl.textContent = Math.floor(state.res[ME]);
+    var inc = C.DATA.baseLevels[C.baseLevelOf(state, ME) - 1].income;
+    state.buildings.forEach(function (b) {
+      if (b.team === ME && b.def.income) inc += C.statsForLevel(b.def, b.level || 1, b.branch).income;
+    });
+    rateEl.textContent = '+' + inc.toFixed(0) + '/s';
+    var fb = C.ownBase(state, FOE);
+    enemyEl.textContent = fb ? ('红方大本营 Lv' + (fb.level || 1) + ' ' + Math.max(0, Math.floor(fb.hp)) + '/' + fb.hpMax)
+      : '红方大本营 已摧毁';
+    if (suddenEl && suddenEl.checked && state.time > 300) {
+      hintEl.textContent = '⚔️ 决胜时刻：双方大本营持续掉血，先撑不住的输！已进行 ' +
+        Math.floor(state.time - 300) + ' 秒';
+      hintEl.style.borderColor = '#ff7a7a';
+    } else {
+      hintEl.style.borderColor = '#3b4763';
+    }
+    updateCards();
+  }
+
+  /* ---------------------------------------------------------------- 卡片 */
+  function buildCards() {
+    bcardsEl.innerHTML = '';
+    BUILD_ORDER.forEach(function (key) {
+      var d = C.DATA.buildings[key];
+      var el = document.createElement('div');
+      el.className = 'card'; el.dataset.kind = 'building'; el.dataset.key = key;
+      el.innerHTML = '<div class="g" style="color:' + d.color + '">' + d.glyph + '</div>' +
+        '<div class="n">' + d.name + '</div><div class="c">' + d.cost + '</div>';
+      el.onclick = function () { select('building', key); };
+      bcardsEl.appendChild(el);
+    });
+    ucardsEl.innerHTML = '';
+    UNIT_ORDER.forEach(function (key) {
+      var d = C.DATA.units[key];
+      var el = document.createElement('div');
+      el.className = 'card'; el.dataset.kind = 'unit'; el.dataset.key = key;
+      el.innerHTML = '<div class="cdbar"></div>' +
+        '<div class="g" style="color:' + d.color + '">' + d.glyph + '</div>' +
+        '<div class="n">' + d.name + '</div><div class="c">' + d.cost + '</div>' +
+        '<div class="cd"></div>';
+      el.onclick = function () { select('unit', key); };
+      ucardsEl.appendChild(el);
+    });
+    scardsEl.innerHTML = '';
+    C.DATA.spells.forEach(function (sp) {
+      var el = document.createElement('div');
+      el.className = 'card'; el.dataset.kind = 'spell'; el.dataset.key = sp.key;
+      el.innerHTML = '<div class="cdbar"></div>' +
+        '<div class="g" style="color:' + sp.color + '">' + sp.glyph + '</div>' +
+        '<div class="n">' + sp.name + '</div><div class="c">Lv' + sp.unlockBaseLevel + '</div>' +
+        '<div class="cd"></div>';
+      el.onclick = function () { select('spell', sp.key); };
+      scardsEl.appendChild(el);
+    });
+  }
+
+  function updateCards() {
+    if (!state) return;
+    Array.prototype.forEach.call(bcardsEl.children, function (el) {
+      var key = el.dataset.key, d = C.DATA.buildings[key];
+      var poor = state.res[ME] < d.cost;
+      el.classList.toggle('locked', poor);
+      el.classList.toggle('sel', !!sel && sel.kind === 'building' && sel.key === key);
+    });
+    Array.prototype.forEach.call(ucardsEl.children, function (el) {
+      var key = el.dataset.key, d = C.DATA.units[key];
+      var cd = state.unitCd[ME][key] || 0;
+      var poor = state.res[ME] < d.cost;
+      el.classList.toggle('locked', poor);
+      el.classList.toggle('sel', !!sel && sel.kind === 'unit' && sel.key === key);
+      var fill = el.querySelector('.cdbar');
+      if (fill) fill.style.width = (d.deployCd > 0 ? Math.min(100, cd / d.deployCd * 100) : 0) + '%';
+      var tag = el.querySelector('.cd');
+      if (tag) tag.textContent = cd > 0 ? cd.toFixed(1) + 's' : '';
+    });
+    Array.prototype.forEach.call(scardsEl.children, function (el) {
+      var key = el.dataset.key;
+      var st = C.spellStatus(state, ME).filter(function (x) { return x.key === key; })[0];
+      if (!st) return;
+      el.classList.toggle('locked', !st.unlocked);
+      el.classList.toggle('sel', !!sel && sel.kind === 'spell' && sel.key === key);
+      var fill = el.querySelector('.cdbar');
+      if (fill) fill.style.width = (st.cooldown > 0 ? Math.min(100, st.cd / st.cooldown * 100) : 0) + '%';
+      var tag = el.querySelector('.cd');
+      if (tag) tag.textContent = !st.unlocked ? '锁' : (st.cd > 0 ? st.cd.toFixed(0) + 's' : '');
+    });
+  }
+
+  function select(kind, key) {
+    sel = { kind: kind, key: key };
+    if (kind === 'building') {
+      hintEl.textContent = '「' + C.DATA.buildings[key].name + '」：点自己半场（行6~10）的空格放置';
+    } else if (kind === 'unit') {
+      var d = C.DATA.units[key];
+      var cd = state.unitCd[ME][key] || 0;
+      hintEl.textContent = cd > 0
+        ? ('「' + d.name + '」冷却中（还有 ' + cd.toFixed(1) + ' 秒）')
+        : ('「' + d.name + '」：点最下面那条行B 的某一列派出去');
+    } else {
+      var sp = null;
+      C.DATA.spells.forEach(function (x) { if (x.key === key) sp = x; });
+      var ok = C.canCastSpell(state, ME, key, 5, 5);
+      hintEl.textContent = ok.ok
+        ? ('「' + sp.name + '」：点棋盘上任意一格作为落点（覆盖 ' + ((sp.aoe || 0) * 2 + 1) + '×' + ((sp.aoe || 0) * 2 + 1) + '）')
+        : ('「' + sp.name + '」现在不能用：' + ok.why);
+    }
+    updateCards();
+    render();
+  }
+
+  /* ---------------------------------------------------------- 总体升级卡片 */
+  function buildGlobalCards() {
+    if (!state) return;
+    gcardsEl.innerHTML = '';
+    C.globalUpgradeStatus(state, ME).forEach(function (g) {
+      var el = document.createElement('div');
+      el.className = 'card'; el.dataset.gkey = g.key;
+      el.innerHTML = '<div class="g" style="color:' + g.color + '">' + g.glyph + '</div>' +
+        '<div class="n">' + g.name + '</div>' +
+        '<div class="lvtag">Lv' + g.level + '/10</div>' +
+        '<div class="eff">' + g.effect + '</div>' +
+        '<div class="c">' + (g.cost == null ? '满级' : g.cost + ' 金') + '</div>';
+      el.onclick = function () {
+        var r = C.upgradeGlobal(state, ME, g.key);
+        hintEl.textContent = r.ok
+          ? (g.name + ' 升到 Lv' + r.level + '（花费 ' + r.cost + ' 金），现在 ' + g.nextEffect)
+          : (g.name + '：' + r.why);
+        buildGlobalCards(); updateCards(); render();
+      };
+      gcardsEl.appendChild(el);
+    });
+  }
+
+  /* 点击自己的单位 → 弹出它的详细状况 */
+  function renderUnitDetail(u) {
+    var d = u.def;
+    var gb = C.globalBonus(state, u.team);
+    var rows = [
+      ['所属', (u.team === ME ? '我方' : '敌方') + ' · ' + (d.air ? '空中单位' : '地面单位')],
+      ['血量', Math.max(0, Math.ceil(u.hp)) + ' / ' + u.hpMax],
+      ['攻击力', (d.atk * (u.team === ME ? gb.unitAtk : 1)).toFixed(1) + '（基础 ' + d.atk + '）'],
+      ['攻击间隔', d.atkInterval + ' 秒'],
+      ['攻击范围', d.range + ' 格（上下左右）'],
+      ['可打目标', d.targets === 'both' ? '对地对空' : '只对地'],
+      ['打什么', d.priority === 'siege' ? '只打建筑和大本营' : '只打士兵和大本营'],
+      ['移动速度', d.speed + ' 格/秒'],
+      ['护甲', d.armor]
+    ];
+    var ratio = Math.max(0, Math.min(1, u.hp / u.hpMax));
+    detailEl.innerHTML = '' +
+      '<div class="head">' +
+        '<div class="g" style="background:' + d.color + '">' + d.glyph + '</div>' +
+        '<div class="nm">' + d.name + ' <span class="lv">' + (u.team === ME ? '我方' : '敌方') + '</span></div>' +
+        '<div class="x" id="detailclose">✕</div>' +
+      '</div>' +
+      '<div class="desc">' + (d.desc || '') + '</div>' +
+      '<div class="bar"><i style="width:' + (ratio * 100).toFixed(1) + '%;background:' +
+        (ratio > .5 ? '#54d96b' : ratio > .25 ? '#ffcc44' : '#ff5f5f') + '"></i></div>' +
+      '<table>' + rows.map(function (r) {
+        return '<tr><td class="k">' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>';
+      }).join('') + '</table>';
+    detailEl.classList.add('show');
+    document.getElementById('detailclose').onclick = function () { selectedUnit = null; renderDetail(); render(); };
+  }
+  /* ------------------------------------------------------- 建筑详情 + 升级 */
+  function renderDetail() {
+    var b = selectedBuilding;
+    if (selectedUnit) { renderUnitDetail(selectedUnit); return; }
+    if (!b || !state || state.buildings.indexOf(b) < 0) {
+      detailEl.classList.remove('show');
+      detailEl.innerHTML = '';
+      return;
+    }
+    var info = C.buildingInfo(state, b);
+    var cost = info.upgradeCost;
+    var canUp = b.team === ME && cost !== null && state.res[ME] >= cost && !state.over;
+    var rows = [];
+    rows.push(['血量', info.hp + ' / ' + info.hpMax + (info.next ? ' <span class="up">→ ' + info.next.hp + '</span>' : '')]);
+    if (info.isBase) {
+      rows.push(['金币收入', info.income + '/s' + (info.nextIncome ? ' <span class="up">→ ' + info.nextIncome + '/s</span>' : '')]);
+      rows.push(['已解锁法术', (info.spells && info.spells.length) ? info.spells.join('、') : '—']);
+    } else {
+      if (info.atk !== null && info.atk !== undefined) rows.push(['攻击力', info.atk + (info.next ? ' <span class="up">→ ' + info.next.atk + '</span>' : '')]);
+      if (info.atkInterval) rows.push(['攻击间隔', info.atkInterval + 's' + (info.next ? ' <span class="up">→ ' + info.next.atkInterval + 's</span>' : '')]);
+      if (info.range !== null && info.range !== undefined) rows.push(['射程', info.range + ' 格' + (info.next ? ' <span class="up">→ ' + info.next.range + '</span>' : '')]);
+      if (info.targets) rows.push(['可打目标', info.targets === 'air' ? '只打空中' : info.targets === 'ground' ? '只打地面' : '对地对空']);
+      if (info.mode) rows.push(['攻击方式', modeName(info.mode)]);
+      if (info.income) rows.push(['金币加成', info.income + '/s' + (info.next ? ' <span class="up">→ ' + info.next.income + '/s</span>' : '')]);
+      if (info.auraDR) rows.push(['护盾减伤', Math.round(info.auraDR * 100) + '%' + (info.next && info.next.auraDR ? ' <span class="up">→ ' + Math.round(info.next.auraDR * 100) + '%</span>' : '')]);
+    }
+    var ratio = Math.max(0, Math.min(1, b.hp / b.hpMax));
+    // 拆除按钮：返还 = 累计投入 × 0.8 ×（当前血量/总血量）
+    var demolishBtn = '';
+    if (b.team === ME && !b.def.isBase) {
+      var refund = C.demolishRefund(b);
+      demolishBtn = '<button id="detaildemolish" class="danger" title="返还 80% 已投入金币 × 当前血量比例">' +
+        '拆除（返还 ' + refund + ' 金）</button>';
+    }
+    var acts = '';
+    if (info.branches && info.branches.length) {
+      var opts = info.branches;
+      acts = opts.map(function (o, i) {
+        return '<button class="' + (i ? 'alt' : '') + '" data-branch="' + o.key + '"' + (canUp ? '' : ' disabled') + ' title="' + o.desc + '">' +
+          o.name + '（' + (cost == null ? '—' : cost + ' 金') + '）<br><span style="font-weight:400;font-size:10px">' + o.desc + '</span></button>';
+      }).join('');
+    } else {
+      acts = '<button id="detailup"' + (canUp ? '' : ' disabled') + '>' +
+        (b.team !== ME ? '敌方建筑（只读）'
+          : cost === null ? '已满级'
+          : '升级到 Lv' + (info.level + 1) + '（' + cost + ' 金）') + '</button>';
+    }
+    detailEl.innerHTML = '' +
+      '<div class="head">' +
+        '<div class="g" style="background:' + b.def.color + '">' + b.def.glyph + '</div>' +
+        '<div class="nm">' + info.name +
+          (info.branchName ? ' · ' + info.branchName : '') +
+          ' <span class="lv">Lv' + info.level + '/' + info.maxLevel + '</span></div>' +
+        '<div class="x" id="detailclose">✕</div>' +
+      '</div>' +
+      '<div class="desc">' + (b.team === ME ? '己方' : '敌方') + ' · ' + (info.desc || '') + (info.note ? ' · ' + info.note : '') + '</div>' +
+      '<div class="bar"><i style="width:' + (ratio * 100).toFixed(1) + '%;background:' + (ratio > .5 ? '#54d96b' : ratio > .25 ? '#ffcc44' : '#ff5f5f') + '"></i></div>' +
+      '<table>' + rows.map(function (r) { return '<tr><td class="k">' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>'; }).join('') + '</table>' +
+      '<div class="acts">' + acts + demolishBtn + '</div>';
+    detailEl.classList.add('show');
+    document.getElementById('detailclose').onclick = function () { selectedBuilding = null; renderDetail(); render(); };
+    var upBtn = document.getElementById('detailup');
+    if (upBtn && canUp) {
+      upBtn.onclick = function () {
+        var res = C.upgradeBuilding(state, b);
+        hintEl.textContent = res.ok ? ('升级成功：Lv' + res.level + (res.branch ? '（' + (C.branches[res.branch] ? C.branches[res.branch].name : '') + '）' : ''))
+          : ('不能升级：' + res.why);
+        renderDetail(); render();
+      };
+    }
+    var dmBtn = document.getElementById('detaildemolish');
+    if (dmBtn) {
+      dmBtn.onclick = function () {
+        var res = C.demolishBuilding(state, b);
+        hintEl.textContent = res.ok
+          ? ('已拆除「' + info.name + '」，返还 ' + res.refund + ' 金')
+          : ('不能拆除：' + res.why);
+        if (res.ok) selectedBuilding = null;
+        renderDetail(); render();
+      };
+      dmBtn.textContent = '拆除（返还 ' + C.demolishRefund(b) + ' 金）';
+    }
+    Array.prototype.forEach.call(detailEl.querySelectorAll('[data-branch]'), function (btn) {
+      btn.onclick = function () {
+        var res = C.upgradeBuilding(state, b, btn.dataset.branch);
+        hintEl.textContent = res.ok ? ('升级成功：' + (C.branches[res.branch] ? C.branches[res.branch].name : ''))
+          : ('不能升级：' + res.why);
+        renderDetail(); render();
+      };
+    });
+  }
+  function modeName(mode) {
+    return { single: '单体', group: '群攻（同格全打）', line: '群攻（直线贯穿）', allInRange: '群攻（范围内全部）', multi3: '最多3个单体' }[mode] || mode;
+  }
+
+  /* ---------------------------------------------------------------- 交互 */
+  function handleTap(px, py) {
+    if (!state || state.over) return;
+    var cell = pointToCell(px, py);
+    if (!cell) return;
+
+    // 法术落点优先
+    if (sel && sel.kind === 'spell') {
+      var r = C.castSpell(state, ME, sel.key, cell.row, cell.col);
+      hintEl.textContent = r.ok ? ('施放成功，命中 ' + r.hits + ' 个目标') : ('不能施放：' + r.why);
+      if (r.ok) sel = null;
+      updateCards(); render();
+      return;
+    }
+
+    // 点已有建筑 → 详情（再点同一次 = 取消选中）
+    var hit = state.grid[cell.row] && state.grid[cell.row][cell.col];
+    if (hit && cell.row >= 1 && cell.row <= C.ROWS) {
+      if (selectedBuilding === hit) {          // 再次点击 → 取消选中
+        selectedBuilding = null; selectedUnit = null;
+        hintEl.textContent = '已取消选中';
+        renderDetail(); render();
+        return;
+      }
+      selectedBuilding = hit; selectedUnit = null;
+      renderDetail(); render();
+      return;
+    }
+    // 点单位 → 看它的详细状况（再点同一次 = 取消）
+    var hitUnit = null;
+    for (var ui2 = 0; ui2 < state.units.length; ui2++) {
+      var uu = state.units[ui2];
+      if (uu.row === cell.row && uu.col === cell.col) { hitUnit = uu; break; }
+    }
+    if (hitUnit) {
+      if (selectedUnit === hitUnit) {
+        selectedUnit = null; hintEl.textContent = '已取消选中';
+        renderDetail(); render();
+        return;
+      }
+      selectedUnit = hitUnit; selectedBuilding = null;
+      hintEl.textContent = '查看「' + hitUnit.def.name + '」的状况（再点一次可取消）';
+      renderDetail(); render();
+      return;
+    }
+    selectedBuilding = null; selectedUnit = null; renderDetail();
+
+    if (!sel) { hintEl.textContent = '先选一个建筑 / 兵种 / 法术，或点已有建筑查看升级'; return; }
+
+    if (sel.kind === 'unit') {
+      if (cell.row !== C.CHANNEL_ROW[ME]) { hintEl.textContent = '派兵要点最下面那条「行B」通道'; return; }
+      var r2 = C.deployUnit(state, ME, sel.key, cell.col);
+      hintEl.textContent = r2.ok ? ('已派出「' + C.DATA.units[sel.key].name + '」到 列' + cell.col) : ('不能派兵：' + r2.why);
+    } else if (sel.kind === 'building') {
+      var r3 = C.placeBuilding(state, ME, sel.key, cell.row, cell.col);
+      if (r3.ok) { hintEl.textContent = '已建造「' + C.DATA.buildings[sel.key].name + '」（点它可升级）'; sel = null; }
+      else hintEl.textContent = '不能建造：' + r3.why;
+    }
+    updateCards(); render();
+  }
+
+  canvas.addEventListener('pointermove', function (e) {
+    var rect = canvas.getBoundingClientRect();
+    var c2 = pointToCell(e.clientX - rect.left, e.clientY - rect.top);
+    var changed = (!!c2 !== !!hoverCell) || (c2 && hoverCell && (c2.row !== hoverCell.row || c2.col !== hoverCell.col));
+    hoverCell = c2;
+    if (changed) render();
+  });
+  canvas.addEventListener('pointerleave', function () { if (hoverCell) { hoverCell = null; render(); } });
+  canvas.addEventListener('pointerdown', function (e) {
+    var rect = canvas.getBoundingClientRect();
+    handleTap(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  btnPath.onclick = function () {
+    showPath = !showPath;
+    btnPath.style.color = showPath ? '#6fd3ff' : '';
+    render();
+  };
+  function showTab(which) {
+    var g = (which === 'global');
+    paneBuild.style.display = g ? 'none' : 'block';
+    paneGlobal.style.display = g ? 'block' : 'none';
+    tabBuild.classList.toggle('on', !g);
+    tabGlobal.classList.toggle('on', g);
+    if (g) buildGlobalCards();
+  }
+  tabBuild.onclick = function () { showTab('build'); };
+  tabGlobal.onclick = function () { showTab('global'); };
+  document.getElementById('btnrestart').onclick = newGame;
+  document.getElementById('again').onclick = startGame;
+  document.getElementById('startbtn').onclick = startGame;
+
+  /* ---------------------------------------------------------------- 主循环 */
+  var last = 0, acc = 0, autoTimer = 0;
+  function frame(ts) {
+    if (!last) last = ts;
+    var dt = Math.min(0.1, (ts - last) / 1000);
+    last = ts;
+    acc += dt;
+    var guard = 0;
+    var running = startedAt >= 0 && !state.over;   // 「开始游戏」之前 / 已经分出胜负之后都不再推进模拟
+    while (running && acc >= C.DT && guard++ < 60) {
+      state.suddenDeath = !suddenEl || suddenEl.checked;
+      C.update(state, C.DT);
+      C.aiUpdate(state, FOE, C.DT);
+      // 自动派兵：哪个兵冷却好了就派出去（省手）
+      autoTimer += C.DT;
+      if (autoDeployEl && autoDeployEl.checked && autoTimer >= 0.5) {
+        autoTimer = 0;
+        for (var ui = 0; ui < UNIT_ORDER.length; ui++) {
+          var k = UNIT_ORDER[ui];
+          if (!C.isUnitReady(state, ME, k)) continue;
+          if (state.res[ME] < C.DATA.units[k].cost) continue;
+          for (var c = 1; c <= C.COLS; c++) {
+            if (C.deployUnit(state, ME, k, c).ok) { ui = 99; break; }
+          }
+        }
+      }
+      acc -= C.DT;
+    }
+    render();
+    if (selectedBuilding) {
+      lastDetailRefresh += dt;
+      if (lastDetailRefresh > 0.3) { lastDetailRefresh = 0; renderDetail(); }
+    }
+    if (state.over && !overEl.classList.contains('show')) {
+      var win = state.winner === ME;
+      overText.textContent = win ? '🎉 你赢了！' : state.winner === FOE ? '💥 你的大本营被摧毁' : '平局';
+      overText.style.color = win ? '#7ef0a0' : state.winner === FOE ? '#ff8080' : '#cfe0ff';
+      overSub.textContent = win ? '红方大本营已被摧毁' : state.winner === FOE ? '下次记得早点盖塔、升大本营' : '双方都没能推掉对方';
+      // 结束界面给一份战绩
+      var foeBase = C.ownBase(state, FOE);
+      var myBase = C.ownBase(state, ME);
+      var myLv = C.baseLevelOf(state, ME);
+      overStats.innerHTML =
+        '对局时长：<b>' + Math.floor(state.time) + ' 秒</b><br>' +
+        '红方大本营：' + (foeBase ? Math.max(0, Math.floor(foeBase.hp)) + '/' + foeBase.hpMax : '已摧毁') + '<br>' +
+        '我方大本营：' + (myBase ? Math.max(0, Math.floor(myBase.hp)) + '/' + myBase.hpMax : '已摧毁') + '（Lv' + myLv + '）<br>' +
+        '我方累计收入：' + Math.floor(state.stats[ME].income) + ' 金　花费：' + Math.floor(state.stats[ME].spent) + ' 金<br>' +
+        '击败敌方单位：' + (state.stats[FOE].produced ? '—' : '—') + '　我方已派兵：' + state.stats[ME].produced + ' 个';
+      overEl.classList.add('show');
+    }
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('resize', function () { if (state) render(); });
+  window.__game = {
+    get state() { return state; },
+    render: render,
+    start: startGame,               // 供测试/自动化用：等价于点「开始游戏」
+    select: function (x) { sel = x; render(); },
+    inspect: function (b) { selectedBuilding = b; selectedUnit = null; renderDetail(); render(); },
+    inspectUnit: function (u) { selectedUnit = u; selectedBuilding = null; renderDetail(); render(); }
+  };
+  // 先建一局（但 startedAt 仍是 -1，所以模拟不会跑），等玩家点「开始游戏」
+  buildDiffCards();
+  newGame();
+  render();
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+(function () {
+  // 等主脚本初始化完成后，把局面推进到中段
+  function boot() {
+    if (!window.__shotReady) { setTimeout(boot, 30); return; }
+  }
+  setTimeout(function () {
+    var g = window.__game;
+    if (!g) { document.title = 'NO_GAME_HANDLE'; return; }
+    var C = window.GameCore, s = g.state;
+    // 给玩家一些资源与建筑
+    s.res.blue = 640;
+    C.placeBuilding(s, 'blue', 'tower', 8, 3);
+    C.placeBuilding(s, 'blue', 'mine', 9, 7);
+    C.placeBuilding(s, 'blue', 'barracks', 9, 2);
+    C.upgradeBuilding(s, s.byRef.blue[C.toRef(8, 3)]);
+    C.placeBuilding(s, 'blue', 'tower', 8, 8);
+    // 红方也摆一点
+    s.res.red = 900;
+    C.placeBuilding(s, 'red', 'tower', 3, 4);
+    C.placeBuilding(s, 'red', 'mine', 2, 8);
+    C.placeBuilding(s, 'red', 'barracks', 1, 3);
+    // 推进 26 秒，让双方都有兵在场上
+    for (var i = 0; i < 20 * 26; i++) {
+      C.update(s, C.DT);
+      C.aiUpdate(s, 'red', C.DT);
+      C.aiUpdate(s, 'blue', C.DT);
+    }
+    // 蓝方再手动派几个兵，保证画面里有己方兵
+    ['infantry','infantry','siege','scout'].forEach(function (k, idx) {
+      s.reserve.blue[k] = (s.reserve.blue[k] || 0) + 1;
+      s.res.blue = 500;
+      C.deployUnit(s, 'blue', k, 2 + idx * 2);
+    });
+    for (var j = 0; j < 20 * 6; j++) {
+      C.update(s, C.DT);
+      C.aiUpdate(s, 'red', C.DT);
+    }
+    // 打开一张建筑详情卡，展示「点建筑看攻击力+升级」
+    var t = s.byRef.blue[C.toRef(8, 3)];
+    if (t) { g.select(t); }
+    g.render();
+    document.title = 'SHOT_READY units=' + s.units.length + ' buildings=' + s.buildings.length;
+  }, 120);
+})();
+</script>
+</body>
+</html>

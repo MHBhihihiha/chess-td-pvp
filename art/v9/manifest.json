@@ -1,0 +1,2582 @@
+{
+  "version": "v9",
+  "generatedFor": "棋盘塔防 · 蓝方 vs 红方",
+  "canvas": 512,
+  "anchor": "bottom-center is the footprint center; barK pivot at canvas center for top layers",
+  "layerRules": "base = shared pedestal (no weapon). top = weapon/ornament, pivot at canvas center, pointing 0deg (right). body = single whole image.",
+  "total": 149,
+  "batches": {
+    "1": 19,
+    "2": 52,
+    "3": 16,
+    "4": 32,
+    "5": 18,
+    "6": 12
+  },
+  "items": [
+    {
+      "no": 1,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "base",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "cannon_base_e1.png",
+      "prompt": "A cannon-tower pedestal for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 2,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "base",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "cannon_base_e2.png",
+      "prompt": "A cannon-tower pedestal for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 3,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "base",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "cannon_base_e3.png",
+      "prompt": "A cannon-tower pedestal for a tower defense game, cast iron plates, riveted seams, dark steel, industrial. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 4,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "base",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "cannon_base_e4.png",
+      "prompt": "A cannon-tower pedestal for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 5,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "base",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "cannon_base_e5.png",
+      "prompt": "A cannon-tower pedestal for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 6,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "cannon_top_e1.png",
+      "prompt": "A cannon barrel for a cannon tower, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 7,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "cannon_top_e2.png",
+      "prompt": "A cannon barrel for a cannon tower, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 8,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "twin",
+      "branchName": "双管炮塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "cannon_twin_top_e3.png",
+      "prompt": "A cannon barrel for the twin-barrel upgrade of a cannon tower, and it must read as TWO parallel cannon barrels mounted side by side (left and right muzzles). Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 9,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "twin",
+      "branchName": "双管炮塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "cannon_twin_top_e4.png",
+      "prompt": "A cannon barrel for the twin-barrel upgrade of a cannon tower, and it must read as TWO parallel cannon barrels mounted side by side (left and right muzzles). Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 10,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "twin",
+      "branchName": "双管炮塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "cannon_twin_top_e5.png",
+      "prompt": "A cannon barrel for the twin-barrel upgrade of a cannon tower, and it must read as TWO parallel cannon barrels mounted side by side (left and right muzzles). Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 11,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "bigcannon",
+      "branchName": "大炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "cannon_bigcannon_top_e3.png",
+      "prompt": "A cannon barrel for the heavy cannon upgrade of a cannon tower, and it must read as ONE very thick, long cannon barrel with a heavy muzzle brake. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 12,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "bigcannon",
+      "branchName": "大炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "cannon_bigcannon_top_e4.png",
+      "prompt": "A cannon barrel for the heavy cannon upgrade of a cannon tower, and it must read as ONE very thick, long cannon barrel with a heavy muzzle brake. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 13,
+      "batch": 1,
+      "group": "building/cannon",
+      "layer": "top",
+      "family": "cannon",
+      "familyName": "炮塔",
+      "branch": "bigcannon",
+      "branchName": "大炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "cannon_bigcannon_top_e5.png",
+      "prompt": "A cannon barrel for the heavy cannon upgrade of a cannon tower, and it must read as ONE very thick, long cannon barrel with a heavy muzzle brake. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 14,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "base",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "arrow_base_e1.png",
+      "prompt": "An archer-tower pedestal for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 15,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "base",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "arrow_base_e2.png",
+      "prompt": "An archer-tower pedestal for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 16,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "base",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "arrow_base_e3.png",
+      "prompt": "An archer-tower pedestal for a tower defense game, cast iron plates, riveted seams, dark steel, industrial. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 17,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "base",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "arrow_base_e4.png",
+      "prompt": "An archer-tower pedestal for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 18,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "base",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "arrow_base_e5.png",
+      "prompt": "An archer-tower pedestal for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 19,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "arrow_top_e1.png",
+      "prompt": "A bow for a archer tower, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 20,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "arrow_top_e2.png",
+      "prompt": "A bow for a archer tower, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 21,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "rapid",
+      "branchName": "速射塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "arrow_rapid_top_e3.png",
+      "prompt": "A bow for the rapid-fire upgrade of a archer tower, and it must read as a bundle of arrows in a quick-load magazine, light and bristling. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 22,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "rapid",
+      "branchName": "速射塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "arrow_rapid_top_e4.png",
+      "prompt": "A bow for the rapid-fire upgrade of a archer tower, and it must read as a bundle of arrows in a quick-load magazine, light and bristling. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 23,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "rapid",
+      "branchName": "速射塔",
+      "branchEffect": "攻速翻倍",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "arrow_rapid_top_e5.png",
+      "prompt": "A bow for the rapid-fire upgrade of a archer tower, and it must read as a bundle of arrows in a quick-load magazine, light and bristling. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 24,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "crossbow",
+      "branchName": "弩塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "arrow_crossbow_top_e3.png",
+      "prompt": "A bow for the crossbow upgrade of a archer tower, and it must read as a large heavy crossbow with wide steel limbs, drawn string. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 25,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "crossbow",
+      "branchName": "弩塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "arrow_crossbow_top_e4.png",
+      "prompt": "A bow for the crossbow upgrade of a archer tower, and it must read as a large heavy crossbow with wide steel limbs, drawn string. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 26,
+      "batch": 2,
+      "group": "building/arrow",
+      "layer": "top",
+      "family": "arrow",
+      "familyName": "箭塔",
+      "branch": "crossbow",
+      "branchName": "弩塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "arrow_crossbow_top_e5.png",
+      "prompt": "A bow for the crossbow upgrade of a archer tower, and it must read as a large heavy crossbow with wide steel limbs, drawn string. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 27,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "base",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "mage_base_e1.png",
+      "prompt": "A mage-tower pedestal for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 28,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "base",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "mage_base_e2.png",
+      "prompt": "A mage-tower pedestal for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 29,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "base",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mage_base_e3.png",
+      "prompt": "A mage-tower pedestal for a tower defense game, cast iron plates, riveted seams, dark steel, industrial. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 30,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "base",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mage_base_e4.png",
+      "prompt": "A mage-tower pedestal for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 31,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "base",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mage_base_e5.png",
+      "prompt": "A mage-tower pedestal for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 32,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "mage_top_e1.png",
+      "prompt": "A floating magic orb for a mage tower, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 33,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "mage_top_e2.png",
+      "prompt": "A floating magic orb for a mage tower, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 34,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "white",
+      "branchName": "白魔法塔",
+      "branchEffect": "群攻：单次攻击沿方向贯穿 3 格",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mage_white_top_e3.png",
+      "prompt": "A floating magic orb for the radiant upgrade of a mage tower, and it must read as a bright white radiant energy orb with a halo ring. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 35,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "white",
+      "branchName": "白魔法塔",
+      "branchEffect": "群攻：单次攻击沿方向贯穿 3 格",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mage_white_top_e4.png",
+      "prompt": "A floating magic orb for the radiant upgrade of a mage tower, and it must read as a bright white radiant energy orb with a halo ring. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 36,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "white",
+      "branchName": "白魔法塔",
+      "branchEffect": "群攻：单次攻击沿方向贯穿 3 格",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mage_white_top_e5.png",
+      "prompt": "A floating magic orb for the radiant upgrade of a mage tower, and it must read as a bright white radiant energy orb with a halo ring. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 37,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "black",
+      "branchName": "黑魔法塔",
+      "branchEffect": "伤害翻五倍，但攻速减慢 40%",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mage_black_top_e3.png",
+      "prompt": "A floating magic orb for the void upgrade of a mage tower, and it must read as a large dark violet void orb, heavy and ominous. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 38,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "black",
+      "branchName": "黑魔法塔",
+      "branchEffect": "伤害翻五倍，但攻速减慢 40%",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mage_black_top_e4.png",
+      "prompt": "A floating magic orb for the void upgrade of a mage tower, and it must read as a large dark violet void orb, heavy and ominous. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 39,
+      "batch": 2,
+      "group": "building/mage",
+      "layer": "top",
+      "family": "mage",
+      "familyName": "法师塔",
+      "branch": "black",
+      "branchName": "黑魔法塔",
+      "branchEffect": "伤害翻五倍，但攻速减慢 40%",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mage_black_top_e5.png",
+      "prompt": "A floating magic orb for the void upgrade of a mage tower, and it must read as a large dark violet void orb, heavy and ominous. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 40,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "base",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "mortar_base_e1.png",
+      "prompt": "A mortar-tower pedestal for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 41,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "base",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "mortar_base_e2.png",
+      "prompt": "A mortar-tower pedestal for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 42,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "base",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mortar_base_e3.png",
+      "prompt": "A mortar-tower pedestal for a tower defense game, cast iron plates, riveted seams, dark steel, industrial. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 43,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "base",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mortar_base_e4.png",
+      "prompt": "A mortar-tower pedestal for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 44,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "base",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mortar_base_e5.png",
+      "prompt": "A mortar-tower pedestal for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 45,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "mortar_top_e1.png",
+      "prompt": "A wide mortar tube for a mortar tower, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 46,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "mortar_top_e2.png",
+      "prompt": "A wide mortar tube for a mortar tower, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 47,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "bigmortar",
+      "branchName": "大迫击炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mortar_bigmortar_top_e3.png",
+      "prompt": "A wide mortar tube for the heavy mortar upgrade of a mortar tower, and it must read as a short fat mortar bowl, wide bore aimed high. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 48,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "bigmortar",
+      "branchName": "大迫击炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mortar_bigmortar_top_e4.png",
+      "prompt": "A wide mortar tube for the heavy mortar upgrade of a mortar tower, and it must read as a short fat mortar bowl, wide bore aimed high. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 49,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "bigmortar",
+      "branchName": "大迫击炮塔",
+      "branchEffect": "伤害翻两倍",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mortar_bigmortar_top_e5.png",
+      "prompt": "A wide mortar tube for the heavy mortar upgrade of a mortar tower, and it must read as a short fat mortar bowl, wide bore aimed high. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 50,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "missile",
+      "branchName": "导弹塔",
+      "branchEffect": "射程扩大到 7×7",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "mortar_missile_top_e3.png",
+      "prompt": "A wide mortar tube for the missile upgrade of a mortar tower, and it must read as a long slim missile launch tube on a rail. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 51,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "missile",
+      "branchName": "导弹塔",
+      "branchEffect": "射程扩大到 7×7",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "mortar_missile_top_e4.png",
+      "prompt": "A wide mortar tube for the missile upgrade of a mortar tower, and it must read as a long slim missile launch tube on a rail. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 52,
+      "batch": 2,
+      "group": "building/mortar",
+      "layer": "top",
+      "family": "mortar",
+      "familyName": "迫击炮塔",
+      "branch": "missile",
+      "branchName": "导弹塔",
+      "branchEffect": "射程扩大到 7×7",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "mortar_missile_top_e5.png",
+      "prompt": "A wide mortar tube for the missile upgrade of a mortar tower, and it must read as a long slim missile launch tube on a rail. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 53,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "base",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "tesla_base_e1.png",
+      "prompt": "A tesla-coil pedestal for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 54,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "base",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "tesla_base_e2.png",
+      "prompt": "A tesla-coil pedestal for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 55,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "base",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "tesla_base_e3.png",
+      "prompt": "A tesla-coil pedestal for a tower defense game, cast iron plates, riveted seams, dark steel, industrial. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 56,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "base",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "tesla_base_e4.png",
+      "prompt": "A tesla-coil pedestal for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 57,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "base",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "tesla_base_e5.png",
+      "prompt": "A tesla-coil pedestal for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary. This is the BASE layer only — a platform/pedestal with a socket on top, no weapon mounted. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 58,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "tesla_top_e1.png",
+      "prompt": "A tesla coil for a tesla coil tower, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 59,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "tesla_top_e2.png",
+      "prompt": "A tesla coil for a tesla coil tower, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, in its standard form. WEAPON LAYER ONLY, the barrel/aiming part must point EXACTLY to the right (3 o'clock, 0 degrees), no base under it, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 60,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "pulse",
+      "branchName": "脉冲塔",
+      "branchEffect": "自塔顶向外扩散一圈电磁波，波前扫到的敌人受伤",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "tesla_pulse_top_e3.png",
+      "prompt": "A tesla coil for the pulse emitter upgrade of a tesla coil tower, and it must read as a ring of electrode fins around a central emitter. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 61,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "pulse",
+      "branchName": "脉冲塔",
+      "branchEffect": "自塔顶向外扩散一圈电磁波，波前扫到的敌人受伤",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "tesla_pulse_top_e4.png",
+      "prompt": "A tesla coil for the pulse emitter upgrade of a tesla coil tower, and it must read as a ring of electrode fins around a central emitter. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 62,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "pulse",
+      "branchName": "脉冲塔",
+      "branchEffect": "自塔顶向外扩散一圈电磁波，波前扫到的敌人受伤",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "tesla_pulse_top_e5.png",
+      "prompt": "A tesla coil for the pulse emitter upgrade of a tesla coil tower, and it must read as a ring of electrode fins around a central emitter. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 63,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "bigtesla",
+      "branchName": "大电塔",
+      "branchEffect": "伤害翻四倍，最多同时打 3 个目标",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "tesla_bigtesla_top_e3.png",
+      "prompt": "A tesla coil for the heavy tesla upgrade of a tesla coil tower, and it must read as a three-pronged heavy electrode with arcing tips. Material: cast iron plates, riveted seams, dark steel, industrial. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 64,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "bigtesla",
+      "branchName": "大电塔",
+      "branchEffect": "伤害翻四倍，最多同时打 3 个目标",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "tesla_bigtesla_top_e4.png",
+      "prompt": "A tesla coil for the heavy tesla upgrade of a tesla coil tower, and it must read as a three-pronged heavy electrode with arcing tips. Material: hexagonal armor plating, angled steel skirts, reinforced joints. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 65,
+      "batch": 2,
+      "group": "building/tesla",
+      "layer": "top",
+      "family": "tesla",
+      "familyName": "特斯拉电塔",
+      "branch": "bigtesla",
+      "branchName": "大电塔",
+      "branchEffect": "伤害翻四倍，最多同时打 3 个目标",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "tesla_bigtesla_top_e5.png",
+      "prompt": "A tesla coil for the heavy tesla upgrade of a tesla coil tower, and it must read as a three-pronged heavy electrode with arcing tips. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. WEAPON LAYER ONLY, pointing EXACTLY to the right (3 o'clock, 0 degrees), no base, nothing below the pivot line. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 66,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "base",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1,
+        2
+      ],
+      "file": "ward_body_e1.png",
+      "prompt": "A defensive ward tower (aura support building, no gun) for a tower defense game, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, with a socket on top for an ornament. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 67,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "base",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3,
+        4
+      ],
+      "file": "ward_body_e2.png",
+      "prompt": "A defensive ward tower (aura support building, no gun) for a tower defense game, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, with a socket on top for an ornament. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 68,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "base",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "ward_body_e3.png",
+      "prompt": "A defensive ward tower (aura support building, no gun) for a tower defense game, cast iron plates, riveted seams, dark steel, industrial, with a socket on top for an ornament. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 69,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "base",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "ward_body_e4.png",
+      "prompt": "A defensive ward tower (aura support building, no gun) for a tower defense game, hexagonal armor plating, angled steel skirts, reinforced joints, with a socket on top for an ornament. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 70,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "base",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "ward_body_e5.png",
+      "prompt": "A defensive ward tower (aura support building, no gun) for a tower defense game, ornate golden plates, engraved trim, blue gem inlays, royal and legendary, with a socket on top for an ornament. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 71,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "crystal",
+      "branchName": "水晶塔",
+      "branchEffect": "保护范围扩大到 5×5，减伤 +40%",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "ward_crystal_top_e3.png",
+      "prompt": "The top ornament for a crystal ward upgrade (aura support tower), must read as a large floating blue crystal held in a stone claw. Material: cast iron plates, riveted seams, dark steel, industrial. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 72,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "crystal",
+      "branchName": "水晶塔",
+      "branchEffect": "保护范围扩大到 5×5，减伤 +40%",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "ward_crystal_top_e4.png",
+      "prompt": "The top ornament for a crystal ward upgrade (aura support tower), must read as a large floating blue crystal held in a stone claw. Material: hexagonal armor plating, angled steel skirts, reinforced joints. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 73,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "crystal",
+      "branchName": "水晶塔",
+      "branchEffect": "保护范围扩大到 5×5，减伤 +40%",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "ward_crystal_top_e5.png",
+      "prompt": "The top ornament for a crystal ward upgrade (aura support tower), must read as a large floating blue crystal held in a stone claw. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 74,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "bunker",
+      "branchName": "碉堡塔",
+      "branchEffect": "对周围己方建筑减伤 40%",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5,
+        6
+      ],
+      "file": "ward_bunker_top_e3.png",
+      "prompt": "The top ornament for a bunker ward upgrade (aura support tower), must read as thick stone bunker walls with narrow firing slits. Material: cast iron plates, riveted seams, dark steel, industrial. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 75,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "bunker",
+      "branchName": "碉堡塔",
+      "branchEffect": "对周围己方建筑减伤 40%",
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        7,
+        8
+      ],
+      "file": "ward_bunker_top_e4.png",
+      "prompt": "The top ornament for a bunker ward upgrade (aura support tower), must read as thick stone bunker walls with narrow firing slits. Material: hexagonal armor plating, angled steel skirts, reinforced joints. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 76,
+      "batch": 3,
+      "group": "building/ward",
+      "layer": "top",
+      "family": "ward",
+      "familyName": "防御塔",
+      "branch": "bunker",
+      "branchName": "碉堡塔",
+      "branchEffect": "对周围己方建筑减伤 40%",
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        9,
+        10
+      ],
+      "file": "ward_bunker_top_e5.png",
+      "prompt": "The top ornament for a bunker ward upgrade (aura support tower), must read as thick stone bunker walls with narrow firing slits. Material: ornate golden plates, engraved trim, blue gem inlays, royal and legendary. TOP ORNAMENT ONLY, no base. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 77,
+      "batch": 3,
+      "group": "building/mine",
+      "layer": "body",
+      "family": "mine",
+      "familyName": "金矿",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1
+      ],
+      "file": "mine_L1.png",
+      "prompt": "A gold mine building (resource generator) for a tower defense game at upgrade level 1 of 5, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, with a visible mine shaft entrance and gold ore piles, getting richer and grander as level rises. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 78,
+      "batch": 3,
+      "group": "building/mine",
+      "layer": "body",
+      "family": "mine",
+      "familyName": "金矿",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        2
+      ],
+      "file": "mine_L2.png",
+      "prompt": "A gold mine building (resource generator) for a tower defense game at upgrade level 2 of 5, weathered timber construction, hand-hewn beams, hemp rope lashings, crude and small, with a visible mine shaft entrance and gold ore piles, getting richer and grander as level rises. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 79,
+      "batch": 3,
+      "group": "building/mine",
+      "layer": "body",
+      "family": "mine",
+      "familyName": "金矿",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        3
+      ],
+      "file": "mine_L3.png",
+      "prompt": "A gold mine building (resource generator) for a tower defense game at upgrade level 3 of 5, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, with a visible mine shaft entrance and gold ore piles, getting richer and grander as level rises. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 80,
+      "batch": 3,
+      "group": "building/mine",
+      "layer": "body",
+      "family": "mine",
+      "familyName": "金矿",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        4
+      ],
+      "file": "mine_L4.png",
+      "prompt": "A gold mine building (resource generator) for a tower defense game at upgrade level 4 of 5, carved stone masonry, chipped weathered edges, faint moss, solid and grounded, with a visible mine shaft entrance and gold ore piles, getting richer and grander as level rises. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 81,
+      "batch": 3,
+      "group": "building/mine",
+      "layer": "body",
+      "family": "mine",
+      "familyName": "金矿",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        5
+      ],
+      "file": "mine_L5.png",
+      "prompt": "A gold mine building (resource generator) for a tower defense game at upgrade level 5 of 5, cast iron plates, riveted seams, dark steel, industrial, with a visible mine shaft entrance and gold ore piles, getting richer and grander as level rises. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 82,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e1",
+      "eraName": "木",
+      "levels": [
+        1
+      ],
+      "file": "base_L1.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 1 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 83,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e2",
+      "eraName": "石",
+      "levels": [
+        2
+      ],
+      "file": "base_L2.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 2 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 84,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        3
+      ],
+      "file": "base_L3.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 3 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 85,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e4",
+      "eraName": "装甲",
+      "levels": [
+        4
+      ],
+      "file": "base_L4.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 4 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 86,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        5
+      ],
+      "file": "base_L5.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 5 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 87,
+      "batch": 1,
+      "group": "base",
+      "layer": "body",
+      "family": "base",
+      "familyName": "大本营",
+      "branch": null,
+      "era": "e5",
+      "eraName": "金",
+      "levels": [
+        6
+      ],
+      "file": "base_L6.png",
+      "prompt": "The main keep / royal base building of a tower defense game, upgrade level 6 of 6, a grand fortified castle keep with a banner pole, growing more magnificent with level (stone keep → castle → fortress → golden palace). Clash Royale / Supercell hand-painted mobile game asset. This is the centerpiece of the board, so it must look iconic and readable from above. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 88,
+      "batch": 4,
+      "group": "unit/infantry",
+      "layer": "sprite",
+      "family": "infantry",
+      "familyName": "步兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_infantry_blue_idle.png",
+      "prompt": "a light infantry soldier with a short sword and a round wooden shield, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 89,
+      "batch": 4,
+      "group": "unit/infantry",
+      "layer": "sprite",
+      "family": "infantry",
+      "familyName": "步兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_infantry_blue_attack.png",
+      "prompt": "a light infantry soldier with a short sword and a round wooden shield, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 90,
+      "batch": 4,
+      "group": "unit/infantry",
+      "layer": "sprite",
+      "family": "infantry",
+      "familyName": "步兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_infantry_red_idle.png",
+      "prompt": "a light infantry soldier with a short sword and a round wooden shield, red team colors — crimson banner, red-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 91,
+      "batch": 4,
+      "group": "unit/infantry",
+      "layer": "sprite",
+      "family": "infantry",
+      "familyName": "步兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_infantry_red_attack.png",
+      "prompt": "a light infantry soldier with a short sword and a round wooden shield, red team colors — crimson banner, red-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 92,
+      "batch": 4,
+      "group": "unit/heavy",
+      "layer": "sprite",
+      "family": "heavy",
+      "familyName": "重甲兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_heavy_blue_idle.png",
+      "prompt": "a heavy armored soldier with a big tower shield and a war hammer, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 93,
+      "batch": 4,
+      "group": "unit/heavy",
+      "layer": "sprite",
+      "family": "heavy",
+      "familyName": "重甲兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_heavy_blue_attack.png",
+      "prompt": "a heavy armored soldier with a big tower shield and a war hammer, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 94,
+      "batch": 4,
+      "group": "unit/heavy",
+      "layer": "sprite",
+      "family": "heavy",
+      "familyName": "重甲兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_heavy_red_idle.png",
+      "prompt": "a heavy armored soldier with a big tower shield and a war hammer, red team colors — crimson banner, red-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 95,
+      "batch": 4,
+      "group": "unit/heavy",
+      "layer": "sprite",
+      "family": "heavy",
+      "familyName": "重甲兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_heavy_red_attack.png",
+      "prompt": "a heavy armored soldier with a big tower shield and a war hammer, red team colors — crimson banner, red-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 96,
+      "batch": 4,
+      "group": "unit/siege",
+      "layer": "sprite",
+      "family": "siege",
+      "familyName": "攻城兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_siege_blue_idle.png",
+      "prompt": "a siege engineer carrying a battering ram charge and a torch, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 97,
+      "batch": 4,
+      "group": "unit/siege",
+      "layer": "sprite",
+      "family": "siege",
+      "familyName": "攻城兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_siege_blue_attack.png",
+      "prompt": "a siege engineer carrying a battering ram charge and a torch, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 98,
+      "batch": 4,
+      "group": "unit/siege",
+      "layer": "sprite",
+      "family": "siege",
+      "familyName": "攻城兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_siege_red_idle.png",
+      "prompt": "a siege engineer carrying a battering ram charge and a torch, red team colors — crimson banner, red-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 99,
+      "batch": 4,
+      "group": "unit/siege",
+      "layer": "sprite",
+      "family": "siege",
+      "familyName": "攻城兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_siege_red_attack.png",
+      "prompt": "a siege engineer carrying a battering ram charge and a torch, red team colors — crimson banner, red-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 100,
+      "batch": 4,
+      "group": "unit/ram",
+      "layer": "sprite",
+      "family": "ram",
+      "familyName": "攻城车",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_ram_blue_idle.png",
+      "prompt": "a wheeled battering ram cart with an iron ram head, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 101,
+      "batch": 4,
+      "group": "unit/ram",
+      "layer": "sprite",
+      "family": "ram",
+      "familyName": "攻城车",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_ram_blue_attack.png",
+      "prompt": "a wheeled battering ram cart with an iron ram head, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 102,
+      "batch": 4,
+      "group": "unit/ram",
+      "layer": "sprite",
+      "family": "ram",
+      "familyName": "攻城车",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_ram_red_idle.png",
+      "prompt": "a wheeled battering ram cart with an iron ram head, red team colors — crimson banner, red-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 103,
+      "batch": 4,
+      "group": "unit/ram",
+      "layer": "sprite",
+      "family": "ram",
+      "familyName": "攻城车",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_ram_red_attack.png",
+      "prompt": "a wheeled battering ram cart with an iron ram head, red team colors — crimson banner, red-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 104,
+      "batch": 4,
+      "group": "unit/archer",
+      "layer": "sprite",
+      "family": "archer",
+      "familyName": "弓箭手",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_archer_blue_idle.png",
+      "prompt": "an archer with a longbow and a quiver of arrows, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 105,
+      "batch": 4,
+      "group": "unit/archer",
+      "layer": "sprite",
+      "family": "archer",
+      "familyName": "弓箭手",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_archer_blue_attack.png",
+      "prompt": "an archer with a longbow and a quiver of arrows, blue team colors — cobalt blue banner, blue-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 106,
+      "batch": 4,
+      "group": "unit/archer",
+      "layer": "sprite",
+      "family": "archer",
+      "familyName": "弓箭手",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_archer_red_idle.png",
+      "prompt": "an archer with a longbow and a quiver of arrows, red team colors — crimson banner, red-tinted armor trim, standing on the ground in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 107,
+      "batch": 4,
+      "group": "unit/archer",
+      "layer": "sprite",
+      "family": "archer",
+      "familyName": "弓箭手",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_archer_red_attack.png",
+      "prompt": "an archer with a longbow and a quiver of arrows, red team colors — crimson banner, red-tinted armor trim, standing on the ground in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 108,
+      "batch": 4,
+      "group": "unit/balloon",
+      "layer": "sprite",
+      "family": "balloon",
+      "familyName": "气球兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_balloon_blue_idle.png",
+      "prompt": "a balloon trooper in a wicker basket holding a bomb, floating, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 109,
+      "batch": 4,
+      "group": "unit/balloon",
+      "layer": "sprite",
+      "family": "balloon",
+      "familyName": "气球兵",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_balloon_blue_attack.png",
+      "prompt": "a balloon trooper in a wicker basket holding a bomb, floating, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 110,
+      "batch": 4,
+      "group": "unit/balloon",
+      "layer": "sprite",
+      "family": "balloon",
+      "familyName": "气球兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_balloon_red_idle.png",
+      "prompt": "a balloon trooper in a wicker basket holding a bomb, floating, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 111,
+      "batch": 4,
+      "group": "unit/balloon",
+      "layer": "sprite",
+      "family": "balloon",
+      "familyName": "气球兵",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_balloon_red_attack.png",
+      "prompt": "a balloon trooper in a wicker basket holding a bomb, floating, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 112,
+      "batch": 4,
+      "group": "unit/airship",
+      "layer": "sprite",
+      "family": "airship",
+      "familyName": "攻城飞艇",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_airship_blue_idle.png",
+      "prompt": "a small siege airship with a bomb bay, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 113,
+      "batch": 4,
+      "group": "unit/airship",
+      "layer": "sprite",
+      "family": "airship",
+      "familyName": "攻城飞艇",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_airship_blue_attack.png",
+      "prompt": "a small siege airship with a bomb bay, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 114,
+      "batch": 4,
+      "group": "unit/airship",
+      "layer": "sprite",
+      "family": "airship",
+      "familyName": "攻城飞艇",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_airship_red_idle.png",
+      "prompt": "a small siege airship with a bomb bay, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 115,
+      "batch": 4,
+      "group": "unit/airship",
+      "layer": "sprite",
+      "family": "airship",
+      "familyName": "攻城飞艇",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_airship_red_attack.png",
+      "prompt": "a small siege airship with a bomb bay, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 116,
+      "batch": 4,
+      "group": "unit/dragon",
+      "layer": "sprite",
+      "family": "dragon",
+      "familyName": "飞龙",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_dragon_blue_idle.png",
+      "prompt": "a young dragon with folded wings and an open flaming mouth, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 117,
+      "batch": 4,
+      "group": "unit/dragon",
+      "layer": "sprite",
+      "family": "dragon",
+      "familyName": "飞龙",
+      "branch": null,
+      "team": "blue",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_dragon_blue_attack.png",
+      "prompt": "a young dragon with folded wings and an open flaming mouth, blue team colors — cobalt blue banner, blue-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 118,
+      "batch": 4,
+      "group": "unit/dragon",
+      "layer": "sprite",
+      "family": "dragon",
+      "familyName": "飞龙",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_dragon_red_idle.png",
+      "prompt": "a young dragon with folded wings and an open flaming mouth, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in a neutral IDLE pose. Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 119,
+      "batch": 4,
+      "group": "unit/dragon",
+      "layer": "sprite",
+      "family": "dragon",
+      "familyName": "飞龙",
+      "branch": null,
+      "team": "red",
+      "era": "e3",
+      "eraName": "铁",
+      "levels": [
+        1
+      ],
+      "file": "unit_dragon_red_attack.png",
+      "prompt": "a young dragon with folded wings and an open flaming mouth, red team colors — crimson banner, red-tinted armor trim, floating above the ground with a soft shadow beneath in an ATTACK pose (weapon swung / projectile released). Small game unit sprite, must stay readable at 64 pixels. Clash Royale / Supercell hand-painted mobile game asset. Top-down three-quarter view suited to a chessboard grid; feet/pivot near the bottom center. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 120,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "arrowRain",
+      "familyName": "箭雨",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_arrowRain.png",
+      "prompt": "A game spell icon for \"Arrow Rain\": a sky full of falling arrows. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 121,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "fireball",
+      "familyName": "火球",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_fireball.png",
+      "prompt": "A game spell icon for \"Fireball\": a blazing orange fireball. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 122,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "rocket",
+      "familyName": "火箭",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_rocket.png",
+      "prompt": "A game spell icon for \"Rocket\": a single heavy rocket. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 123,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "rage",
+      "familyName": "狂暴",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_rage.png",
+      "prompt": "A game spell icon for \"Rage\": a red berserk aura with an up arrow. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 124,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "freeze",
+      "familyName": "冰冻",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_freeze.png",
+      "prompt": "A game spell icon for \"Freeze\": an ice crystal burst. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 125,
+      "batch": 5,
+      "group": "spell",
+      "layer": "icon",
+      "family": "weaken",
+      "familyName": "弱化",
+      "branch": null,
+      "era": "ui",
+      "eraName": "UI",
+      "levels": [
+        1
+      ],
+      "file": "spell_weaken.png",
+      "prompt": "A game spell icon for \"Weaken\": a cracked purple curse sigil. Square icon composition, bold readable silhouette, painted in the same style as the buildings. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 126,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_muzzle_1",
+      "familyName": "fx_muzzle_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_muzzle_1.png",
+      "prompt": "A game particle effect frame: a small bright muzzle flash burst, 4-point star. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 127,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_muzzle_2",
+      "familyName": "fx_muzzle_2",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_muzzle_2.png",
+      "prompt": "A game particle effect frame: a wide short muzzle flash with smoke puff. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 128,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_impact_1",
+      "familyName": "fx_impact_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_impact_1.png",
+      "prompt": "A game particle effect frame: a small hit spark, 3 short shards. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 129,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_impact_2",
+      "familyName": "fx_impact_2",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_impact_2.png",
+      "prompt": "A game particle effect frame: a medium hit burst with dust. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 130,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_impact_3",
+      "familyName": "fx_impact_3",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_impact_3.png",
+      "prompt": "A game particle effect frame: a heavy impact crack with debris. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 131,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_boom_1",
+      "familyName": "fx_boom_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_boom_1.png",
+      "prompt": "A game particle effect frame: an explosion fireball, early stage, bright core. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 132,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_boom_2",
+      "familyName": "fx_boom_2",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_boom_2.png",
+      "prompt": "A game particle effect frame: an explosion fireball, mid stage, expanding. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 133,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_boom_3",
+      "familyName": "fx_boom_3",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_boom_3.png",
+      "prompt": "A game particle effect frame: an explosion, late stage, smoke and embers. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 134,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_boom_4",
+      "familyName": "fx_boom_4",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_boom_4.png",
+      "prompt": "A game particle effect frame: an explosion residue, dark smoke ring fading. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 135,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_heal_1",
+      "familyName": "fx_heal_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_heal_1.png",
+      "prompt": "A game particle effect frame: a soft green healing sparkle burst. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 136,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_spawn_1",
+      "familyName": "fx_spawn_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_spawn_1.png",
+      "prompt": "A game particle effect frame: a small dust puff where something appears. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 137,
+      "batch": 5,
+      "group": "fx",
+      "layer": "fx",
+      "family": "fx_death_1",
+      "familyName": "fx_death_1",
+      "branch": null,
+      "era": "fx",
+      "eraName": "FX",
+      "levels": [
+        1
+      ],
+      "file": "fx_death_1.png",
+      "prompt": "A game particle effect frame: a small puff of smoke and debris where a unit dies. Centered, no background, no ground, painted with soft edges. Clash Royale / Supercell hand-painted mobile game asset. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 138,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_rivets",
+      "familyName": "dc_rivets",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_rivets.png",
+      "prompt": "A reusable decoration overlay: a horizontal strip of iron rivets, top-down. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 139,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_gold_band",
+      "familyName": "dc_gold_band",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_gold_band.png",
+      "prompt": "A reusable decoration overlay: a thin ornate gold trim band, horizontal. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 140,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_banner_blue",
+      "familyName": "dc_banner_blue",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_banner_blue.png",
+      "prompt": "A reusable decoration overlay: a small blue heraldic banner on a short pole. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 141,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_banner_red",
+      "familyName": "dc_banner_red",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_banner_red.png",
+      "prompt": "A reusable decoration overlay: a small crimson heraldic banner on a short pole. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 142,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_emblem_star",
+      "familyName": "dc_emblem_star",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_emblem_star.png",
+      "prompt": "A reusable decoration overlay: a carved stone star emblem plate. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 143,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_cracks",
+      "familyName": "dc_cracks",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_cracks.png",
+      "prompt": "A reusable decoration overlay: a set of fine stone cracks, transparent. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 144,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_moss",
+      "familyName": "dc_moss",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_moss.png",
+      "prompt": "A reusable decoration overlay: small patches of green moss, transparent. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 145,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_rust",
+      "familyName": "dc_rust",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_rust.png",
+      "prompt": "A reusable decoration overlay: rust streaks and stains, transparent. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 146,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_skull",
+      "familyName": "dc_skull",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_skull.png",
+      "prompt": "A reusable decoration overlay: a small carved skull ornament. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 147,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_chain",
+      "familyName": "dc_chain",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_chain.png",
+      "prompt": "A reusable decoration overlay: a short hanging chain with a hook. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 148,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_gem_blue",
+      "familyName": "dc_gem_blue",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_gem_blue.png",
+      "prompt": "A reusable decoration overlay: a small faceted blue gem, glowing faintly. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    },
+    {
+      "no": 149,
+      "batch": 6,
+      "group": "decor",
+      "layer": "overlay",
+      "family": "dc_crown_tiny",
+      "familyName": "dc_crown_tiny",
+      "branch": null,
+      "era": "fx",
+      "eraName": "装饰",
+      "levels": [
+        1
+      ],
+      "file": "dc_crown_tiny.png",
+      "prompt": "A reusable decoration overlay: a tiny golden crown ornament. Isolated, transparent/white background, painted to match the building art. Clash Royale / Supercell hand-painted mobile game asset. It will be composited on top of other art, so it must have clean edges and no drop shadow of its own. 2.5D isometric three-quarter top-down view, camera tilted 30 degrees, single isolated object centered with generous margins. Chunky exaggerated cartoon proportions, thick solid forms, hand-painted soft shading, one warm key light from upper-left, cool ambient shadow, soft ambient occlusion wherever parts touch. Outlines are colored only (dark version of each material color), thin and soft, never black, absent on top lit surfaces. No ground, no floor, no cast shadow, no text, no watermark, clean cut-out silhouette on a flat solid white background."
+    }
+  ]
+}

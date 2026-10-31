@@ -1,0 +1,33 @@
+# Render 蓝图 —— 让双人对战有一个永久固定的地址
+# ----------------------------------------------------------------------------
+# 解决的问题（免费 SSH 隧道的三个死结，均已实测）：
+#   1. pinggy 免费版 60 分钟硬性到期 → 一局没打完就断
+#   2. localhost.run 免费版会在运行中轮换子域名 → 对局中途地址失效（502）
+#   3. cloudflared 在校园网下三条下载路径全废 → 装不上
+#
+# 托管到 Render 之后：
+#   · 地址固定（https://<服务名>.onrender.com），不会变
+#   · 不依赖你的电脑开机，朋友随时能进
+#   · 没有 60 分钟限制
+#   · 免费额度：每工作区每月 750 实例小时（一个服务 24 小时满月约 744 小时，刚好够）
+#   · WSS 自动可用：relay 里 pvpServerUrl() 会按 https 自动切 wss://，无需改代码
+#
+# 唯一的代价：免费实例 15 分钟无入站流量会休眠，下次访问冷启动约 30-60 秒。
+#   → 对局中不会睡：relay 每 25 秒广播一次心跳，锁步每 20 tick 一个校验包。
+#   → 只有「两人都还没打开页面」时才会睡，第一个打开的人等半分钟即可。
+
+services:
+  - type: web
+    name: chess-td-pvp
+    runtime: node
+    plan: free
+    # 新加坡离国内最近，延迟明显低于美区（免费实例可自选区域）
+    region: singapore
+    # 项目零第三方依赖，这条只是为了产出 node_modules 目录结构，几秒就完
+    buildCommand: npm install --omit=dev
+    startCommand: node server/relay.js
+    # relay 监听 process.env.PORT（server/relay.js 已适配），不用改任何代码
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
