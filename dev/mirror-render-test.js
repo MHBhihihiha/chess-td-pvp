@@ -182,6 +182,21 @@ item('列方向：屏幕列 5、6 与逻辑列 6、5 互换',
   G.view.pick(viewCenter(1, 5).x, viewCenter(1, 5).y).col === 6 &&
   G.view.pick(viewCenter(1, 6).x, viewCenter(1, 6).y).col === 5);
 
+/* 多格建筑：2×2 的大本营在镜像后左上角会变成右下角。
+ * 不取四角 min 的话，红方视角下整块会向右下错一格、压到最底那条通道行上。 */
+var baseBox = G.view.cellRect(1, 5, 2, 2);
+var baseCen = viewCenter(9, 5);
+item('红方视角下 2×2 大本营（逻辑 1,5）左上角落在屏幕 (9,5)',
+  Math.abs((baseBox.x + baseBox.s / 2) - baseCen.x) < 1 &&
+  Math.abs((baseBox.y + baseBox.s / 2) - baseCen.y) < 1,
+  '矩形中心=(' + (baseBox.x + baseBox.s / 2).toFixed(1) + ',' + (baseBox.y + baseBox.s / 2).toFixed(1) +
+  ') 期望=(' + baseCen.x.toFixed(1) + ',' + baseCen.y.toFixed(1) + ')');
+var oppBox = G.view.cellRect(9, 5, 2, 2);
+var oppCen = viewCenter(1, 5);
+item('红方视角下对手 2×2 大本营（逻辑 9,5）左上角落在屏幕 (1,5)',
+  Math.abs((oppBox.x + oppBox.s / 2) - oppCen.x) < 1 &&
+  Math.abs((oppBox.y + oppBox.s / 2) - oppCen.y) < 1);
+
 /* 端到端：在红方视角下点屏幕 (1,10)，应该命中刚才建在 (10,1) 的那座炮塔（弹详情卡） */
 tap(viewCenter(1, 10).x, viewCenter(1, 10).y);
 var detail = document.getElementById('detail');

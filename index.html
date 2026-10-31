@@ -1653,11 +1653,20 @@
     layout.ox = (W - cell * C.COLS) / 2;
     layout.oy = (H - cell * rows) / 2;
   }
-  /* 逻辑格 → 屏幕矩形。多格建筑（size 全为 1×1）按左上角格算，
-   * 若将来出现 N×M 建筑，红方视角下左上角会变成右下角 —— 那时要改成按四角取 min。 */
-  function cellRect(row, col) {
+  /* 逻辑格 → 屏幕矩形。
+   * 多格建筑（大本营 2×2）必须传 spanRows/spanCols：
+   * 180° 镜像会把「左上角」翻成「右下角」，只按单格算会让整块建筑向右下错一格 ——
+   * 红方视角下大本营会压到最底那条通道行上，盖住通道标签（v21 实测到的现象）。
+   * 所以镜像时对四角取 min，才是真正的屏幕左上角。 */
+  function cellRect(row, col, spanRows, spanCols) {
     var s = layout.cell;
-    return { x: layout.ox + (vCol(col) - 1) * s, y: layout.oy + vRow(row) * s, s: s };
+    var sr = (spanRows | 0) || 1, sc = (spanCols | 0) || 1;
+    var vr = vRow(row), vc = vCol(col);
+    if (sr > 1 || sc > 1) {
+      vr = Math.min(vr, vRow(row + sr - 1));
+      vc = Math.min(vc, vCol(col + sc - 1));
+    }
+    return { x: layout.ox + (vc - 1) * s, y: layout.oy + vr * s, s: s };
   }
   /* 屏幕点 → 逻辑格。180° 旋转是自逆变换，所以「正向」和「反向」用同一对映射。 */
   function pointToCell(px, py) {
@@ -2824,7 +2833,7 @@
 
     // 2 建筑
     state.buildings.forEach(function (b) {
-      var r = cellRect(b.row, b.col);
+      var r = cellRect(b.row, b.col, b.def.size[0], b.def.size[1]);
       var w = s * b.def.size[1], h = s * b.def.size[0];
       var hurt = (state.time - (b.justDamaged || -99)) < 0.18;
       var color = b.def.color;
@@ -2968,7 +2977,7 @@
     }
     if (selectedBuilding && state.buildings.indexOf(selectedBuilding) >= 0) {
       var sb = selectedBuilding;
-      var sr = cellRect(sb.row, sb.col);
+      var sr = cellRect(sb.row, sb.col, sb.def.size[0], sb.def.size[1]);
       var cx0 = sr.x + s * sb.def.size[1] / 2;
       var cy0 = sr.y + s * sb.def.size[0] / 2;
       var stb = C.combatStatsOf(sb);

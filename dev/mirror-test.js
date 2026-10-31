@@ -129,7 +129,19 @@ function has(re) { return re.test(HTML); }
 item('引入了 src/view.js', has(/<script src="src\/view\.js"><\/script>/));
 item('有 FLIP 状态位', has(/var FLIP = false;/));
 item('cellRectF 走 vRow/vCol', /function cellRectF[\s\S]{0,220}?vCol\(col\)[\s\S]{0,120}?vRow\(row\)/.test(HTML));
-item('cellRect 走 vRow/vCol', /function cellRect\([\s\S]{0,260}?vCol\(col\)[\s\S]{0,120}?vRow\(row\)/.test(HTML));
+/* 多格建筑：2×2 的大本营在镜像后左上角会变成右下角，必须对四角取 min，
+ * 否则整块建筑向右下错一格 —— 红方视角下大本营会压到最底那条通道行上。 */
+item('cellRect 支持多格 span（对四角取 min）',
+  has(/Math\.min\(vr, vRow\(row \+ sr - 1\)\)/) && has(/Math\.min\(vc, vCol\(col \+ sc - 1\)\)/));
+item('建筑绘制时把 def.size 传给 cellRect',
+  has(/cellRect\(b\.row, b\.col, b\.def\.size\[0\], b\.def\.size\[1\]\)/));
+item('选中框中心也按 span 算',
+  has(/cellRect\(sb\.row, sb\.col, sb\.def\.size\[0\], sb\.def\.size\[1\]\)/));
+(function () {
+  var m = HTML.match(/function cellRect\([\s\S]{0,700}?\n  \}/);
+  var body = m ? m[0] : '';
+  item('cellRect 走 vRow/vCol', /vRow\(/.test(body) && /vCol\(/.test(body), body ? body.split('\n')[0] : '未找到函数体');
+})();
 item('pointToCell 反向映射回逻辑格', /function pointToCell[\s\S]{0,420}?return \{ row: vRow\(row\), col: vCol\(col\) \}/.test(HTML));
 item('单位贴图阵营走 vTeam（不再按逻辑阵营取图）',
   /var team = vTeam\(u\.team\)/.test(HTML) && !/var team = u\.team === 'blue' \? 'blue' : 'red'/.test(HTML));
@@ -160,7 +172,8 @@ item('不再残留按 ME 反推方位/阵营的文案',
     if (/layout\.ox = |layout\.oy = /.test(ln)) return;                    // computeLayout
     if (/layout\.ox, layout\.oy, dpr/.test(ln)) return;                    // 缓存 key
     if (/var bx = layout\.ox, by = layout\.oy;/.test(ln)) return;          // buildBackground
-    if (/layout\.ox \+ \(vCol|layout\.oy \+ vRow/.test(ln)) return;         // cellRect(F)
+    if (/layout\.ox \+ \(?vCol|layout\.oy \+ vRow/.test(ln)) return;         // cellRect(F)
+    if (/layout\.ox \+ \(vc|layout\.oy \+ vr/.test(ln)) return;             // cellRect（多格 span 版）
     if (/px - layout\.ox|py - layout\.oy/.test(ln)) return;                // pointToCell
     if (/W - cell \* C\.COLS/.test(ln)) return;
     offenders.push((i + 1) + ': ' + ln.trim().slice(0, 70));
