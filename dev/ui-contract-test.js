@@ -198,13 +198,17 @@ var bm = script.match(/var BUILD_ORDER\s*=\s*\[([^\]]*)\]/);
 var bcount = bm ? (bm[1].match(/'[^']+'/g) || []).length : -1;
 item('BUILD_ORDER 含 7 项建筑', bcount === 7, '实际 ' + bcount + ' 项');
 
-/* 三 Tab 结构含「大本营 / 建筑 / 兵种」文案（限定在 class="cx-tab" 按钮内，避免与别处文案误判） */
+/* 三 Tab 结构含「建筑 / 兵种 / 法术」文案（限定在 class="cx-tab" 按钮内，避免与别处文案误判）
+ * v23：大本营不再单列一个 Tab，它并进「建筑」类并排在第一位（cxList 里 'base' 打头）。 */
 function tabHas(label) {
   return new RegExp('<button[^>]*class="cx-tab[^"]*"[^>]*>\\s*' + label).test(html);
 }
-item('三 Tab 结构含「大本营」文案', tabHas('大本营'));
 item('三 Tab 结构含「建筑」文案', tabHas('建筑'));
 item('三 Tab 结构含「兵种」文案', tabHas('兵种'));
+item('三 Tab 结构含「法术」文案', tabHas('法术'));
+item('三个 Tab 用 data-cat="bld|unit|spell" 标识（不再有独立的 base 分类）',
+  /data-cat="bld"/.test(html) && /data-cat="unit"/.test(html) && /data-cat="spell"/.test(html) &&
+  !/data-cat="base"/.test(html));
 
 /* ========== 11. 总体升级卡片图标贴图化（T7-IMPL-GLOBALICONS） ========== */
 section('11. 总体升级卡片：up_<key>.png 图标槽（T7-IMPL-GLOBALICONS）');

@@ -433,9 +433,21 @@
     #start .corner { bottom: 12px; }
   }
   @media (max-width: 620px) {
-    /* 图鉴详情：窄屏改成「大图在上、数值在下」 */
-    #codex .cx-detail-grid { grid-template-columns: 1fr; gap: 14px; }
-    #codex .cx-hero-stage { max-width: 264px; margin: 0 auto; }
+    /* 图鉴第二层：窄屏改成「大图在上、数值在下」的单列。
+     * 这里的写法看着啰嗦（多挂一级 class、甚至带上元素名），是被优先级逼的：
+     * 媒体查询并不比常规规则优先 —— 同特异性时照样看源码顺序，而图鉴的 CSS 写在后面，
+     * 用 `#codex .cx-detail-grid` 会被后文那条 grid-template-columns 直接盖掉
+     * （实测右栏被挤到 34px，文字竖着排成一列）。断点只能有这一个，不能另开。 */
+    #codex div.cx-detail { max-width: none; }
+    #codex .cx-detail .cx-detail-grid { grid-template-columns: 1fr; gap: 16px; }
+    #codex .cx-detail .cx-hero { width: 100%; max-width: 300px; margin: 0 auto; }
+    /* 左右翻页键占位的左右 padding 收窄，不然 390 屏上内容只剩一半宽度 */
+    #codex .cx-dwrap .cx-dscroll { padding-left: 46px; padding-right: 46px; }
+    #codex .cx-dwrap button.cx-nav { width: 34px; height: 62px; font-size: 22px; }
+    #codex .cx-dwrap button.cx-nav.prev { left: 4px; }
+    #codex .cx-dwrap button.cx-nav.next { right: 4px; }
+    #codex .cx-detail .cx-downbtn { max-width: none; }
+
     /* 开始界面：两角收窄，按钮上移，避免挤在一起 */
     #start .corner-l { left: 12px; }
     #start .corner-r { right: 12px; }
@@ -497,13 +509,10 @@
 #codex .cx-tab.on { color: #8fe06a; border-bottom-color: #8fe06a; }
 #codex .cx-tab:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; border-radius: 4px; }
 
-#codex .cx-body { flex: 1 1 auto; overflow-y: auto; padding: 14px 20px 24px; }
-#codex .cx-pane { display: none; }
-#codex .cx-pane.on { display: block; }
-
-/* 说明：v15 起图鉴改成「列表 → 详情」两级，
- * 旧的单页卡片（.cx-card / .cx-entry / .cx-unit / .cx-stats / .cx-note）已全部退役，
- * 这里只保留两级都会用到的「每级数值表」(.cx-tw/.cx-lv) 与「科技表」(.cx-gup/.cx-g)。 */
+/* 说明：v23 起图鉴是「翻页浏览 → 详情」两层，
+ * 旧的单页卡片（.cx-card / .cx-entry / .cx-unit / .cx-stats / .cx-note）
+ * 与旧容器（.cx-body / .cx-pane）已全部退役并删干净，
+ * 这里只保留两层都会用到的「每级数值表」(.cx-tw/.cx-lv) 与「科技表」(.cx-gup/.cx-g)。 */
 
 /* —— 每级数值表（详情页右侧复用） —— */
 #codex .cx-tw { overflow-x: auto; margin-top: 10px; }
@@ -524,49 +533,195 @@
 #codex table.cx-g td.lv { color:#9db89a; text-align:left; }
 #codex table.cx-g td.pct { color:#ffd479; font-weight:700; }
 
-/* ==================== 图鉴两级索引（v15）：列表 → 详情 ==================== */
-/* —— 第一层：列表（小图 + 名称 + 两行精简信息） —— */
-/* 列宽按「缩略图 56 + 两行文字」定：太窄会把「对地对空 · 攻击 16」截成省略号，
-   * 太宽一页只有两列反而空。276 起 → 1280 视口正好 4 列（建筑 4+3、兵种 4+4）。 */
-#codex .cx-index { display: grid; grid-template-columns: repeat(auto-fill, minmax(276px, 1fr)); gap: 10px; }
-#codex .cx-i {
-  display: flex; gap: 11px; align-items: center; text-align: left;
-  font: inherit; color: inherit; cursor: pointer;
-  background: linear-gradient(#243829, #1b2b1f);
-  border: 1px solid #3c5c44; border-radius: 12px; padding: 10px 12px;
-  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
-}
-#codex .cx-i:hover {
-  transform: translateY(-2px); border-color: #5da04a; background: linear-gradient(#2a4130, #1e3024);
-  box-shadow: 0 8px 20px rgba(0,0,0,.42);
-}
-#codex .cx-i:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
-#codex .cx-i .meta { display: flex; flex-direction: column; min-width: 0; }
-#codex .cx-i .nm { font-size: 14px; font-weight: 800; color: #e8f0e6; }
-#codex .cx-i .ln { font-size: 11px; color: #a8c3a4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#codex .cx-i .ln.dim { color: #8ba488; }
-#codex .cx-hintline { margin-top: 12px; font-size: 11px; color: #8ba488; text-align: center; letter-spacing: .06em; }
+/* ==================== 第一层：翻页浏览（v22 重做） ====================
+ * 从「网格列表」改成「一次只看一件，左右翻页」。理由是玩家的原话：
+ * 列表一次铺 7~8 张，每张只有 56px 缩略图，根本看不清建筑长什么样 ——
+ * 而这是个靠贴图认建筑的游戏，认不出图等于图鉴没用。
+ * 现在主图给到 300px，两侧只留相邻项的一角残影做「旁边还有东西」的暗示。
+ * ==================================================================== */
+#codex .cx-browse { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+#codex .cx-browse[hidden] { display: none; }
 
-/* 缩略图：建筑=底座(78%,贴底) + 武器(90%,中心52%)，和棋盘同一套比例 */
-#codex .thumb {
-  position: relative; flex: 0 0 auto; width: 56px; height: 56px; border-radius: 9px; overflow: hidden;
-  background:
-    radial-gradient(ellipse 26px 13px at 50% 86%, rgba(152,212,124,.30), rgba(0,0,0,0) 74%),
-    rgba(12,19,12,.35);
+#codex .cx-stage {
+  flex: 1 1 auto; position: relative; display: flex;
+  align-items: center; justify-content: center;
+  min-height: 0; padding: 4px clamp(28px, 7vw, 96px) 0;
+  /* 左右两条渐隐遮罩：残影贴到边缘时自然淡出，不会硬切一刀 */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
 }
-#codex .thumb img { position: absolute; display: block; object-fit: contain; pointer-events: none; }
-#codex .thumb img.b { left: 50%; bottom: 2px; width: 78%; height: 78%; transform: translateX(-50%); }
-#codex .thumb img.t { left: 50%; top: 52%; width: 90%; height: 90%; transform: translate(-50%, -50%); }
-#codex .thumb img.u { left: 50%; bottom: 3px; width: 84%; height: 84%; transform: translateX(-50%); }
-#codex .thumb .gt {
+
+/* —— 相邻项残影 ——
+ * 刻意不给完整图：只留靠近主图的那一侧，越靠边越淡。
+ * 给全了就会和主图抢注意力，看图鉴变成了「比较三张图」。
+ * 尺寸跟主图挂钩（.82 倍 + 同高），这样看着是「同一排被切掉两头」而不是缩小的别的东西。 */
+#codex .cx-ghost {
+  position: absolute; top: 50%; width: calc(var(--cxfig) * .82); height: var(--cxfig);
+  transform: translateY(-50%);
+  opacity: .22; filter: blur(1.2px) saturate(.6);
+  pointer-events: none; overflow: hidden;
+  display: flex; align-items: center;
+  transition: opacity .25s ease;
+}
+#codex .cx-ghost.l { left: 0; justify-content: flex-end; }
+#codex .cx-ghost.r { right: 0; justify-content: flex-start; }
+#codex .cx-ghost .gf { position: relative; width: 170%; height: 100%; flex: 0 0 auto; }
+#codex .cx-ghost.l .gf { margin-right: -70%; }
+#codex .cx-ghost.r .gf { margin-left: -70%; }
+#codex .cx-ghost img { position: absolute; display: block; object-fit: contain; }
+#codex .cx-ghost img.b { left: 50%; bottom: 4%; width: 74%; height: 74%; transform: translateX(-50%); }
+#codex .cx-ghost img.t { left: 50%; top: 50%; width: 84%; height: 84%; transform: translate(-50%, -50%); }
+#codex .cx-ghost img.u { left: 50%; bottom: 6%; width: 80%; height: 80%; transform: translateX(-50%); }
+/* img.s = 法术图。绝对不能漏：position:absolute 又没给宽高的话，
+ * 浏览器会按图片原始尺寸撑开，超出 .gf 直接被裁光 —— 表现就是「残影不见了」。 */
+#codex .cx-ghost img.s { left: 50%; top: 50%; width: 76%; height: 76%; transform: translate(-50%, -50%); }
+#codex .cx-ghost .gt {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 800;
+  font-size: 40px; font-weight: 800;
 }
-#codex .thumb img ~ .gt { display: none; }
+#codex .cx-ghost img ~ .gt { display: none; }
+
+/* —— 主图 —— */
+#codex .cx-focus {
+  position: relative; z-index: 2; flex: 0 1 auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 10px 34px 6px; border-radius: 22px; cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+#codex .cx-focus:hover { transform: translateY(-4px); background: rgba(93,160,74,.07); }
+#codex .cx-focus:focus-visible { outline: 2px solid #8fe06a; outline-offset: 4px; }
+
+/* —— 主图尺寸 ——
+ * 抽成变量是因为「残影」必须跟主图同比例缩放：残影一旦比主图小太多，
+ * 读起来就是「三张大小不一的图」，而不是「同一排里被切掉两头的相邻项」。
+ * 38vh 在 900 高屏上约 342px —— 图鉴这一层唯一的任务就是认图，图必须够大。 */
+#codex { --cxfig: min(clamp(180px, 44vh, 400px), 64vw); }
+
+#codex .cx-fig {
+  position: relative;
+  width: var(--cxfig); height: var(--cxfig);
+  border-radius: 18px; overflow: hidden;
+  border: 1px solid rgba(60,92,68,.55);
+  background:
+    radial-gradient(ellipse 56% 42% at 50% 60%, rgba(158,212,126,.18), transparent 74%),
+    radial-gradient(ellipse 60% 26% at 50% 94%, rgba(140,200,110,.24), transparent 70%),
+    rgba(12,19,12,.55);
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+#codex .cx-focus:hover .cx-fig {
+  border-color: #5da04a;
+  box-shadow: 0 14px 38px rgba(0,0,0,.5), 0 0 0 1px rgba(143,224,106,.25) inset;
+}
+#codex .cx-fig::before {   /* 落地阴影，让大图站在地上而不是浮着 */
+  content: ''; position: absolute; left: 50%; bottom: 5%; width: 60%; height: 11%;
+  transform: translateX(-50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse, rgba(0,0,0,.5), transparent 72%);
+  filter: blur(3px);
+}
+#codex .cx-fig img { position: absolute; display: block; object-fit: contain; }
+#codex .cx-fig img.b { left: 50%; bottom: 3%; width: 78%; height: 78%; transform: translateX(-50%); }
+#codex .cx-fig img.t { left: 50%; top: 52%; width: 90%; height: 90%; transform: translate(-50%, -50%); }
+#codex .cx-fig img.u { left: 50%; bottom: 4%; width: 84%; height: 84%; transform: translateX(-50%); }
+#codex .cx-fig img.s {   /* 法术图标：不吃满整格，留出光晕呼吸的空间 */
+  left: 50%; top: 50%; width: 72%; height: 72%; transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 18px currentColor);
+}
+#codex .cx-fig .gt {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 48px; font-weight: 800;
+}
+#codex .cx-fig img ~ .gt { display: none; }
+
+#codex .cx-fname {
+  margin-top: 14px; font-size: 19px; font-weight: 800; color: #e8f0e6; letter-spacing: .06em;
+}
+#codex .cx-fsub { margin-top: 3px; font-size: 11px; color: #9db89a; letter-spacing: .05em; }
+
+/* 翻页动画：新的一张从移动方向那侧滑进来，配合残影淡出，看起来像「滚动了一格」 */
+@keyframes cx-roll-next { from { opacity: 0; transform: translateX(42%) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes cx-roll-prev { from { opacity: 0; transform: translateX(-42%) scale(.9); } to { opacity: 1; transform: none; } }
+#codex .cx-focus.roll-next { animation: cx-roll-next .28s cubic-bezier(.22,.8,.3,1) both; }
+#codex .cx-focus.roll-prev { animation: cx-roll-prev .28s cubic-bezier(.22,.8,.3,1) both; }
+
+/* —— 左右翻页键 ——
+ * 平常半透明浮着（.55），鼠标进舞台或悬停本身才变实：要看得见「这里能点」，
+ * 但不能实到和主图抢注意力 —— 所以用「有没有底色」而不是「有没有箭头」来区分。
+ * 键盘 / 触屏也都能用（按钮本身可聚焦，方向键另做绑定）。 */
+#codex .cx-nav {
+  position: absolute; top: 50%; z-index: 3; transform: translateY(-50%);
+  width: 48px; height: 80px; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; line-height: 1; font-weight: 700; color: #c4d8c0;
+  background: linear-gradient(rgba(31,47,36,.55), rgba(20,30,22,.55));
+  border: 1px solid rgba(68,102,75,.55); border-radius: 14px;
+  opacity: .55; transition: opacity .18s ease, background .18s ease, transform .18s ease;
+}
+#codex .cx-nav.prev { left: 18px; }
+#codex .cx-nav.next { right: 18px; }
+#codex .cx-stage:hover .cx-nav, #codex .cx-dwrap:hover .cx-nav,
+#codex .cx-nav:hover, #codex .cx-nav:focus-visible { opacity: 1; }
+#codex .cx-nav:hover { background: rgba(68,102,75,.42); color: #8fe06a; }
+#codex .cx-nav:active { transform: translateY(-50%) scale(.95); }
+#codex .cx-nav:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
+#codex .cx-nav[disabled] { opacity: .12; cursor: default; }
+
+#codex .cx-tip {
+  flex: 0 0 auto; text-align: center; font-size: 11px; color: #8ba488;
+  letter-spacing: .08em; padding: 6px 0 14px;
+}
+
+/* ==================== 第二层：详情（v22 沿用旧布局 + 新增对比区） ==================== */
+/* 左大图 / 右数值；下方一条「下」键把各等级对照表折进来。 */
 
 /* —— 第二层：详情（左大图 / 右数值） —— */
-#codex .cx-detail { animation: cx-in .22s ease both; }
+/* 第二层内容限宽：这一层的信息量是「一张图 + 一张小表」，
+ * 让它撑满 1440 的话右半边会空掉一大片，读起来像没做完。
+ * 1020px 刚好是「左图 300 + 间距 + 右栏 680」的自然宽度。 */
+/* 注意 width:100% 不能省：在 flex 容器里 margin:auto 会让元素按内容宽度收缩
+ * （实测右栏被挤到 340px，数值小卡被迫换行）。 */
+#codex .cx-detail { animation: cx-in .22s ease both; width: 100%; max-width: 1020px; margin: 0 auto; }
 @keyframes cx-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* 第二层容器：独立的滚动区 + 固定的左右切换键。
+ * 注意这里**没有** .cx-ghost —— 玩家在这一层是来横向比较数值的，
+ * 两侧再放残影会把视线从数字上拽走，这是第一层和第二层刻意的差别。 */
+#codex .cx-dwrap {
+  flex: 1 1 auto; min-height: 0; position: relative;
+  display: flex; flex-direction: column;
+}
+#codex .cx-dwrap[hidden] { display: none; }
+/* 第二层的翻页键跟着内容走（宽屏时贴到 1020 内容区外侧），
+ * 否则 1440 屏上箭头会孤零零地挂在屏幕最边上、离内容 200px 远。 */
+#codex .cx-dwrap .cx-nav { top: 42%; }
+#codex .cx-dwrap .cx-nav.prev { left: max(14px, calc(50% - 600px)); }
+#codex .cx-dwrap .cx-nav.next { right: max(14px, calc(50% - 600px)); }
+/* 内容不超高时垂直居中：第二层信息量本来就少（一张图 + 一张小表），
+ * 顶对齐会让下半屏空掉一大片。用 safe center —— 内容一旦超高就退回顶部对齐，
+ * 不会像普通的 center 那样把顶部「← 返回」裁到滚动区外面去。 */
+#codex .cx-dscroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; justify-content: safe center;
+  padding: 2px 74px 10px;
+}
+#codex .cx-dtop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+#codex .cx-didx { font-size: 11px; color: #8ba488; letter-spacing: .1em; }
+
+/* 「下」键：把各等级对照表折进来 / 收回去 */
+#codex .cx-downbtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; max-width: 320px; margin: 16px auto 10px;
+  font: inherit; font-size: 12px; font-weight: 700; color: #c4d8c0; letter-spacing: .1em;
+  background: rgba(31,47,36,.62); border: 1px solid #44664b; border-radius: 10px;
+  padding: 9px 16px; cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+#codex .cx-downbtn:hover { background: rgba(68,102,75,.35); color: #8fe06a; border-color: #5da04a; }
+#codex .cx-downbtn:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
+#codex .cx-downbtn .ar { font-size: 13px; transition: transform .22s ease; }
+#codex .cx-downbtn.open .ar { transform: rotate(180deg); }
+#codex .cx-cmp { margin: 2px 0 20px; animation: cx-in .2s ease both; }
+#codex .cx-cmp[hidden] { display: none; }
+#codex .cx-cmp .cmptitle { font-size: 12px; color: #9db89a; margin: 0 0 7px; letter-spacing: .08em; }
 #codex .cx-back {
   font: inherit; font-size: 12px; font-weight: 700; color: #c4d8c0;
   background: transparent; border: 1px solid #44664b; border-radius: 8px;
@@ -575,8 +730,8 @@
 #codex .cx-back:hover { background: rgba(68,102,75,.22); }
 #codex .cx-back:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
 #codex .cx-detail-grid {
-  display: grid; grid-template-columns: minmax(248px, 362px) minmax(0, 1fr);
-  gap: 20px; align-items: start;
+  display: grid; grid-template-columns: minmax(220px, 308px) minmax(0, 1fr);
+  gap: 22px; align-items: start;
 }
 #codex .cx-hero { min-width: 0; }
 #codex .cx-hero-stage {
@@ -598,6 +753,11 @@
 #codex .cx-hero-stage img.b { left: 50%; bottom: 3%; width: 78%; height: 78%; transform: translateX(-50%); }
 #codex .cx-hero-stage img.t { left: 50%; top: 52%; width: 90%; height: 90%; transform: translate(-50%, -50%); }
 #codex .cx-hero-stage img.u { left: 50%; bottom: 4%; width: 84%; height: 84%; transform: translateX(-50%); }
+/* 法术图（同 .cx-ghost，漏了就没有尺寸可依，图会被裁没） */
+#codex .cx-hero-stage img.s {
+  left: 50%; top: 50%; width: 72%; height: 72%; transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 22px currentColor);
+}
 #codex .cx-hero-stage .gt {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-size: 54px; font-weight: 800;
@@ -766,18 +926,32 @@
     </div>
     <div id="codex" role="dialog" aria-modal="true" aria-label="单位图鉴" hidden>
       <div class="cx-bar">
-        <div class="cx-title">单位图鉴</div>
+        <div class="cx-title">图鉴</div>
         <button type="button" class="g cx-close" id="codexclose" aria-label="关闭图鉴">✕</button>
       </div>
-      <div class="cx-tabs" role="tablist" aria-label="图鉴分类">
-        <button type="button" class="cx-tab on" role="tab" aria-selected="true"  data-tab="base" tabindex="0">大本营</button>
-        <button type="button" class="cx-tab"    role="tab" aria-selected="false" data-tab="bld"  tabindex="-1">建筑</button>
-        <button type="button" class="cx-tab"    role="tab" aria-selected="false" data-tab="unit" tabindex="-1">兵种</button>
+
+      <!-- 第一层：一次只看一件，左右翻页 -->
+      <div class="cx-browse" id="cxbrowse">
+        <div class="cx-tabs" role="tablist" aria-label="图鉴分类">
+          <button type="button" class="cx-tab on" role="tab" aria-selected="true"  data-cat="bld"   tabindex="0">建筑</button>
+          <button type="button" class="cx-tab"    role="tab" aria-selected="false" data-cat="unit"  tabindex="-1">兵种</button>
+          <button type="button" class="cx-tab"    role="tab" aria-selected="false" data-cat="spell" tabindex="-1">法术</button>
+        </div>
+        <div class="cx-stage" id="cxstage">
+          <button type="button" class="cx-nav prev" id="cxprev" aria-label="上一件">‹</button>
+          <div class="cx-ghost l" id="cxghostl" aria-hidden="true"></div>
+          <div class="cx-focus" id="cxfocus" role="button" tabindex="0" aria-label="查看当前条目详情"></div>
+          <div class="cx-ghost r" id="cxghostr" aria-hidden="true"></div>
+          <button type="button" class="cx-nav next" id="cxnext" aria-label="下一件">›</button>
+        </div>
+        <div class="cx-tip">点大图看详情　·　两侧可翻页　·　方向键也能换</div>
       </div>
-      <div class="cx-body">
-        <section class="cx-pane on" data-pane="base" aria-labelledby="cxh-base"></section>
-        <section class="cx-pane"    data-pane="bld"  aria-labelledby="cxh-bld" hidden></section>
-        <section class="cx-pane"    data-pane="unit" aria-labelledby="cxh-unit" hidden></section>
+
+      <!-- 第二层：详情（左大图 + 右数值 + 下方对比，刻意不放左右残影） -->
+      <div class="cx-dwrap" id="cxdetail" hidden>
+        <button type="button" class="cx-nav prev" id="cxdprev" aria-label="上一件">‹</button>
+        <button type="button" class="cx-nav next" id="cxdnext" aria-label="下一件">›</button>
+        <div class="cx-dscroll" id="cxdscroll"></div>
       </div>
     </div>
   </div>
@@ -786,7 +960,6 @@
       <button class="tab on" id="tabBuild">建筑 / 派兵 / 法术</button>
       <button class="tab" id="tabGlobal">总体升级</button>
       <span class="sp"></span>
-      <label><input type="checkbox" id="sudden" checked> 5分钟后决胜</label>
       <label style="margin-left:6px"><input type="checkbox" id="autodeploy"> 自动派兵</label>
       <!-- 折叠按钮：收起到只剩这一行标签栏，把下半屏让给棋盘（用户需求） -->
       <button type="button" class="paneltoggle" id="paneltoggle"
@@ -1342,7 +1515,6 @@
   var detailEl = document.getElementById('detail');
   var btnPath = document.getElementById('btnpath');
   var autoDeployEl = document.getElementById('autodeploy');
-  var suddenEl = document.getElementById('sudden');
 
   var ME = 'blue', FOE = 'red';
 
@@ -1357,7 +1529,7 @@
    * ================================================================ */
   var NetMod = (typeof window !== 'undefined' && window.Net) ? window.Net : null;
   var REAL_C = Object.assign({}, C);   // 原始动作函数快照（必须在包裹之前）
-  var PVP = { active: false, role: null, net: null, raw: null, transport: null, sudden: true, room: null,
+  var PVP = { active: false, role: null, net: null, raw: null, transport: null, room: null,
               rtt: -1, pingAt: -1, pingTimer: 0, desync: false };
 
   (function installPvpHooks() {
@@ -1520,13 +1692,13 @@
         /* D 由房主算、随 start 下发，保证两端拿到完全同一个值 ——
          * 两端各自算的话，一次 RTT 抖动就能让两边取到不同的 D，直接分叉。 */
         var dt = pvpDelayTicks();
-        PVP.transport.send({ type: 'start', seed: seed, sudden: !!(suddenEl && suddenEl.checked), dt: dt });
-        pvpBegin(seed, !!(suddenEl && suddenEl.checked), dt);
+        PVP.transport.send({ type: 'start', seed: seed, dt: dt });
+        pvpBegin(seed, dt);
       } else {
         pvpStatus('配对成功（你是应战方），等待房主开局…');
       }
     } else if (msg.type === 'start') {
-      pvpBegin(msg.seed >>> 0, msg.sudden !== false, msg.dt);
+      pvpBegin(msg.seed >>> 0, msg.dt);
     } else if (msg.type === 'rematch') {
       if (PVP.role === 'host' && PVP.active) pvpRestart();
     } else if (msg.type === 'peer-left') {
@@ -1550,17 +1722,15 @@
     hintEl.textContent = s;
   }
 
-  function pvpBegin(seed, sudden, dt) {
+  function pvpBegin(seed, dt) {
     if (!NetMod || !NetMod.createLockstep) { pvpStatus('联机模块未加载', true); return; }
     PVP.active = true;
-    PVP.sudden = sudden !== false;
     ME = (PVP.role === 'host') ? 'blue' : 'red';
     FOE = (ME === 'blue') ? 'red' : 'blue';
     /* v21：红方玩家把整盘倒过来看 —— 双方都「自己是蓝方、在下方」 */
     setFlip(ME === 'red');
     state = C.createState({ seed: seed >>> 0, difficulty: 'hard' });
     state.aiTeam = null;                 // 双人：没有 AI
-    state.suddenDeath = PVP.sudden;
     sel = null; selectedUnit = null; selectedBuilding = null;
     startedAt = 0;
     if (overEl) overEl.classList.remove('show');
@@ -1588,8 +1758,8 @@
   function pvpRestart() {
     var seed = genSeed();
     var dt = pvpDelayTicks();
-    if (PVP.transport) PVP.transport.send({ type: 'start', seed: seed, sudden: PVP.sudden, dt: dt });
-    pvpBegin(seed, PVP.sudden, dt);
+    if (PVP.transport) PVP.transport.send({ type: 'start', seed: seed, dt: dt });
+    pvpBegin(seed, dt);
   }
 
   function pvpLeave() {
@@ -3302,13 +3472,7 @@
     var fb = C.ownBase(state, FOE);
     enemyEl.textContent = fb ? ('红方大本营 Lv' + (fb.level || 1) + ' ' + Math.max(0, Math.floor(fb.hp)) + '/' + fb.hpMax)
       : '红方大本营 已摧毁';
-    if (suddenEl && suddenEl.checked && state.time > 300) {
-      hintEl.textContent = '⚔️ 决胜时刻：双方大本营持续掉血，先撑不住的输！已进行 ' +
-        Math.floor(state.time - 300) + ' 秒';
-      hintEl.style.borderColor = '#ff7a7a';
-    } else {
-      hintEl.style.borderColor = '#44664b';
-    }
+    hintEl.style.borderColor = '#44664b';
     retryIcons();   // 等贴图加载完的建筑卡片图标（数组空时零成本）
     updateCards();
   }
@@ -3922,9 +4086,7 @@
     var running = startedAt >= 0 && !state.over;   // 「开始游戏」之前 / 已经分出胜负之后都不再推进模拟
     while (running && acc >= C.DT && guard++ < 60) {
       if (PVP.active) {
-        /* 双人：不跑 AI，由锁步引擎消费双方命令后推进一 tick。
-         * suddenDeath 是「仿真输入」，必须两端一致，否则会分叉 —— 用开局同步的值。 */
-        state.suddenDeath = PVP.sudden;
+        /* 双人：不跑 AI，由锁步引擎消费双方命令后推进一 tick。 */
         if (PVP.net) {
           /* step() 返回 false = 对手 tick 还没跟上，本帧不推进（保持两端口径一致）。
            * 把 acc 压回一步之内：否则等待期间会攒一堆积压，放开瞬间猛追几十 tick，
@@ -3932,7 +4094,6 @@
           if (!PVP.net.step()) { acc = Math.min(acc, C.DT); break; }
         }
       } else {
-        state.suddenDeath = !suddenEl || suddenEl.checked;
         C.update(state, C.DT);
         C.aiUpdate(state, FOE, C.DT);
         // 自动派兵：哪个兵冷却好了就派出去（省手）
@@ -3977,9 +4138,8 @@
         draw: '战至时限，双方大本营均未被摧毁'
       }[res];
       var mm = Math.floor(state.time / 60), ss = ('0' + Math.floor(state.time % 60)).slice(-2);
-      var sudden = state.suddenDeath !== false && state.time > 300;
-      overMeta.innerHTML = (PVP.active ? '模式 <b>双人对战</b>' : '难度 <b>' + DIFF_INFO[difficulty].name + '</b>') + ' · 用时 <b>' + mm + ':' + ss + '</b>' +
-        (sudden ? ' · <b>' + (res === 'win' ? '决胜时刻拿下' : res === 'lose' ? '倒在决胜时刻' : '决胜时刻仍未破局') + '</b>' : '');
+      overMeta.innerHTML = (PVP.active ? '模式 <b>双人对战</b>' : '难度 <b>' + DIFF_INFO[difficulty].name + '</b>') +
+        ' · 用时 <b>' + mm + ':' + ss + '</b>';
       function n(v) { return Math.floor(v).toLocaleString(); }
       function baseCell(team) {
         var b = C.ownBase(state, team);
@@ -4035,11 +4195,15 @@
     /* 朝向：返回某单位最近一次判定出的朝向（down/up/left/right） */
     facingOf: function (u) { return ART.facing(u.id); },
     reloadArt: function () { ART.load(); },
-    /* 图鉴的两级索引（纯字符串，供 dev/dom-test.js 断言数值列没标错）。
-     * 第一层：codexIndexHtml('bld'|'base'|'unit')
-     * 第二层：codexDetailHtml(kind, key, lv, branch) */
-    codexIndexHtml: function (kind) { return codexIndexHTML(kind); },
-    codexDetailHtml: function (kind, key, lv, branch) { return codexDetailHTML(kind, key, lv, branch); },
+    /* 图鉴的两级（纯字符串，供 dev/dom-test.js 断言数值列没标错）。
+     * 第一层：codexIndexHtml('bld'|'unit'|'spell')  —— 翻页浏览的整块 HTML
+     * 第二层：codexDetailHtml(kind, key, lv, branch[, cmpOpen])
+     * 另给 codexList(cat) 拿条目顺序，测试据此断言「一条都没漏」。 */
+    codexIndexHtml: function (cat) { return codexIndexHTML(cat); },
+    codexDetailHtml: function (kind, key, lv, branch, cmpOpen) {
+      return codexDetailHTML(kind, key, lv, branch, cmpOpen);
+    },
+    codexList: function (cat) { return cxList(cat).slice(); },
 
     /* ---- 视角镜像调试口（v21）----
      * 自动化里没法"用眼睛看"红方视角，只能靠这几个口子把渲染层翻过去再验坐标。
@@ -4056,22 +4220,28 @@
     }
   };
 
-  /* ============================================================ 单位图鉴（Codex） */
-  /* 规格 docs/ux/codex.md —— 在开始界面下方加「📖 单位图鉴」入口，打开覆盖层展示
-   * 大本营 / 建筑 / 兵种 的每级数值与图片。所有数值来自 C.* API，零硬编码。
-   * 防御性：canvas/ctx 在某些环境是桩（dom-test）、ART 可能未加载、img onerror 兜底，
-   * 图鉴代码绝不抛错影响主流程；内容在「首次打开」时懒渲染一次并缓存。 */
+  /* ============================================================ 图鉴（Codex）
+   * v22 重做：两级结构 ——
+   *   第一层「翻页浏览」：建筑 / 兵种 / 法术 三个分类，一次只看一件，两侧留残影暗示可翻；
+   *   第二层「详情」：左大图（带等级滑轨）+ 右数值，下方「下」键展开各等级对照表。
+   *
+   * 两条铁律沿用至今：
+   *   · 数值全部来自 C.* API（statsForLevel / buildingUpgradeCost / baseLevels），零硬编码；
+   *   · 生成 HTML 的都是**纯字符串函数**（不碰 DOM），node 下可直接断言数值没标错
+   *     （dev/dom-test.js 走的就是这条路）。
+   *
+   * 贴图合成与棋盘同一套规则：底座贴底居中(78%) + 武器层中心 52% 高(90%)。
+   * 这里不重写，而是造一个「假建筑」复用 ART.baseFile / ART.topFile，
+   * 保证图鉴里的大楼 = 棋盘上的那栋楼。
+   * ========================================================================== */
   var codexFilled = false;
   function openCodex() {
     var el = document.getElementById('codex');
     if (!el) return;
-    if (!codexFilled) {
-      try { fillBasePane(); fillBldPane(); fillUnitPane(); codexFilled = true; }
-      catch (e) { /* 图鉴渲染失败静默降级，主流程不受影响 */ }
-    }
-    try { bindCodexTabs(); } catch (e) {}
     el.hidden = false;
     el.classList.add('show');
+    codexFilled = true;
+    try { bindCodexTabs(); mountBrowse(); } catch (e) { /* 图鉴渲染失败静默降级，主流程不受影响 */ }
   }
   function closeCodex() {
     var el = document.getElementById('codex');
@@ -4083,45 +4253,68 @@
     if (!document.querySelectorAll) return;
     var tabs = document.querySelectorAll('#codex .cx-tab');
     Array.prototype.forEach.call(tabs, function (t) {
-      t.onclick = function () {
-        try {
-          Array.prototype.forEach.call(tabs, function (x) {
-            var on = x === t;
-            x.classList.toggle('on', on);
-            x.setAttribute('aria-selected', on ? 'true' : 'false');
-            x.tabIndex = on ? 0 : -1;
-          });
-          var panes = document.querySelectorAll('#codex .cx-pane');
-          Array.prototype.forEach.call(panes, function (p) {
-            var on = p.getAttribute('data-pane') === t.getAttribute('data-tab');
-            p.classList.toggle('on', on);
-            if (on) p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
-          });
-        } catch (e) {}
-      };
+      t.onclick = function () { try { setCat(t.getAttribute('data-cat')); } catch (e) {} };
     });
   }
 
-  /* ============================================== 图鉴：两级索引（v15 改版）
-   * 玩家要求：
-   *   ① 先看列表：名称 + 小图 + 精简信息；
-   *   ② 点进去：左侧精美大图、右侧对应数值；
-   *   ③ 建筑与大本营的大图下方加一条等级滑动轨，拖到哪级就换哪级的图与数值。
-   *
-   * 两条沿用的铁律：
-   *   · 数值全部来自 C.* API（statsForLevel / buildingUpgradeCost / baseLevels），零硬编码；
-   *   · 生成 HTML 的是**纯函数**（codexIndexHTML / codexDetailHTML / cxFactsHTML），不碰 DOM ——
-   *     这样 node 下就能断言「图鉴里的数没标错」（dev/dom-test.js 用的就是这条路）。
-   *
-   * 贴图合成方式与棋盘一致：底座贴底居中(78%) + 武器层中心落在 52% 高(90%)。
-   * 这里不重写这套规则，而是造一个「假建筑」复用 ART.baseFile / ART.topFile，
-   * 保证图鉴里的大楼 = 棋盘上的那栋楼。
-   * ========================================================================== */
-  var cxSel = {
-    base: { lv: 1 },
-    bld: { key: 'mine', lv: 1, branch: null },
-    unit: { key: 'infantry' }
+  /* ---- 浏览状态 ----
+   * 分类用 bld / unit / spell。大本营并入 bld 的第一项 —— 它本来就是一栋建筑，
+   * 单独占一个 Tab 只会让「建筑」这一栏少一栋、让玩家多按一次。
+   * 每个分类各自记住「翻到第几张」和「看到第几级」，来回切分类不会丢位置。 */
+  var CX_CATS = ['bld', 'unit', 'spell'];
+  var cxState = {
+    cat: 'bld',
+    pos: { bld: 0, unit: 0, spell: 0 },
+    lv: { bld: 1, unit: 1, spell: 1 },
+    branch: { bld: null },
+    cmp: false            // 第二层是否展开「各等级对比」
   };
+
+  /* 某分类的全部条目，顺序即翻页顺序。大本营排建筑类第一位：
+   * 它是最关键的建筑，也是新手第一个该看懂的东西。 */
+  function cxList(cat) {
+    if (!C || !C.DATA) return [];
+    if (cat === 'bld') {
+      var order = (typeof BUILD_ORDER !== 'undefined' && BUILD_ORDER)
+        ? BUILD_ORDER : Object.keys(C.DATA.buildings);
+      return ['base'].concat(order);
+    }
+    if (cat === 'unit') {
+      return ((typeof UNIT_ORDER !== 'undefined' && UNIT_ORDER)
+        ? UNIT_ORDER : Object.keys(C.DATA.units)).slice();
+    }
+    if (cat === 'spell') return C.DATA.spells.map(function (s) { return s.key; });
+    return [];
+  }
+  /* 首尾循环：翻到最后一张再往右会回到第一张（图鉴本来就该能一直翻下去）。 */
+  function cxPos(cat) {
+    var list = cxList(cat);
+    if (!list.length) return 0;
+    var p = cxState.pos[cat] || 0;
+    return ((p % list.length) + list.length) % list.length;
+  }
+  function cxCurKey(cat) { return cxList(cat)[cxPos(cat)]; }
+  function cxName(cat, key) {
+    if (cat === 'bld') return key === 'base' ? '大本营' : ((C.DATA.buildings[key] || {}).name || key);
+    if (cat === 'unit') return (C.DATA.units[key] || {}).name || key;
+    var sp = cxSpell(key);
+    return sp ? sp.name : key;
+  }
+  function cxSpell(key) {
+    if (!C || !C.DATA) return null;
+    var out = null;
+    C.DATA.spells.forEach(function (s) { if (s.key === key) out = s; });
+    return out;
+  }
+  /* 该分类的最大等级：建筑/大本营有等级，兵种/法术没有（返回 0）。 */
+  function cxMaxLv(cat, key) {
+    if (cat === 'bld') {
+      if (key === 'base') return C.DATA.baseLevels.length;
+      var d = C.DATA.buildings[key];
+      return (d && (d.maxLevel || 10)) || 10;
+    }
+    return 0;
+  }
 
   /* 用「假建筑」复用 ART 的两层取图 */
   function cxArtFiles(key, lv, branch) {
@@ -4159,7 +4352,9 @@
     if (branches.length < 2 || L <= 4) return { single: true, v: C.statsForLevel(def, L, null)[stat] };
     var va = C.statsForLevel(def, L, branches[0].key)[stat];
     var vb = C.statsForLevel(def, L, branches[1].key)[stat];
-    return { single: (va === vb), a: va, b: vb };
+    /* v 必须一起带上：两分支同值时走 single 分支，读的就是 v。
+     * 少了这一行，L5+ 的「生命」「射程」这种两分支一致的属性会整列显示成 —。 */
+    return { single: (va === vb), v: va, a: va, b: vb };
   }
   function cellHTML(def, L, stat, branches, asPct) {
     var c = lvCell(def, L, stat, branches);
@@ -4180,78 +4375,85 @@
     return role + (air ? ' · 飞行' : '') + ' · ' + dom;
   }
 
-  /* ---------- 缩略图（列表用小图） / 大图（详情用） ---------- */
-  function cxThumb(kind, key, lv, branch) {
-    if (kind === 'unit') {
-      var u = C.DATA.units[key];
-      if (!u) return '<span class="thumb"></span>';
-      return '<span class="thumb">' +
-        '<img class="u" src="art/v9/unit_' + key + '_blue_idle.png" alt="" onerror="this.remove()">' +
-        '<span class="gt" style="color:' + u.color + '">' + u.glyph + '</span></span>';
-    }
-    var f = cxArtFiles(key, lv, branch), gl = cxGlyph(key);
-    var h = '<span class="thumb">';
-    if (f.base) h += '<img class="b" src="art/v9/' + f.base + '" alt="" onerror="this.remove()">';
-    if (f.top)  h += '<img class="t" src="art/v9/' + f.top + '" alt="" onerror="this.remove()">';
-    return h + '<span class="gt" style="color:' + gl.c + '">' + gl.g + '</span></span>';
-  }
-  function cxHeroInner(kind, key, lv, branch) {
-    if (kind === 'unit') {
+  /* ---------- 大图 / 残影共用的图片层 ----------
+   * 建筑两层叠法（底座贴底 + 武器居中）与棋盘一模一样；兵种是单张 idle；
+   * 法术用 spell_*.png，那张图自带光晕，所以只给 72% 尺寸留出呼吸空间。
+   * 残影不另画一套 —— 同一份 HTML 塞进更小更淡的容器即可。 */
+  function cxMediaInner(cat, key, lv, branch) {
+    if (cat === 'unit') {
       var u = C.DATA.units[key];
       if (!u) return '';
       return '<img class="u" src="art/v9/unit_' + key + '_blue_idle.png" alt="" onerror="this.remove()">' +
              '<span class="gt" style="color:' + u.color + '">' + u.glyph + '</span>';
     }
+    if (cat === 'spell') {
+      var sp = cxSpell(key);
+      if (!sp) return '';
+      return '<img class="s" src="art/v9/spell_' + key + '.png" alt="" style="color:' + sp.color +
+             '" onerror="this.remove()">' +
+             '<span class="gt" style="color:' + sp.color + '">' + sp.glyph + '</span>';
+    }
     var f = cxArtFiles(key, lv, branch), h = '';
-    if (f.base) h += '<img class="b" src="art/v9/' + f.base + '" alt="">';
-    if (f.top)  h += '<img class="t" src="art/v9/' + f.top + '" alt="">';
+    if (f.base) h += '<img class="b" src="art/v9/' + f.base + '" alt="" onerror="this.remove()">';
+    if (f.top)  h += '<img class="t" src="art/v9/' + f.top + '" alt="" onerror="this.remove()">';
     if (!h) { var gl = cxGlyph(key); h = '<span class="gt" style="color:' + gl.c + '">' + gl.g + '</span>'; }
     return h;
   }
-
-  /* ---------- 第一层：列表 ---------- */
-  function cxIndexCard(kind, key, lv, branch, name, line1, line2) {
-    return '<button type="button" class="cx-i" data-kind="' + kind + '" data-key="' + key + '" data-lv="' + lv + '">' +
-      cxThumb(kind, key, lv, branch) +
-      '<span class="meta"><span class="nm">' + name + '</span>' +
-      '<span class="ln">' + line1 + '</span>' +
-      (line2 ? '<span class="ln dim">' + line2 + '</span>' : '') +
-      '</span></button>';
+  /* 兼容旧签名（codexDetailHTML 与调试口仍在用 'base' / 'bld' / 'unit' 三值） */
+  function cxHeroInner(kind, key, lv, branch) {
+    var cat = (kind === 'unit') ? 'unit' : (kind === 'spell' ? 'spell' : 'bld');
+    return cxMediaInner(cat, key, lv, branch);
   }
-  function codexIndexHTML(kind) {
-    if (!C || !C.DATA) return '';
-    var cards = '';
-    if (kind === 'base') {
-      var BL = C.DATA.baseLevels, n0 = BL.length, b1 = BL[0], bN = BL[n0 - 1];
-      cards = cxIndexCard('base', 'base', 1, null, '大本营',
-        n0 + ' 级 · 生命 ' + b1.hp.toLocaleString() + '→' + bN.hp.toLocaleString(),
-        '收入 ' + b1.income + '→' + bN.income + '/秒 · 每级解锁一个新法术');
-    } else if (kind === 'bld') {
-      cards = BUILD_ORDER.map(function (key) {
-        var d = C.DATA.buildings[key];
-        if (!d) return '';
-        var maxLv = d.maxLevel || 10, line2 = '';
-        if (d.incomeByLevel) {
-          line2 = '收入 ' + d.income + '→' + d.incomeByLevel[d.incomeByLevel.length - 1] + ' /秒';
-        } else if (d.aura) {
-          line2 = '光环减伤（不能攻击）';
-        } else if (d.atk != null) {
-          line2 = (d.targets === 'both' ? '对地对空' : '只对地') + ' · 攻击 ' + d.atk;
-        }
-        return cxIndexCard('bld', key, 1, null, d.name, d.cost + ' 金 · ' + maxLv + ' 级', line2);
-      }).join('');
-    } else {
-      cards = UNIT_ORDER.map(function (key) {
-        var d = C.DATA.units[key];
-        if (!d) return '';
-        return cxIndexCard('unit', key, 1, null, d.name,
-          d.cost + ' 金 · 冷却 ' + d.deployCd + ' 秒',
-          (d.priority === 'siege' ? '拆建筑' : '清兵') + ' · ' +
-          (d.targets === 'both' ? '对地对空' : '只对地') + (d.air ? ' · 飞行' : ''));
-      }).join('');
+
+  /* ---------- 第一层：翻页浏览 ---------- */
+  /* 副标题只给一句「这是什么」，不铺数值 —— 数值是第二层的事。
+   * 这一层要解决的是「认图」，塞满数字反而没人看得进去。 */
+  function cxSubLine(cat, key) {
+    if (cat === 'bld') {
+      if (key === 'base') return '核心建筑 · ' + C.DATA.baseLevels.length + ' 级 · 被摧毁即失败';
+      var d = C.DATA.buildings[key];
+      if (!d) return '';
+      var role = d.incomeByLevel ? '产出金币' : (d.aura ? '光环防护' : '攻击塔');
+      return role + ' · ' + d.cost + ' 金 · ' + (d.maxLevel || 10) + ' 级';
     }
-    return '<div class="cx-index cx-index-' + kind + '">' + cards + '</div>' +
-      '<div class="cx-hintline">点任意条目 → 看大图与逐级数值</div>';
+    if (cat === 'unit') {
+      var u = C.DATA.units[key];
+      if (!u) return '';
+      return u.cost + ' 金 · 冷却 ' + u.deployCd + ' 秒' + (u.air ? ' · 飞行' : '');
+    }
+    var sp = cxSpell(key);
+    if (!sp) return '';
+    return '大本营 Lv' + sp.unlockBaseLevel + ' 解锁 · 冷却 ' + sp.cooldown + ' 秒';
+  }
+
+  /* 主图：整块可点，点了进第二层 */
+  function cxFocusHTML(cat, key, lv, branch) {
+    return '<div class="cx-fig">' + cxMediaInner(cat, key, lv, branch) + '</div>' +
+      '<div class="cx-fname">' + cxName(cat, key) + '</div>' +
+      '<div class="cx-fsub">' + cxSubLine(cat, key) + '</div>';
+  }
+
+  /* 残影：相邻项的图。**只放图不放字** —— 一旦写了名字，眼睛就会去读，
+   * 而这一层的任务仅仅是告诉你「旁边还有东西」。 */
+  function cxGhostHTML(cat, offset) {
+    var list = cxList(cat);
+    if (list.length < 2) return '';
+    var p = cxPos(cat) + offset;
+    p = ((p % list.length) + list.length) % list.length;
+    var key = list[p];
+    var lv = (cat === 'bld') ? (cxState.lv.bld || 1) : 1;
+    return '<div class="gf">' + cxMediaInner(cat, key, lv, null) + '</div>';
+  }
+
+  /* 完整第一层 HTML。挂载时是拆开填三个容器，但这个整体版本对测试/截图更方便。 */
+  function codexIndexHTML(cat) {
+    cat = cat || cxState.cat;
+    if (!C || !C.DATA) return '';
+    var key = cxCurKey(cat);
+    var lv = (cat === 'bld') ? (cxState.lv.bld || 1) : 1;
+    return '<div class="cx-ghost l">' + cxGhostHTML(cat, -1) + '</div>' +
+      '<div class="cx-focus">' + cxFocusHTML(cat, key, lv, cxState.branch.bld) + '</div>' +
+      '<div class="cx-ghost r">' + cxGhostHTML(cat, 1) + '</div>';
   }
 
   /* ---------- 数值小卡 ---------- */
@@ -4321,8 +4523,9 @@
     var rowsToKV = function (rows) {
       return rows.map(function (r) { return cxKV(r.k, r.v, r.next, r.gold); }).join('');
     };
-    if (kind === 'base') {
-      var BL = C.DATA.baseLevels, cur = BL[lv - 1], nx = BL[lv];
+    /* 大本营：既接受旧签名 kind='base'，也接受新签名 kind='bld' + key='base' */
+    if (kind === 'base' || (kind === 'bld' && key === 'base')) {
+      var BL = C.DATA.baseLevels, cur = BL[lv - 1];
       if (!cur) return '';
       var sp = C.DATA.spells.filter(function (s) { return s.unlockBaseLevel === lv; })
         .map(function (s) { return s.name; });
@@ -4330,9 +4533,11 @@
         cxKV('升级花费', cur.upgradeCost != null ? cur.upgradeCost + ' 金' : '已满级', null, true) +
         cxKV('防御射程', '2 格（外围 5×5）', null) +
         cxKV('自我修复', '8 秒未挨打后 1%/秒', null);
+      /* 注意：全等级对照表不在这里出，改由第二层下方「各等级数值对比」折叠区统一渲染 ——
+       * 否则同一张表在右侧和折叠区各来一份，屏幕直接被撑爆。 */
       return '<div class="cxd-name">大本营<span class="tag2">Lv' + lv + ' / ' + BL.length + '</span></div>' +
         '<div class="cxd-desc">被摧毁即失败；不受攻击时会自我修复血量。等级同时决定生命、金币产出与可用法术。</div>' +
-        '<div class="cx-kv">' + kv + '</div>' + cxBaseTable();
+        '<div class="cx-kv">' + kv + '</div>';
     }
     if (kind === 'unit') {
       var d = C.DATA.units[key];
@@ -4363,6 +4568,23 @@
         '<div class="cx-gup"><table class="cx-g"><thead><tr>' + ghead + '</tr></thead><tbody>' +
         grow('士兵攻击') + grow('士兵生命') + '</tbody></table></div>';
     }
+    /* 法术：没有等级，所以给的不是「几级多少伤」，而是「怎么用、什么时候能拿到」——
+     * 解锁等级、冷却、范围、作用对象，这些才是挑法术时真正要比的四件事。 */
+    if (kind === 'spell') {
+      var spd = cxSpell(key);
+      if (!spd) return '';
+      /* aoe 是「格距离半径」，不是边长：aoe=1 实际盖 3×3。
+       * 直接写 aoe+'×'+aoe 会把火球印成 1×1，和 desc 里的「3×3 范围」自相矛盾。 */
+      var edge = spd.aoe * 2 + 1;
+      var skv = cxKV('解锁等级', '大本营 Lv' + spd.unlockBaseLevel, null, true) +
+        cxKV('冷却', spd.cooldown + ' 秒', null) +
+        cxKV('作用范围', edge + '×' + edge + ' 格', null) +
+        cxKV('作用对象', spd.affects === 'enemy' ? '敌方单位与建筑'
+                          : (spd.affects === 'ally' ? '己方单位与建筑' : '全场'), null);
+      return '<div class="cxd-name">' + spd.name + '<span class="tag2">法术</span></div>' +
+        '<div class="cxd-desc">' + (spd.desc || '') + '</div>' +
+        '<div class="cx-kv">' + skv + '</div>';
+    }
     /* bld */
     var bd = C.DATA.buildings[key];
     if (!bd) return '';
@@ -4390,7 +4612,7 @@
       (br ? '<span class="tag2" style="color:' + br.color + '">' + br.name + '</span>' : '') +
       '<span class="tag2">Lv' + lv + ' / ' + maxLv + '</span></div>' +
       '<div class="cxd-desc">' + (br ? br.desc : (bd.desc || '')) + '</div>' +
-      '<div class="cx-kv">' + kv2 + '</div>' + branchLine + cxBldTable(key);
+      '<div class="cx-kv">' + kv2 + '</div>' + branchLine;
   }
 
   /* ---------- 等级滑动轨 / 分支选择 ---------- */
@@ -4413,54 +4635,154 @@
     }).join('');
   }
 
-  /* ---------- 第二层：完整详情（纯字符串，测试直接调它） ---------- */
-  function codexDetailHTML(kind, key, lv, branch) {
+  /* ---------- 第二层：完整详情（纯字符串，测试直接调它） ----------
+   * v22 新增：正下方「各等级数值对比」折叠区。
+   * 为什么要折叠而不是直接铺开：等级表有 10 列，铺开会把右下角的数值挤到屏幕外，
+   * 玩家一进来只想看「这一级什么水平」，对比是第二步的需求。
+   * 兵种 / 法术没有逐级数值，因此**不显示这个键** —— 摆一个空键比不摆更让人困惑。 */
+  function codexDetailHTML(kind, key, lv, branch, cmpOpen) {
     if (!C || !C.DATA) return '';
-    var maxLv = (kind === 'base') ? C.DATA.baseLevels.length
-               : (kind === 'bld' ? ((C.DATA.buildings[key] && (C.DATA.buildings[key].maxLevel || 10)) || 10) : 0);
-    if (lv < 1) lv = 1;
-    if (maxLv && lv > maxLv) lv = maxLv;
-    var bpick = (kind === 'bld') ? cxBranchPickInner(key, lv, branch) : '';
+    var cat = (kind === 'base') ? 'bld' : (kind || 'bld');
+    var ckey = (kind === 'base') ? 'base' : key;
+    if (cat === 'bld' && !ckey) ckey = 'base';
+    var maxLv = (cat === 'bld') ? cxMaxLv('bld', ckey) : 0;
+    if (maxLv) { if (!lv || lv < 1) lv = 1; if (lv > maxLv) lv = maxLv; }
+    var bpick = (cat === 'bld' && ckey !== 'base') ? cxBranchPickInner(ckey, lv, branch) : '';
+
+    var downBtn = maxLv
+      ? '<button type="button" class="cx-downbtn' + (cmpOpen ? ' open' : '') + '" data-cmpbtn>' +
+        '<span class="ar">▾</span>' + (cmpOpen ? '收起各等级对比' : '各等级数值对比') + '</button>'
+      : '';
+    var cmpBody = maxLv
+      ? '<div class="cx-cmp"' + (cmpOpen ? '' : ' hidden') + ' data-cmppanel>' +
+        '<div class="cmptitle">' + cxName(cat, ckey) + ' · L1 – L' + maxLv + '</div>' +
+        (ckey === 'base' ? cxBaseTable() : cxBldTable(ckey)) + '</div>'
+      : '';
+
     return '<div class="cx-detail" data-kind="' + kind + '">' +
-      '<button type="button" class="cx-back" data-back="1">← 返回列表</button>' +
+      '<div class="cx-dtop">' +
+        '<button type="button" class="cx-back" data-back="1">← 返回</button>' +
+        '<span class="cx-didx">' + (cxPos(cat) + 1) + ' / ' + cxList(cat).length + '</span>' +
+      '</div>' +
       '<div class="cx-detail-grid">' +
         '<div class="cx-hero">' +
-          '<div class="cx-hero-stage" data-hero' + (kind === 'unit' ? ' data-unit="1"' : '') + '>' +
-            cxHeroInner(kind, key, lv, branch) + '</div>' +
-          (kind === 'unit' ? '' : cxlvBarHTML(kind, lv, maxLv)) +
+          '<div class="cx-hero-stage" data-hero' + (cat === 'unit' ? ' data-unit="1"' : '') + '>' +
+            cxHeroInner(cat, ckey, lv, branch) + '</div>' +
+          (maxLv ? cxlvBarHTML(cat, lv, maxLv) : '') +
           '<div class="cx-branchpick" data-branchpick' + (bpick ? '' : ' hidden') + '>' + bpick + '</div>' +
         '</div>' +
-        '<div class="cx-facts" data-facts>' + cxFactsHTML(kind, key, lv, branch) + '</div>' +
-      '</div></div>';
+        '<div class="cx-facts" data-facts>' + cxFactsHTML(cat, ckey, lv, branch) + '</div>' +
+      '</div>' +
+      downBtn + cmpBody +
+      '</div>';
   }
 
   /* ---------- 挂载 + 交互（唯一碰 DOM 的一层） ---------- */
-  function cxPane(kind) {
-    return document.querySelector ? document.querySelector('#codex [data-pane="' + kind + '"]') : null;
+  function cxEl(id) {
+    return (typeof document !== 'undefined' && document.getElementById) ? document.getElementById(id) : null;
   }
-  function mountCodexIndex(kind) {
-    var wrap = cxPane(kind);
-    if (!wrap) return;
-    wrap.innerHTML = codexIndexHTML(kind);
-    if (!wrap.querySelectorAll) return;
-    Array.prototype.forEach.call(wrap.querySelectorAll('.cx-i'), function (el) {
-      el.onclick = function () {
-        var s = cxSel[kind];
-        s.key = el.getAttribute('data-key') || s.key;
-        s.lv = +(el.getAttribute('data-lv') || 1) || 1;
-        if (kind === 'bld') s.branch = null;
-        mountCodexDetail(kind);
+  function cxSetHidden(el, hidden) {
+    if (!el) return;
+    if (hidden) el.setAttribute('hidden', '');
+    else el.removeAttribute('hidden');
+  }
+
+  /* 分支合法性：L5 起才有分支；换了建筑或降级要回退到 A 支 */
+  function normalizeBranch(key, lv) {
+    if (key === 'base') { cxState.branch.bld = null; return; }
+    var brs = bldBranches(key);
+    if (lv < 5 || !brs.length) { cxState.branch.bld = null; return; }
+    var ok = false;
+    brs.forEach(function (b) { if (b.key === cxState.branch.bld) ok = true; });
+    if (!ok) cxState.branch.bld = brs[0].key;
+  }
+
+  /* 分类切换 */
+  function setCat(cat) {
+    if (CX_CATS.indexOf(cat) < 0) return;
+    cxState.cat = cat;
+    cxState.cmp = false;
+    if (typeof document !== 'undefined' && document.querySelectorAll) {
+      Array.prototype.forEach.call(document.querySelectorAll('#codex .cx-tab'), function (t) {
+        var on = t.getAttribute('data-cat') === cat;
+        t.classList.toggle('on', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+    }
+    cxSetHidden(cxEl('cxbrowse'), false);
+    cxSetHidden(cxEl('cxdetail'), true);
+    mountBrowse(0);
+  }
+
+  /* ---------------- 第一层：翻页浏览 ---------------- */
+  function mountBrowse(dir) {
+    if (!C || !C.DATA) return;
+    var cat = cxState.cat, list = cxList(cat);
+    if (!list.length) return;
+    var key = cxCurKey(cat);
+    var lv = (cat === 'bld') ? (cxState.lv.bld || 1) : 1;
+
+    var gl = cxEl('cxghostl'), gr = cxEl('cxghostr'), fr = cxEl('cxfocus');
+    if (gl) gl.innerHTML = cxGhostHTML(cat, -1);
+    if (gr) gr.innerHTML = cxGhostHTML(cat, 1);
+    if (fr) {
+      fr.innerHTML = cxFocusHTML(cat, key, lv, cxState.branch.bld);
+      if (dir) {
+        /* 摘掉再加、中间强制一次回流：否则连续翻页时动画只会播第一次，
+         * 后面几次看起来是「图突然换了」而不是「滑过去」。 */
+        fr.classList.remove('roll-next', 'roll-prev');
+        if (fr.offsetWidth !== undefined) void fr.offsetWidth;
+        fr.classList.add(dir > 0 ? 'roll-next' : 'roll-prev');
+      }
+      fr.onclick = function () { enterDetail(); };
+      fr.onkeydown = function (e) {
+        if (e && (e.key === 'Enter' || e.key === ' ')) {
+          if (e.preventDefault) e.preventDefault();
+          enterDetail();
+        }
       };
-    });
+    }
+    var pv = cxEl('cxprev'), nx = cxEl('cxnext');
+    if (pv) { pv.disabled = list.length < 2; pv.onclick = function () { cxTurn(-1); }; }
+    if (nx) { nx.disabled = list.length < 2; nx.onclick = function () { cxTurn(1); }; }
   }
-  function mountCodexDetail(kind) {
-    var wrap = cxPane(kind);
+  function cxTurn(dir) {
+    var cat = cxState.cat;
+    cxState.pos[cat] = cxPos(cat) + dir;
+    cxState.cmp = false;
+    mountBrowse(dir);
+  }
+  function enterDetail() {
+    cxState.cmp = false;
+    cxSetHidden(cxEl('cxbrowse'), true);
+    cxSetHidden(cxEl('cxdetail'), false);
+    mountDetail();
+  }
+  function backToBrowse() {
+    cxSetHidden(cxEl('cxdetail'), true);
+    cxSetHidden(cxEl('cxbrowse'), false);
+    mountBrowse(0);
+  }
+
+  /* ---------------- 第二层：详情 ---------------- */
+  function cxCmpInner(cat, key) {
+    if (cat !== 'bld') return '';
+    var mx = cxMaxLv('bld', key);
+    return '<div class="cmptitle">' + cxName('bld', key) + ' · L1 – L' + mx + '</div>' +
+      (key === 'base' ? cxBaseTable() : cxBldTable(key));
+  }
+  function mountDetail() {
+    var wrap = cxEl('cxdscroll');
     if (!wrap || !C || !C.DATA) return;
-    var s = cxSel[kind];
-    var maxLv = (kind === 'base') ? C.DATA.baseLevels.length
-               : ((C.DATA.buildings[s.key] && (C.DATA.buildings[s.key].maxLevel || 10)) || 10);
-    if (s.lv > maxLv) s.lv = maxLv;
-    wrap.innerHTML = codexDetailHTML(kind, s.key, s.lv, s.branch);
+    var cat = cxState.cat, key = cxCurKey(cat);
+    var lv = (cat === 'bld') ? (cxState.lv.bld || 1) : 1;
+    if (cat === 'bld') normalizeBranch(key, lv);
+    wrap.innerHTML = codexDetailHTML(cat, key, lv, cxState.branch.bld, cxState.cmp);
+    if (wrap.scrollTop !== undefined) wrap.scrollTop = 0;   // 换了一件就从头上看
+    var pv0 = cxEl('cxdprev'), nx0 = cxEl('cxdnext');
+    if (pv0) pv0.disabled = cxList(cat).length < 2;
+    if (nx0) nx0.disabled = cxList(cat).length < 2;
     if (!wrap.querySelector) return;
 
     var heroEl = wrap.querySelector('[data-hero]');
@@ -4468,53 +4790,65 @@
     var lvtextEl = wrap.querySelector('[data-lvtext]');
     var rangeEl = wrap.querySelector('[data-range]');
     var bpEl = wrap.querySelector('[data-branchpick]');
+    var cmpPanel = wrap.querySelector('[data-cmppanel]');
+    var cmpBtn = wrap.querySelector('[data-cmpbtn]');
     var backEl = wrap.querySelector('.cx-back');
 
-    /* 分支合法性：L5 起才有分支；换了建筑/降级要回退到 A 支 */
-    function normalize() {
-      if (kind !== 'bld') return;
-      var brs = bldBranches(s.key);
-      if (s.lv < 5 || !brs.length) { s.branch = null; return; }
-      var ok = false;
-      brs.forEach(function (b) { if (b.key === s.branch) ok = true; });
-      if (!ok) s.branch = brs[0].key;
-    }
+    /* 只重画「跟着等级变」的部分，不整块重建 ——
+     * 整块重建会让 range 输入框失焦，拖着拖着手感就断了。 */
     function paint() {
-      normalize();
-      if (heroEl) heroEl.innerHTML = cxHeroInner(kind, s.key, s.lv, s.branch);
-      if (factsEl) factsEl.innerHTML = cxFactsHTML(kind, s.key, s.lv, s.branch);
-      if (lvtextEl) lvtextEl.textContent = 'Lv' + s.lv;
+      var k = cxCurKey(cat);
+      var l = (cat === 'bld') ? (cxState.lv.bld || 1) : 1;
+      if (cat === 'bld') normalizeBranch(k, l);
+      if (heroEl) heroEl.innerHTML = cxHeroInner(cat, k, l, cxState.branch.bld);
+      if (factsEl) factsEl.innerHTML = cxFactsHTML(cat, k, l, cxState.branch.bld);
+      if (lvtextEl) lvtextEl.textContent = 'Lv' + l;
       if (bpEl) {
-        var inner = cxBranchPickInner(s.key, s.lv, s.branch);
+        var inner = cxBranchPickInner(k, l, cxState.branch.bld);
         bpEl.innerHTML = inner;
         if (inner) bpEl.removeAttribute('hidden'); else bpEl.setAttribute('hidden', '');
         wireBranch();
       }
-      /* 刻度：只改 class，不重建节点 */
       var tks = wrap.querySelectorAll('.cx-ticks .tk');
       if (tks) {
         Array.prototype.forEach.call(tks, function (t, i) {
-          t.className = 'tk' + ((i + 1) === s.lv ? ' on' : '');
+          t.className = 'tk' + ((i + 1) === l ? ' on' : '');
         });
       }
     }
     function wireBranch() {
       if (!bpEl || !bpEl.querySelectorAll) return;
       Array.prototype.forEach.call(bpEl.querySelectorAll('.cx-bp'), function (b) {
-        b.onclick = function () { s.branch = b.getAttribute('data-bp'); paint(); };
+        b.onclick = function () { cxState.branch.bld = b.getAttribute('data-bp'); paint(); };
       });
     }
-    if (rangeEl) rangeEl.oninput = function () { s.lv = +rangeEl.value || 1; paint(); };
-    if (backEl) backEl.onclick = function () { mountCodexIndex(kind); };
+    if (rangeEl) rangeEl.oninput = function () { cxState.lv.bld = +rangeEl.value || 1; paint(); };
+    if (backEl) backEl.onclick = backToBrowse;
+    if (cmpBtn) cmpBtn.onclick = function () {
+      cxState.cmp = !cxState.cmp;
+      cxSetHidden(cmpPanel, !cxState.cmp);
+      cmpBtn.classList.toggle('open', cxState.cmp);
+      cmpBtn.innerHTML = '<span class="ar">▾</span>' +
+        (cxState.cmp ? '收起各等级对比' : '各等级数值对比');
+      /* 展开后把表格滚进视野：不然点了「下」屏幕上什么都没动，
+       * 玩家会以为键没反应（表格在折叠区下方，可能整张都在屏幕外）。 */
+      if (cxState.cmp && wrap.scrollTo) {
+        try { wrap.scrollTo({ top: wrap.scrollHeight, behavior: 'smooth' }); }
+        catch (e) { wrap.scrollTop = wrap.scrollHeight; }
+      }
+    };
+    if (pv0) pv0.onclick = function () { cxTurnDetail(-1); };
+    if (nx0) nx0.onclick = function () { cxTurnDetail(1); };
     wireBranch();
   }
+  function cxTurnDetail(dir) {
+    var cat = cxState.cat;
+    cxState.pos[cat] = cxPos(cat) + dir;
+    cxState.cmp = false;
+    mountDetail();
+  }
 
-  /* 三个 Tab 的入口（保持旧函数名，openCodex 那边不用改） */
-  function fillBasePane() { mountCodexIndex('base'); }
-  function fillBldPane() { mountCodexIndex('bld'); }
-  function fillUnitPane() { mountCodexIndex('unit'); }
-
-  /* 入口 / 关闭 按钮 + Esc 关闭（纯展示：不开局、不推进模拟） */
+  /* 入口 / 关闭 按钮 + 键盘操作（纯展示：不开局、不推进模拟） */
   try {
     var codexOpenBtn = document.getElementById('codexopen');
     if (codexOpenBtn) codexOpenBtn.onclick = openCodex;
@@ -4522,20 +4856,49 @@
     if (codexCloseBtn) codexCloseBtn.onclick = closeCodex;
     if (document.addEventListener) {
       document.addEventListener('keydown', function (e) {
-        if (e && e.key === 'Escape') {
-          var el = document.getElementById('codex');
-          if (el && !el.hidden) closeCodex();
+        var el = document.getElementById('codex');
+        if (!e || !el || el.hidden) return;
+        var k = e.key;
+        var dw = cxEl('cxdetail'), detailOpen = !!(dw && !dw.hidden);
+
+        /* Esc 分两层退：详情 → 返回列表，列表 → 关掉图鉴。
+         * 一步就关会让「我只想退一层」的人整个重开。 */
+        if (k === 'Escape') {
+          if (detailOpen) backToBrowse(); else closeCodex();
+          return;
+        }
+        if (k === 'ArrowLeft' || k === 'ArrowRight') {
+          /* 滑轨聚焦时方向键是它自己的（调等级），别抢 */
+          var tag = (e.target && e.target.tagName) || '';
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+          if (e.preventDefault) e.preventDefault();
+          if (detailOpen) cxTurnDetail(k === 'ArrowRight' ? 1 : -1);
+          else cxTurn(k === 'ArrowRight' ? 1 : -1);
+          return;
+        }
+        if (!detailOpen) {
+          if (k === 'Enter' || k === ' ' || k === 'ArrowUp') {
+            if (e.preventDefault) e.preventDefault();
+            enterDetail();
+          }
+          return;
+        }
+        /* 详情里「↓」= 展开/收起各等级对比，和屏幕上的「下」键同一个入口 */
+        if (k === 'ArrowDown') {
+          var sc = cxEl('cxdscroll');
+          var cb = sc && sc.querySelector ? sc.querySelector('[data-cmpbtn]') : null;
+          if (cb) { if (e.preventDefault) e.preventDefault(); cb.click(); }
         }
       });
     }
   } catch (e) {}
 
   /* 调试口（截图 / 自测用，正常玩不会触发）：
-   *   #codex              打开图鉴（大本营 Tab）
-   *   #codex=bld          打开并切到「建筑」
-   *   #codex=bld,ward,5   打开建筑页并直接进入「防御塔 Lv5」详情
-   *   #codex=unit,archer  打开兵种页并进入「弓箭手」详情
-   * 这样无头浏览器不用模拟点击也能截到第二层界面。 */
+   *   #codex              打开图鉴（建筑分类第一件 = 大本营）
+   *   #codex=unit         打开并切到「兵种」
+   *   #codex=bld,ward,5   打开建筑页、翻到防御塔、进详情并停在 Lv5
+   *   #codex=spell,fireball  打开法术页并进入「火球」详情
+   * 这样无头浏览器不用模拟点击也能截到任意一层。 */
   (function () {
     try {
       var h = (typeof location !== 'undefined' && location.hash) ? location.hash.replace(/^#/, '') : '';
@@ -4543,23 +4906,15 @@
       openCodex();
       var rest = h.indexOf('=') >= 0 ? h.split('=')[1] : '';
       var parts = rest ? rest.split(',') : [];
-      var tab = parts[0] || 'base';
-      if (tab !== 'base' && tab !== 'bld' && tab !== 'unit') return;
-      var tabs = document.querySelectorAll ? document.querySelectorAll('#codex .cx-tab') : [];
-      Array.prototype.forEach.call(tabs, function (t) {
-        var on = t.getAttribute('data-tab') === tab;
-        t.classList.toggle('on', on);
-        var panes = document.querySelectorAll('#codex .cx-pane');
-        Array.prototype.forEach.call(panes, function (p) {
-          var vis = p.getAttribute('data-pane') === tab;
-          p.classList.toggle('on', vis);
-          if (vis) p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
-        });
-      });
+      var cat = parts[0] || 'bld';
+      if (CX_CATS.indexOf(cat) < 0) return;
+      setCat(cat);
       if (parts[1]) {
-        cxSel[tab].key = parts[1];
-        if (parts[2]) cxSel[tab].lv = +parts[2] || 1;
-        mountCodexDetail(tab);
+        var idx = cxList(cat).indexOf(parts[1]);
+        if (idx >= 0) cxState.pos[cat] = idx;
+        if (parts[2] && cat === 'bld') cxState.lv.bld = +parts[2] || 1;
+        mountBrowse(0);
+        enterDetail();
       }
     } catch (e) {}
   })();

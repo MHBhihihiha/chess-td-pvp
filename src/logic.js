@@ -42,8 +42,6 @@
   var UNIT_CAP = 80;                            // 每方单位上限（性能保护）
   var RESERVE_CAP = 8;                          // 每方待命区（棋盘外）容量
   var CHANNEL_CAP = 4;                          // 同一通道格最多堆几个兵
-  var SUDDEN_DEATH_AT = 300;                    // 5 分钟后进入「决胜时刻」
-  var SUDDEN_DEATH_DPS = 6;                     // 决胜期每秒烧大本营的血（只惩罚僵持，不掩盖实力差距）
   var MAX_SIM_SECONDS = 60 * 60;
 
   /* ------------------------------------------------------------ 配置表 */
@@ -2260,23 +2258,10 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     state.time += dt;
     state.tick++;
 
-    // 0) 决胜时刻：5 分钟后双方大本营一起持续掉血（且越来越快），
-    //    避免两边都堆满兵互相僵持、永远打不完。先被烧掉的一方输。
-    //    可以用 state.suddenDeath = false 关掉（玩家想要超长对局时）。
-    if (state.suddenDeath !== false && state.time > SUDDEN_DEATH_AT) {
-      var extra = (state.time - SUDDEN_DEATH_AT) / 90;          // 每过 1.5 分钟加剧一档
-      TEAMS.forEach(function (team) {
-        if (state.over) return;
-        var base = ownBase(state, team);
-        if (base) { base.hp -= SUDDEN_DEATH_DPS * (1 + extra) * dt; base.justDamaged = state.time; }
-      });
-      TEAMS.forEach(function (team) {
-        if (state.over) return;
-        var base = ownBase(state, team);
-        if (base && base.hp <= 0) removeBuilding(state, base);
-      });
-      if (state.over) return state;
-    }
+    // 0) 决胜时刻已移除（v22）。原本 5 分钟后双方大本营对称烧血，用来强行结束僵持；
+    //    玩家认为这种「到点就掉血」的结束方式太打断节奏，改为纯靠推掉大本营分胜负。
+    //    仍需注意：双方都不进攻时对局不会自己结束，这是有意的（宁可不结束，也不要
+    //    凭空扣血把胜负交给运气）。
 
     // 1) 收入：大本营固定收入 + 金矿等其他资源建筑（等级越高产出越多）
     TEAMS.forEach(function (team) {

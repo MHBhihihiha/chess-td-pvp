@@ -123,8 +123,8 @@ check('合法操作确实有生效（不是全部被拒）',
   ops.placeOk > 0 && ops.deployOk > 0 && ops.upgradeBOk > 0,
   JSON.stringify({ place: ops.placeOk, deploy: ops.deployOk, up: ops.upgradeBOk }));
 
-/* ---------------- 2. 完整对局跑到决胜时刻 ---------------- */
-console.log('\n=== 2. 完整对局（含决胜时刻）稳定性 ===');
+/* ---------------- 2. 完整对局长时间运行 ---------------- */
+console.log('\n=== 2. 完整对局稳定性（v22 起没有决胜时刻，不再被强制结束） ===');
 var s2 = C.createState();
 var seconds = 0, badAt = null;
 while (!s2.over && seconds < 800) {
@@ -136,17 +136,22 @@ while (!s2.over && seconds < 800) {
     if (!invariants(s2, '对局第 ' + Math.round(seconds) + ' 秒') && !badAt) badAt = Math.round(seconds);
   }
 }
-check('对局最终分出胜负（不会永远僵持）', s2.over === true, '跑了 ' + seconds.toFixed(0) + ' 秒');
 check('对局过程中状态始终一致', badAt === null, badAt ? ('第 ' + badAt + ' 秒出现问题') : '');
-check('结束后胜者有效', s2.winner === 'red' || s2.winner === 'blue' || s2.winner === 'draw', 'winner=' + s2.winner);
-console.log('     用时 ' + seconds.toFixed(0) + ' 秒，胜者 ' + s2.winner +
+/* 旧版靠 5 分钟对称烧血保证「一定结束」；移除后 AI 对 AI 可能长期僵持（实测 800 秒
+ * 双方大本营都还是满血）。所以这里不再要求必须分出胜负，只要求终局字段自洽 —— 
+ * 「能不能结束」是平衡问题，不是稳定性问题。 */
+check('终局字段自洽（结束后必须有合法 winner）',
+  !s2.over || s2.winner === 'red' || s2.winner === 'blue' || s2.winner === 'draw',
+  'over=' + s2.over + ' winner=' + s2.winner);
+console.log('     ' + (s2.over ? '用时 ' + seconds.toFixed(0) + ' 秒分出胜负，胜者 ' + s2.winner
+                           : '跑了 ' + seconds.toFixed(0) + ' 秒仍在进行（无决胜时刻，属预期）') +
   '；红方建筑 ' + s2.buildings.filter(function (b) { return b.team === 'red'; }).length +
   ' / 蓝方建筑 ' + s2.buildings.filter(function (b) { return b.team === 'blue'; }).length +
   '；大本营血量 红 ' + (C.ownBase(s2, 'red') ? C.ownBase(s2, 'red').hp.toFixed(0) : '已毁') +
   ' 蓝 ' + (C.ownBase(s2, 'blue') ? C.ownBase(s2, 'blue').hp.toFixed(0) : '已毁'));
 
-/* ---------------- 3. 结束后继续调用不能出事 ---------------- */
-console.log('\n=== 3. 对局结束后继续乱调 API ===');
+/* ---------------- 3. 对局中/结束后继续调用不能出事 ---------------- */
+console.log('\n=== 3. 对局中或结束后继续乱调 API ===');
 var afterErrors = [];
 try {
   for (var k = 0; k < 500; k++) {
@@ -161,22 +166,22 @@ try {
 check('结束后再调 500 次 API 不抛异常', afterErrors.length === 0, afterErrors[0]);
 check('结束后状态依然一致', invariants(s2, '结束后'));
 
-/* ---------------- 4. 超长时间静止局面（数值漂移 / 内存 / 决胜时刻） ---------------- */
-console.log('\n=== 4. 超长静止局面（决胜时刻会烧基地，检查不崩且判定正确） ===');
+/* ---------------- 4. 超长时间静止局面（v22：没有决胜时刻，也不再烧血） ---------------- */
+console.log('\n=== 4. 超长静止局面（谁都不动手就一直打下去，血一点不掉） ===');
 var s3 = C.createState();
 s3.res.blue = 1e6;
 C.placeBuilding(s3, 'blue', 'mine', 9, 1);
 var hp0 = C.ownBase(s3, 'blue').hp;
-// 前 5 分钟（决胜时刻之前）不能掉血
-for (var q = 0; q < 20 * 290; q++) C.update(s3, C.DT);
-check('决胜时刻之前大本营不掉血', Math.abs(C.ownBase(s3, 'blue').hp - hp0) < 0.001,
+var hpR0 = C.ownBase(s3, 'red').hp;
+/* 跑满 25 分钟虚拟时间。旧版在 5 分钟处开始对称烧血、十几分钟内必分胜负；
+ * v22 移除该机制后，这里应当一个血点都不掉，且对局一直继续。 */
+for (var q = 0; q < 20 * 1500; q++) C.update(s3, C.DT);
+check('25 分钟后蓝方大本营血量分毫未变', Math.abs(C.ownBase(s3, 'blue').hp - hp0) < 0.001,
   hp0.toFixed(2) + ' → ' + C.ownBase(s3, 'blue').hp.toFixed(2));
-// 之后一定会分出胜负（即使双方都不动手）
-var extraSec = 0;
-while (!s3.over && extraSec < 1500) { C.update(s3, C.DT); extraSec += C.DT; }
-check('双方都不动手时，决胜时刻也会分出胜负', s3.over === true, '多跑了 ' + extraSec.toFixed(0) + ' 秒仍未结束');
-check('胜负判定有效（不会两边同时炸导致 winner 为空）', s3.winner === 'red' || s3.winner === 'blue', 'winner=' + s3.winner);
-console.log('     决胜时刻后 ' + extraSec.toFixed(0) + ' 秒分出结果，winner=' + s3.winner);
+check('25 分钟后红方大本营血量分毫未变', Math.abs(C.ownBase(s3, 'red').hp - hpR0) < 0.001,
+  hpR0.toFixed(2) + ' → ' + C.ownBase(s3, 'red').hp.toFixed(2));
+check('双方都不动手时对局不会自己结束（去掉决胜时刻的直接结果）', s3.over === false,
+  'over=' + s3.over + ' winner=' + s3.winner);
 check('事件日志不会无限增长', s3.events.length <= 400, '事件数 ' + s3.events.length);
 check('单位/建筑数量没有异常膨胀', s3.units.length <= 200 && s3.buildings.length <= 100,
   '单位 ' + s3.units.length + ' 建筑 ' + s3.buildings.length);

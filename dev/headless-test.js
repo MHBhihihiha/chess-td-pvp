@@ -346,18 +346,23 @@ run(s12h, 25);  // 之后再等 25 秒
 check('停止挨打后开始自我修复', hb.hp > hpStart + 100, hpStart.toFixed(0) + ' → ' + hb.hp.toFixed(0));
 check('自我修复不会超过上限', hb.hp <= hb.hpMax);
 
-/* ---------------------------------------------------------------- 13. 决胜时刻 */
-section('13. 决胜时刻（避免双方僵持打不完）');
+/* ------------------------------------- 13. 无「决胜时刻」（v22 起移除） */
+section('13. 时间流逝不会烧血（v22 移除了「5 分钟后决胜」）');
 var s13 = C.createState();
+var b13hp = C.ownBase(s13, 'blue').hp, r13hp = C.ownBase(s13, 'red').hp;
 s13.time = 299;
-run(s13, 2);                        // 跨过 5 分钟
-var bb13 = C.ownBase(s13, 'blue'), rb13 = C.ownBase(s13, 'red');
-check('5 分钟后双方大本营开始掉血', bb13.hp < bb13.hpMax && rb13.hp < rb13.hpMax,
-  '蓝 ' + bb13.hp.toFixed(0) + ' 红 ' + rb13.hp.toFixed(0));
+run(s13, 2);                        // 跨过原来那条 5 分钟线
+check('跨过 5 分钟后双方大本营血量分毫未变',
+  Math.abs(C.ownBase(s13, 'blue').hp - b13hp) < 1e-9 &&
+  Math.abs(C.ownBase(s13, 'red').hp - r13hp) < 1e-9,
+  '蓝 ' + C.ownBase(s13, 'blue').hp.toFixed(2) + ' 红 ' + C.ownBase(s13, 'red').hp.toFixed(2));
 var s13b = C.createState();
 s13b.time = 299;
-C.update(s13b, C.DT);
-check('5 分钟之前不掉血', C.ownBase(s13b, 'blue').hp === C.ownBase(s13b, 'blue').hpMax);
+run(s13b, 180);                     // 再跑 3 分钟：确认没有任何「随时间加剧」的残留机制
+check('再过 3 分钟仍然不掉血（没有随时间加剧的隐性烧血）',
+  C.ownBase(s13b, 'blue').hp === C.ownBase(s13b, 'blue').hpMax &&
+  C.ownBase(s13b, 'red').hp === C.ownBase(s13b, 'red').hpMax,
+  '蓝 ' + C.ownBase(s13b, 'blue').hp + ' 红 ' + C.ownBase(s13b, 'red').hp);
 
 /* ---------------------------------------------------------------- 14. AI 完整对局 */
 section('12. 电脑对手能完整打完一局');

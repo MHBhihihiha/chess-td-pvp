@@ -74,8 +74,8 @@ console.log('\n=== 2. 实战：自家兵贴着自家大本营，自家大本营�
     'over=' + s.over + ' winner=' + s.winner);
 });
 
-/* ---------- 3. 全 AI 对局：胜者必须是因为「打掉了对面的大本营」 ---------- */
-console.log('\n=== 3. 完整 AI 对局：胜负归因检查 ===');
+/* ---------- 3. 长时间全 AI 对局：掉血必须来自真实战斗 ---------- */
+console.log('\n=== 3. 长时间全 AI 对局：胜负归因仍然正确 ===');
 var s3 = C.createState();
 var seconds = 0;
 while (!s3.over && seconds < 700) {
@@ -84,11 +84,21 @@ while (!s3.over && seconds < 700) {
   C.aiUpdate(s3, 'blue', C.DT);
   seconds += C.DT;
 }
-check('对局能分出胜负', s3.over === true, '跑了 ' + seconds.toFixed(0) + 's 还没结束');
-var loser = s3.winner === 'red' ? 'blue' : 'red';
-check('败方的大本营确实被摧毁了', !C.ownBase(s3, loser), '败方=' + loser + ' 大本营还在? ' + !!C.ownBase(s3, loser));
-check('胜方的大本营还活着', !!C.ownBase(s3, s3.winner), '胜方=' + s3.winner);
-console.log('     用时 ' + seconds.toFixed(0) + ' 秒，胜者 = ' + s3.winner +
+/* v22 移除了「5 分钟后对称烧血」，所以 700 秒打不完是允许的 —— 旧版是被烧血
+ * 强行结束的。这里不再要求「必须结束」，但「一旦结束，归因必须正确」依然锁死。 */
+check('700 秒 AI 对局后单位/建筑数量仍然合法',
+  s3.units.length <= 200 && s3.buildings.length <= 120,
+  '单位 ' + s3.units.length + ' 建筑 ' + s3.buildings.length);
+check('终局字段自洽（不会出现 winner 为空或双方都没了）',
+  !s3.over || s3.winner === 'red' || s3.winner === 'blue' || s3.winner === 'draw',
+  'over=' + s3.over + ' winner=' + s3.winner);
+if (s3.over && (s3.winner === 'red' || s3.winner === 'blue')) {
+  var loser = s3.winner === 'red' ? 'blue' : 'red';
+  check('若分出胜负，则败方大本营确实不在了', !C.ownBase(s3, loser),
+    '败方=' + loser);
+  check('胜方的大本营还活着', !!C.ownBase(s3, s3.winner), '胜方=' + s3.winner);
+}
+console.log('     ' + seconds.toFixed(0) + ' 秒后：' + (s3.over ? '已分胜负（' + s3.winner + '）' : '仍在进行') +
   '；红方出兵 ' + s3.stats.red.produced + ' / 蓝方出兵 ' + s3.stats.blue.produced);
 
 console.log('\n===============================');

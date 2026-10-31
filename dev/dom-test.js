@@ -69,10 +69,9 @@ var ctx = new Proxy({}, {
 });
 
 var els = {};
-['cv', 'gold', 'rate', 'enemyinfo', 'hint', 'over', 'overtext', 'bcards', 'ucards', 'btnpath', 'btnrestart', 'again', 'detail', 'board-wrap', 'autodeploy', 'sudden']
+['cv', 'gold', 'rate', 'enemyinfo', 'hint', 'over', 'overtext', 'bcards', 'ucards', 'btnpath', 'btnrestart', 'again', 'detail', 'board-wrap', 'autodeploy']
   .forEach(function (id) { els[id] = makeEl(id); });
 els['autodeploy'].checked = false;         // 默认手动派兵
-els['sudden'].checked = true;              // 默认开决胜时刻
 els['detailclose'] = makeEl('detailclose');
 els['detailup'] = makeEl('detailup');
 
@@ -426,30 +425,45 @@ if (completePose.length) {
 }
 
 /* ============================================================================
- * v14/v15：图鉴（两级索引）——列表页与详情页都是纯函数，直接断言字符串
- *   ① 列表页：小图 + 名称 + 精简信息，条数对得上数据表
- *   ② 详情页：左大图（底座+武器两层，按等级选图）+ 右数值 + 等级滑动轨
- *   ③ 水晶塔的数值仍然必须是对的（v14 修过的标错点，别回退）
+ * v23：图鉴重做成「两层翻页」
+ *   第一层（浏览）：上面三个分类 Tab、中间一张大图、左右各一张淡淡残影，
+ *                   点左右键滚动式换图，点大图进第二层。
+ *   第二层（详情）：左大图 + 下方等级滑轨 + 右数值，正下方「下」键展开全等级对比，
+ *                   左右键换条目但不出现残影（方便横向比数值）。
+ * 这里锁死的是「结构契约」：分类条数、残影只在第一层、下键只给有等级的东西。
  * ========================================================================== */
 (function () {
   var st = window.__game.state;
   st.res.blue = 999999;
   var G = window.__game;
 
-  /* ---- 第一层：列表 ---- */
+  function count(html, re) { return (html.match(re) || []).length; }
+
+  /* ---- 第一层：条目顺序 ---- */
+  var lb = G.codexList('bld'), lu = G.codexList('unit'), ls = G.codexList('spell');
+  console.log(lb.length === 8 && lb[0] === 'base'
+    ? '✅ 建筑类 8 条，大本营排在第一位（含大本营 + 7 座建筑）'
+    : '❌ 建筑类条目不对：' + lb.length + ' 条，首项 ' + lb[0]);
+  console.log(lu.length === 8 ? '✅ 兵种类 8 条' : '❌ 兵种类条目不对：' + lu.length);
+  console.log(ls.length === C.DATA.spells.length && ls.length > 0
+    ? '✅ 法术类 ' + ls.length + ' 条（与数据表一致）' : '❌ 法术类条目不对：' + ls.length);
+
+  /* ---- 第一层：结构 = 大图 + 双侧残影 ---- */
   var idxBld = G.codexIndexHtml('bld');
-  var nBld = (idxBld.match(/class="cx-i"/g) || []).length;
-  console.log(nBld === C.DATA ? '' : '');
-  console.log(nBld === 7 ? '✅ 建筑列表 7 条（金矿/炮塔/箭塔/法师塔/迫击炮/电塔/防御塔）'
-                        : '❌ 建筑列表条数不对：' + nBld);
-  console.log(idxBld.indexOf('金矿') >= 0 && idxBld.indexOf('防御塔') >= 0 && idxBld.indexOf('cx-hintline') >= 0
-    ? '✅ 列表条目含名称与精简信息，并带操作提示' : '❌ 列表条目内容缺失');
-  var idxUnit = G.codexIndexHtml('unit');
-  var nUnit = (idxUnit.match(/class="cx-i"/g) || []).length;
-  console.log(nUnit === 8 ? '✅ 兵种列表 8 条' : '❌ 兵种列表条数不对：' + nUnit);
-  var idxBase = G.codexIndexHtml('base');
-  console.log((idxBase.match(/class="cx-i"/g) || []).length === 1
-    ? '✅ 大本营列表只有 1 条（等级交给详情页的滑动轨）' : '❌ 大本营列表条数不对');
+  console.log(idxBld.indexOf('class="cx-focus"') >= 0 && idxBld.indexOf('class="cx-ghost l"') >= 0 &&
+              idxBld.indexOf('class="cx-ghost r"') >= 0
+    ? '✅ 第一层 = 主图 + 左右两张残影（cx-focus / cx-ghost l / cx-ghost r）'
+    : '❌ 第一层结构不对');
+  console.log(idxBld.indexOf('class="cx-fname"') >= 0 && idxBld.indexOf('大本营') >= 0
+    ? '✅ 主图下方有名字，且首项就是大本营' : '❌ 主图缺名字或首项不是大本营');
+  /* 残影只放图不放字：一旦写名字，眼睛就去读了，这一层只需要「旁边还有东西」的暗示 */
+  var ghostOnly = /<div class="cx-ghost l">([\s\S]*?)<\/div>\s*<div class="cx-focus"/.exec(idxBld);
+  console.log(ghostOnly && ghostOnly[1].indexOf('cx-fname') < 0 && ghostOnly[1].indexOf('<img') >= 0
+    ? '✅ 左残影只有图、没有名称文字' : '❌ 残影里混进了文字（会抢注意力）');
+  /* 三个分类都能真的出图（法术走 spell_*.png，别漏） */
+  var idxSpell = G.codexIndexHtml('spell');
+  console.log(idxSpell.indexOf('spell_arrowRain.png') >= 0
+    ? '✅ 法术类能出图（spell_arrowRain.png）' : '❌ 法术类没有贴图');
 
   /* ---- 第二层：详情（建筑） ---- */
   var dWard5 = G.codexDetailHtml('bld', 'ward', 5, 'crystal');
@@ -464,17 +478,50 @@ if (completePose.length) {
   console.log(/data-bp="crystal"/.test(dWard5) && /data-bp="bunker"/.test(dWard5)
     ? '✅ L5 起出现分支切换（水晶塔 / 碉堡塔）' : '❌ 分支切换缺失');
 
-  /* L4：还没到分支，大图只有底座、没有武器层，滑动轨照旧 */
-  var dWard4 = G.codexDetailHtml('bld', 'ward', 4, null);
-  console.log(dWard4.indexOf('ward_body_e2.png') >= 0 && dWard4.indexOf('_top_e') < 0
-    ? '✅ L4 防御塔只画底座（分支武器 L5 才出现）' : '❌ L4 防御塔的图层不对');
-  console.log(dWard4.indexOf('data-branchpick hidden') >= 0
-    ? '✅ L4 时分支切换是隐藏的' : '❌ L4 不该显示分支切换');
+  /* ---- 第二层：「下」键 + 折叠的全等级对比 ---- */
+  var cmpClosed = G.codexDetailHtml('bld', 'ward', 5, 'crystal', false);
+  var cmpOpen = G.codexDetailHtml('bld', 'ward', 5, 'crystal', true);
+  console.log(cmpClosed.indexOf('data-cmpbtn') >= 0 && cmpClosed.indexOf('各等级数值对比') >= 0
+    ? '✅ 第二层正下方有「各等级数值对比」按钮' : '❌ 缺「下」键');
+  console.log(/<div class="cx-cmp" hidden data-cmppanel>/.test(cmpClosed) &&
+              cmpClosed.indexOf('L1 – L10') >= 0
+    ? '✅ 对比区默认折叠，但内容已渲染好（免点开才卡）' : '❌ 对比区默认态不对');
+  console.log(/<div class="cx-cmp" data-cmppanel>/.test(cmpOpen) && cmpOpen.indexOf('收起各等级对比') >= 0
+    ? '✅ cmpOpen=true 时对比区展开、按钮文案改成「收起」' : '❌ 展开态不对');
 
-  /* ---- 第二层：详情（大本营 / 兵种） ---- */
+  /* 分支建筑（L5 起分裂成两个方向）里，两个分支**数值相同**的属性 ——
+   * 典型就是生命和射程 —— 必须照常显示数字。
+   * 这里曾经有个坑：单元格在两分支同值时走了 single 分支，却没带 v 字段，
+   * 于是 L5~L10 的「生命」整列变成 —，看起来像数据缺失。 */
+  var hpRow = /<td class="row">生命<\/td>([\s\S]*?)<\/tr>/.exec(cmpOpen);
+  var hpDash = hpRow ? (hpRow[1].match(/>—</g) || []).length : -1;
+  console.log(hpRow && hpDash === 0
+    ? '✅ 分支建筑：L5 起「生命」每级都有数字（两分支同值也不许显示成 —）'
+    : '❌ 「生命」行有 ' + hpDash + ' 个 — （两分支同值时漏带 v 字段）');
+  /* 兵种/法术没有「等级」这回事 → 不能摆一个点了没反应的「下」键 */
+  var dUnit2 = G.codexDetailHtml('unit', 'archer', 1);
+  var dSpell2 = G.codexDetailHtml('spell', 'fireball', 1);
+  console.log(dUnit2.indexOf('data-cmpbtn') < 0 && dSpell2.indexOf('data-cmpbtn') < 0
+    ? '✅ 兵种 / 法术详情不出现「下」键（它们没有等级可对比）' : '❌ 兵种/法术摆了个空键');
+
+  /* 法术的 aoe 是「格距离半径」不是边长：aoe=1 实际盖 3×3。
+   * 直接印 aoe×aoe 会把火球写成 1×1，和 desc 里的「3×3 范围」在同一屏里打架。 */
+  var fb = C.DATA.spells.filter(function (s) { return s.key === 'fireball'; })[0];
+  var want = (fb.aoe * 2 + 1) + '×' + (fb.aoe * 2 + 1);
+  console.log(dSpell2.indexOf(want) >= 0 && dSpell2.indexOf('1×1') < 0
+    ? '✅ 火球作用范围显示 ' + want + '（aoe=' + fb.aoe + ' 换算成边长，不是照抄）'
+    : '❌ 火球作用范围不对，应为 ' + want);
+
+  /* ---- 第二层：不能有残影（否则横向比数值时眼前一直在动） ---- */
+  console.log(dWard5.indexOf('cx-ghost') < 0
+    ? '✅ 第二层没有残影（方便左右切换直接比数值）' : '❌ 第二层混进了残影');
+
+  /* ---- 大本营 / 兵种详情 ---- */
   var dBase3 = G.codexDetailHtml('base', 'base', 3);
   console.log(dBase3.indexOf('base_L3.png') >= 0 ? '✅ 大本营 L3 大图 = base_L3.png' : '❌ 大本营大图不对');
   console.log(/<input[^>]*type="range"[^>]*max="6"/.test(dBase3) ? '✅ 大本营滑动轨 1..6' : '❌ 大本营滑动轨范围不对');
+  console.log(dBase3.indexOf('data-cmpbtn') >= 0
+    ? '✅ 大本营也能展开各等级对比' : '❌ 大本营缺各等级对比');
   var dUnit = G.codexDetailHtml('unit', 'archer', 1);
   console.log(dUnit.indexOf('unit_archer_blue_idle.png') >= 0 && dUnit.indexOf('data-range') < 0
     ? '✅ 兵种详情：大图 + 无滑动轨（兵种没有单兵等级）' : '❌ 兵种详情结构不对');
