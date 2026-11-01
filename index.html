@@ -377,11 +377,18 @@
   #start .ghost svg { opacity: .85; flex: 0 0 auto; }
 
   /* ================= 双人对战：模式切换 + 房间面板（v20） ================= */
-  #start .modes { display: flex; gap: 8px; justify-content: center; margin: 0 0 10px; }
+  /* 模式切换：竖排（三档上下分布）
+   * 原来横着一行放三颗胶囊，加了「闯关」之后在窄屏上挤得慌；
+   * 竖排后每颗给同样的宽度，读起来像一列开关，也不会随文案长短抖动。 */
+  #start .modes {
+    display: flex; flex-direction: column; gap: 7px; align-items: center;
+    margin: 0 0 12px;
+  }
   #start .mtab {
     font: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: .12em;
     color: rgba(206,226,192,.72); background: rgba(6,12,6,.62);
     border: 1px solid rgba(178,214,164,.34); border-radius: 999px; padding: 6px 15px;
+    min-width: 140px; text-align: center;
     cursor: pointer; text-shadow: 0 1px 6px rgba(0,0,0,.9);
     transition: color .16s ease, border-color .16s ease, background .16s ease;
   }
