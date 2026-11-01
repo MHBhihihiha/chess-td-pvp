@@ -580,7 +580,11 @@
       buildCooldown: { red: 0, blue: 0 },
       seed: opts.seed == null ? 12345 : opts.seed,
       rngState: 0,
-      capWarned: false
+      capWarned: false,
+      /* 闯关模式的对手强度倍率。null = 普通对局（双方对称）。
+       * { team: 'red', income: 1.2, hp: 1.1, atk: 1.1 } 这种形状；
+       * team 指明只作用在哪一方 —— 玩家那一侧永远是 1，不然「加强 AI」会连自己一起加强。 */
+      boost: opts.boost || null
     };
     state.rngState = state.seed >>> 0;
     var diff = opts.difficulty || 'hard';
@@ -612,6 +616,20 @@
     return state;
   }
 
+  /* 闯关模式的强度倍率查询。kind ∈ { income, hp, atk }。
+   *
+   * 为什么做成「每次现查」而不是「创建时烘进属性」：
+   *   血量还有个 hpMax 落点可以烘，但攻击力是每帧从 def.atk 现算的
+   *   （def 是所有同类建筑/单位共享的那份），改 def 就等于把玩家也一起加强了。
+   * 所以统一在「真正取值的那一行」乘一次，语义最直白，也不会漏掉升级/新建的路径。 */
+  function boostOf(state, team, kind) {
+    var b = state && state.boost;
+    if (!b) return 1;
+    if (b.team && b.team !== team) return 1;     // 只加强指定阵营
+    var v = b[kind];
+    return (typeof v === 'number' && v > 0) ? v : 1;
+  }
+
   function rand(state) { // 确定性随机（xorshift）
     var x = state.rngState;
     x ^= x << 13; x >>>= 0;
@@ -626,9 +644,11 @@
     var lv = state.baseLevel[team];
     // 大本营自带防御：单体攻击、对地对空，攻击力与「同级别法师塔」相同
     var mageAtk = DATA.buildings.mage.atk;
+    /* 大本营血量也要吃倍率：闯关后期 AI 大本营更硬，否则「推家」的难度不随关卡上升。 */
+    var baseHp = Math.round(DATA.baseLevels[lv - 1].hp * boostOf(state, team, 'hp'));
     var def = {
       key: 'base', name: '大本营', glyph: '营', color: team === RED ? '#d9534f' : '#3d7fd6',
-      size: [2, 2], cost: 0, hp: DATA.baseLevels[lv - 1].hp, armor: 10, tier: 1,
+      size: [2, 2], cost: 0, hp: baseHp, armor: 10, tier: 1,
       isBase: true, maxLevel: DATA.baseLevels.length,
       atk: mageAtk, atkInterval: DATA.buildings.mage.atkInterval,
       range: DATA.buildings.mage.range, targets: 'both', mode: 'single',
@@ -982,9 +1002,10 @@
     if (!chk.ok) return chk;
     var def = DATA.buildings[key];
     var st = statsForLevel(def, 1);
+    var hp0 = Math.round(st.hp * boostOf(state, team, 'hp'));
     var b = {
       id: state.nextId++, kind: 'building', team: team, def: def, key: key,
-      row: row, col: col, hp: st.hp, hpMax: st.hp, armor: st.armor, level: 1,
+      row: row, col: col, hp: hp0, hpMax: hp0, armor: st.armor, level: 1,
       invested: def.cost || 0,
       prodTimer: 0, atkTimer: 0, justDamaged: 0, spawnIdx: 0,
       refs: rectCells({ r1: row, r2: row + def.size[0] - 1, c1: col, c2: col + def.size[1] - 1 })
@@ -1040,7 +1061,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     b.level = lv + 1;
     if (branchKey) b.branch = branchKey;
     var st = statsForLevel(b.def, b.level, b.branch);
-    b.hpMax = st.hp;
+    b.hpMax = Math.round(st.hp * boostOf(state, b.team, 'hp'));
     // 不回血：只补「最大血量的增量」
     b.hp = Math.min(b.hpMax, Math.max(1, b.hp + Math.max(0, b.hpMax - oldMax)));
     reloadNeighbors(state);
@@ -1106,7 +1127,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     state.stats[team].spent += cost;
     state.baseLevel[team] = lv + 1;
     var base = ownBase(state, team);
-    var newHp = DATA.baseLevels[lv].hp;      // 新等级的血量
+    var newHp = Math.round(DATA.baseLevels[lv].hp * boostOf(state, team, 'hp'));   // 新等级的血量
     var ratio = base.hp / base.hpMax;
     base.def = Object.assign({}, base.def, { hp: newHp });
     base.hpMax = newHp;
@@ -1324,7 +1345,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     if (!def) return null;
     if (unitsOf(state, team).length >= UNIT_CAP) return null;
     // 出生血量带上「士兵生命」总体升级的加成
-    var unitHp = Math.round(def.hp * globalBonus(state, team).unitHp);
+    var unitHp = Math.round(def.hp * globalBonus(state, team).unitHp * boostOf(state, team, 'hp'));
     var u = {
       id: state.nextId++, kind: 'unit', team: team, def: def, key: unitKey,
       row: row, col: col, hp: unitHp, hpMax: unitHp, armor: def.armor,
@@ -2269,6 +2290,9 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
       state.buildings.forEach(function (b) {
         if (b.team === team && b.def.income) inc += statsForLevel(b.def, b.level || 1, b.branch).income;
       });
+      /* 闯关模式的「金币收成 +20%/关」就落在这里 —— 整条收入一起放大，
+       * 而不是只加大本营底薪：AI 靠金矿滚雪球的那部分也该跟着涨，否则后期反而变相削弱。 */
+      inc *= boostOf(state, team, 'income');
       state.res[team] += inc * dt;
       state.stats[team].income += inc * dt;
       // 派兵冷却
@@ -2323,7 +2347,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
       if (u2.rageUntil && state.time < u2.rageUntil) interval2 *= 0.5;  // 狂暴：攻速翻倍
       if (u2.atkTimer < interval2) continue;
       u2.atkTimer = 0;
-      var atk2 = u2.def.atk * globalBonus(state, u2.team).unitAtk;
+      var atk2 = u2.def.atk * globalBonus(state, u2.team).unitAtk * boostOf(state, u2.team, 'atk');
       if (u2.weakenUntil && state.time < u2.weakenUntil) atk2 *= (u2.weakenMul != null ? u2.weakenMul : 0.2);
       applyHit(state, u2, t, atk2);
     }
@@ -2356,7 +2380,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
       // 弱化：伤害降低
       var weak = (b.weakenUntil && state.time < b.weakenUntil) ? (b.weakenMul != null ? b.weakenMul : 0.2) : 1;
       var gb = globalBonus(state, b.team);
-      var st = { atk: wst.atk * weak * gb.buildingAtk };
+      var st = { atk: wst.atk * weak * gb.buildingAtk * boostOf(state, b.team, 'atk') };
       var pst = projStyle(b, interval * boosted);
       var originC = centerOf(b);
 
@@ -4994,6 +5018,7 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     canPlace: canPlace, placeBuilding: placeBuilding, upgradeBase: upgradeBase,
     upgradeCost: upgradeCost, spawnUnit: spawnUnit, rebuildFields: rebuildFields,
     statsForLevel: statsForLevel, buildingUpgradeCost: buildingUpgradeCost,
+    boostOf: boostOf,
     upgradeBuilding: upgradeBuilding, buildingInfo: buildingInfo,
     branchesFor: branchesFor, branches: DATA.branches, incomeMultiplier: incomeMultiplier,
     reloadNeighbors: reloadNeighbors,

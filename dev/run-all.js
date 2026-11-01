@@ -54,6 +54,7 @@ var SUITES = [
   { name: 'tick-align', file: 'tick-align-test.js', kind: 'assert', note: 'tick 对齐/输入延迟' },
   /* 真浏览器事件流：dom-test 跑的是 DOM 桩，验不了「按键之后 DOM 有没有变」 */
   { name: 'codex-keys', file: 'codex-interact-test.js', kind: 'assert', note: '图鉴键盘/翻页' },
+  { name: 'stage',      file: 'stage-test.js',      kind: 'assert', note: '闯关模式规则' },
   { name: 'mirror',     file: 'mirror-test.js',     kind: 'assert', note: '红方视角镜像' },
   { name: 'mirror-render', file: 'mirror-render-test.js', kind: 'assert', note: '镜像点击/渲染' },
   { name: 'playtest',   file: 'playtest.js',        kind: 'assert', note: '对局流程' },

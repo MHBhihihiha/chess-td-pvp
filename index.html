@@ -849,6 +849,116 @@
 #start .g.codex-open:hover { background: rgba(68,102,75,.22); }
 #start .g.codex-open:active { filter: brightness(.96); }
 #start .g.codex-open:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
+
+/* ============================ 闯关模式 #stage ============================ */
+/* 关卡面板：全屏覆盖层，10 张关卡卡 + 顶部总星数。
+ * 选关即开局，所以面板里没有"开始"按钮 —— 少一次点击，也少一个"选了关没反应"的状态。 */
+
+/* 模式 tab 上的总星数角标：这是"关卡外也能看到几颗星"的落点 */
+#start .mtab .st-badge {
+  display: none; margin-left: 7px; padding: 0 6px; border-radius: 9px;
+  background: rgba(255,212,121,.15); color: #ffd479;
+  font-size: 10px; font-weight: 800; letter-spacing: 0; text-indent: 0;
+}
+#start .mtab .st-badge.on { display: inline-block; }
+
+#stage {
+  position: fixed; inset: 0; z-index: 70;
+  display: flex; flex-direction: column;
+  color: #e8f0e6;
+  /* 用实色打底 + 一层径向提亮：半透明压不住下面那张大海报，
+   * 大字号标题会透出来，整个面板看着像没盖严的弹窗。 */
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(30,46,34,.55), transparent 72%),
+    #080c09;
+  animation: stage-in .18s ease both;
+}
+#stage[hidden] { display: none; }
+@keyframes stage-in { from { opacity: 0; } to { opacity: 1; } }
+
+#stage .st-bar {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
+  padding: 14px 22px; border-bottom: 1px solid rgba(68,102,75,.38);
+}
+#stage .st-title { font-size: 15px; font-weight: 800; letter-spacing: .16em; }
+#stage .st-total {
+  margin-left: auto; font-size: 12px; color: #9db89a; letter-spacing: .08em;
+}
+#stage .st-total b { color: #ffd479; font-size: 16px; }
+#stage .st-total .of { opacity: .6; }
+#stage .st-close {
+  margin-left: 14px; width: 30px; height: 30px; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font: inherit; font-size: 14px; color: #c4d8c0;
+  background: transparent; border: 1px solid #44664b; border-radius: 8px;
+  transition: background .15s ease;
+}
+#stage .st-close:hover { background: rgba(68,102,75,.28); }
+#stage .st-close:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
+
+/* 内容不多时垂直居中；10 关全解锁变高后自动退回顶部滚动（safe 保证不裁掉第一行） */
+#stage .st-scroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 18px 22px 30px;
+  display: flex; flex-direction: column; justify-content: safe center;
+}
+#stage .st-hint {
+  max-width: 760px; margin: 0 auto 20px; text-align: center;
+  font-size: 11px; line-height: 1.95; color: #8ba488; letter-spacing: .05em;
+}
+#stage .st-hint b { color: #c4d8c0; }
+
+#stage .st-grid {
+  width: 100%; max-width: 1020px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px;
+}
+
+#stage .st-card {
+  position: relative; display: flex; flex-direction: column; gap: 7px;
+  min-height: 148px; padding: 15px 13px 13px; border-radius: 16px; cursor: pointer;
+  font: inherit; text-align: left; color: #c4d8c0;
+  background: linear-gradient(rgba(31,47,36,.72), rgba(18,28,20,.72));
+  border: 1px solid rgba(68,102,75,.55);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+#stage .st-card:hover { transform: translateY(-3px); border-color: #5da04a; background: rgba(68,102,75,.3); }
+#stage .st-card:focus-visible { outline: 2px solid #8fe06a; outline-offset: 2px; }
+#stage .st-card.done { border-color: rgba(255,212,121,.42); }
+#stage .st-card.lock { cursor: default; opacity: .42; filter: grayscale(.55); }
+#stage .st-card.lock:hover { transform: none; border-color: rgba(68,102,75,.55); background: linear-gradient(rgba(31,47,36,.72), rgba(18,28,20,.72)); }
+
+#stage .st-no { font-size: 24px; font-weight: 800; letter-spacing: .04em; color: #e8f0e6; line-height: 1.1; }
+#stage .st-card.done .st-no { color: #ffd479; }
+#stage .st-stars { font-size: 17px; letter-spacing: .14em; color: #ffd479; line-height: 1; }
+#stage .st-stars .e { color: rgba(157,184,154,.3); }
+#stage .st-boost { font-size: 11.5px; line-height: 1.8; color: #9db89a; }
+#stage .st-note { margin-top: auto; font-size: 10.5px; color: #7d9679; }
+#stage .st-card.lock .st-note { color: #b98a5a; }
+#stage .st-crown {
+  position: absolute; top: 12px; right: 13px; font-size: 10px; color: #ffd479;
+  letter-spacing: .06em; opacity: .85;
+}
+
+/* 结算界面里的本关星级 */
+#over .st-stars-big {
+  display: flex; justify-content: center; gap: 6px; margin: 2px 0 6px;
+}
+#over .st-stars-big span {
+  font-size: 26px; line-height: 1; color: rgba(157,184,154,.26);
+  transition: color .2s ease;
+}
+#over .st-stars-big span.on { color: #ffd479; text-shadow: 0 0 14px rgba(255,212,121,.5); }
+#over .st-gain { text-align: center; font-size: 11px; letter-spacing: .06em; margin-bottom: 4px; }
+#over .st-gain b { color: #ffd479; }
+/* 达成 / 未达成：未达成压灰降透明，不许和达成项同色（2 星时「10 分钟内获胜」要一眼看出没拿到） */
+#over .st-gain .on { color: #b8d0b2; }
+#over .st-gain .on i { font-style: normal; color: #ffd479; margin-right: 3px; }
+#over .st-gain .off {
+  color: rgba(140,158,138,.42);
+  text-decoration: line-through;
+  text-decoration-color: rgba(140,158,138,.30);
+  text-decoration-thickness: 1px;
+}
+#over .st-gain .off i { font-style: normal; margin-right: 3px; }
 </style>
 </head>
 <body>
@@ -870,6 +980,7 @@
         <div class="figs" id="overfigs"></div>
         <div class="t" id="overtext"></div>
         <div class="sub" id="oversub"></div>
+        <div id="overstars"></div>
         <div class="meta" id="overmeta"></div>
         <div class="stats" id="overstats"></div>
         <div class="acts">
@@ -894,6 +1005,7 @@
         <div class="modes" id="modes" role="tablist" aria-label="选择游戏模式">
           <button class="mtab on" id="modeai" role="tab" aria-selected="true">单机挑战</button>
           <button class="mtab" id="modepvp" role="tab" aria-selected="false">双人对战</button>
+          <button class="mtab" id="modestage" role="tab" aria-selected="false">闯关<span class="st-badge" id="stbadge">0</span></button>
         </div>
         <button class="cta" id="startbtn">开始对战</button>
         <div class="pvpbox" id="pvpbox" hidden>
@@ -906,7 +1018,7 @@
           </div>
           <div class="pstatus" id="pvpstatus"></div>
         </div>
-        <div class="meta">先摧毁对方大本营 · 没有决胜时刻，打到分出胜负为止</div>
+        <div class="meta" id="startmeta">先摧毁对方大本营 · 没有决胜时刻，打到分出胜负为止</div>
       </div>
 
       <!-- 底部两角：难度（左）/ 图鉴（右），都是半透明小胶囊 -->
@@ -959,6 +1071,20 @@
       </div>
     </div>
   </div>
+
+  <!-- 闯关模式：关卡选择（全屏覆盖层，点关卡即开局） -->
+  <div id="stage" role="dialog" aria-modal="true" aria-label="闯关模式" hidden>
+    <div class="st-bar">
+      <div class="st-title">闯关模式</div>
+      <div class="st-total"><b id="sttotal">0</b> <span class="of">/ 30</span> ★</div>
+      <button type="button" class="st-close" id="stageclose" aria-label="关闭关卡面板">✕</button>
+    </div>
+    <div class="st-scroll">
+      <div class="st-hint" id="sthint"></div>
+      <div class="st-grid" id="stgrid"></div>
+    </div>
+  </div>
+
   <div id="panel" hidden>
     <div class="tabs">
       <button class="tab on" id="tabBuild">建筑 / 派兵 / 法术</button>
@@ -1010,6 +1136,7 @@
   var overStats = document.getElementById('overstats');
   var overCard = document.getElementById('overcard');
   var overMeta = document.getElementById('overmeta');
+  var overStars = document.getElementById('overstars');
   var startEl = document.getElementById('start');
   /* 开始界面与放置面板互斥显示。
    * 只靠 CSS 不够：#start 虽然改成了 fixed 全屏，视觉上盖住了 #panel，
@@ -1777,21 +1904,185 @@
     pvpStatus('');
   }
 
-  /* 模式切换（AI / PvP），只在开始界面生效 */
+  /* ================================ 闯关模式 ================================
+   * 10 关，每关只加强电脑那一方（玩家侧恒定 100%）：
+   *   金币收成 +20%/关    → 第 n 关 = 100% + 20n%  （第 1 关 120%，第 5 关 200%）
+   *   生命 / 攻击 +10%/关 → 第 n 关 = 100% + 10n%  （第 1 关 110%，第 5 关 150%）
+   * 评星（每关最多 3 颗）：
+   *   坚持满 3 分钟   1 颗
+   *   击败敌人（获胜）1 颗
+   *   10 分钟内获胜   1 颗
+   *   3 分钟内速胜 → 直接给满 3 颗。
+   *   （这条必须单独判：速胜时「坚持 3 分钟」天然不满足，不特判的话
+   *     打得越快反而只有 2 星，奖励方向就反了。）
+   * 解锁：第 1 关常开；之后必须**通关**（获胜）前一关，光有星不算 ——
+   *   输掉但撑满 3 分钟也能拿 1 星，那种情况不算过关。
+   * ====================================================================== */
+  var STAGE_MAX = 10;
+  var STAGE_KEY = 'td_stage_progress_v1';
+  var stageMode = false, stageNo = 1;
+
+  function stageBoostOf(n) {
+    return { team: 'red', income: 1 + 0.2 * n, hp: 1 + 0.1 * n, atk: 1 + 0.1 * n };
+  }
+  function pctOf(mul) { return Math.round(mul * 100) + '%'; }
+
+  var stageProg = { cleared: {}, stars: {} };
+  function loadStageProg() {
+    stageProg = { cleared: {}, stars: {} };
+    try {
+      var raw = localStorage.getItem(STAGE_KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (o && typeof o === 'object') {
+        if (o.cleared && typeof o.cleared === 'object') stageProg.cleared = o.cleared;
+        if (o.stars && typeof o.stars === 'object') stageProg.stars = o.stars;
+      }
+    } catch (e) { /* 存档坏了就当没玩过，别让它挡住开局 */ }
+  }
+  function saveStageProg() {
+    try { localStorage.setItem(STAGE_KEY, JSON.stringify(stageProg)); } catch (e) {}
+  }
+  function stageStarOf(n) {
+    var v = stageProg.stars[n];
+    return Math.max(0, Math.min(3, typeof v === 'number' ? v : 0));
+  }
+  function stageCleared(n) { return !!stageProg.cleared[n]; }
+  function stageUnlocked(n) { return n <= 1 || stageCleared(n - 1); }
+  function stageTotalStars() {
+    var t = 0;
+    for (var i = 1; i <= STAGE_MAX; i++) t += stageStarOf(i);
+    return t;
+  }
+
+  /* win = 是否推掉对面大本营；sec = 本局耗时（秒） */
+  function stageStarsOf(win, sec) {
+    if (win && sec <= 180) return 3;      // 3 分钟内速胜：直接满星
+    var s = 0;
+    if (sec >= 180) s++;                  // 撑满 3 分钟
+    if (win) s++;                         // 击败敌人
+    if (win && sec <= 600) s++;           // 10 分钟内获胜
+    return s;
+  }
+  /* 拿到的星分别来自哪一条 —— 结算里照实列出来，否则玩家看到 2 星不知道差在哪 */
+  function stageStarLines(win, sec) {
+    if (win && sec <= 180) {
+      return [
+        { ok: true, text: '3 分钟内速胜（按满星计）' },
+        { ok: true, text: '击败敌人' },
+        { ok: true, text: '10 分钟内获胜' }
+      ];
+    }
+    return [
+      { ok: sec >= 180, text: '坚持 3 分钟' },
+      { ok: !!win, text: '击败敌人' },
+      { ok: !!(win && sec <= 600), text: '10 分钟内获胜' }
+    ];
+  }
+
+  function starMarks(n, max) {
+    var h = '', i;
+    for (i = 1; i <= (max || 3); i++) h += '<span class="' + (i <= n ? '' : 'e') + '">' + (i <= n ? '★' : '☆') + '</span>';
+    return h;
+  }
+
+  function syncStageBadge() {
+    var b = document.getElementById('stbadge');
+    if (!b) return;
+    var t = stageTotalStars();
+    b.textContent = t;
+    b.classList.toggle('on', t > 0);
+  }
+
+  function renderStage() {
+    var grid = document.getElementById('stgrid');
+    if (!grid) return;
+    var hint = document.getElementById('sthint');
+    if (hint) {
+      hint.innerHTML = '连闯 <b>10</b> 关，每关只加强电脑那一方（基础水平固定为「普通」）：' +
+        '<b>金币收成 +20%</b>、<b>血量与攻击 +10%</b>（第 1 关 120% / 110%，第 10 关 300% / 200%）。<br>' +
+        '每关三颗星：<b>坚持 3 分钟</b> · <b>击败敌人</b> · <b>10 分钟内获胜</b>；3 分钟内速胜直接满星。' +
+        '通关前一关才能解锁下一关。';
+    }
+    var html = '', n;
+    for (n = 1; n <= STAGE_MAX; n++) {
+      var b = stageBoostOf(n);
+      var st = stageStarOf(n);
+      var open = stageUnlocked(n);
+      html += '<button type="button" class="st-card' + (open ? '' : ' lock') + (st > 0 ? ' done' : '') + '"' +
+        ' data-n="' + n + '"' + (open ? '' : ' disabled aria-disabled="true"') + '>' +
+        '<span class="st-no">' + (n < 10 ? '0' + n : n) + '</span>' +
+        (st >= 3 ? '<span class="st-crown">满星</span>' : '') +
+        '<span class="st-stars">' + starMarks(st) + '</span>' +
+        '<span class="st-boost">金币 ' + pctOf(b.income) + '<br>血量 ' + pctOf(b.hp) + ' · 攻击 ' + pctOf(b.atk) + '</span>' +
+        '<span class="st-note">' + (open ? (st > 0 ? '已通关 · 可重打' : '可挑战')
+                                         : '通关第 ' + (n - 1) + ' 关解锁') + '</span>' +
+        '</button>';
+    }
+    grid.innerHTML = html;
+    Array.prototype.forEach.call(grid.querySelectorAll('.st-card'), function (el) {
+      if (el.disabled) return;
+      el.onclick = function () { startStage(+el.getAttribute('data-n')); };
+    });
+    var tot = document.getElementById('sttotal');
+    if (tot) tot.textContent = stageTotalStars();
+    syncStageBadge();
+  }
+
+  function openStage() {
+    loadStageProg();
+    renderStage();
+    var el = document.getElementById('stage');
+    if (el) el.hidden = false;
+  }
+  function closeStage() {
+    var el = document.getElementById('stage');
+    if (el) el.hidden = true;
+  }
+  function startStage(n) {
+    if (!stageUnlocked(n)) return;      // 双保险：卡片已 disabled，这里再挡一次
+    stageMode = true;
+    stageNo = n;
+    closeStage();
+    startGame();
+  }
+
+  /* 模式切换（AI / PvP / 闯关），只在开始界面生效 */
   var startMode = 'ai';
   function setStartMode(m) {
     startMode = m;
+    /* 离开闯关（或压根没进）就把关卡状态清掉：
+     * 否则"打过第 5 关 → 返回主菜单 → 点开始对战"会继续带着 200% 的敌人。 */
+    if (m !== 'stage') stageMode = false;
     var ai = document.getElementById('modeai'), pv = document.getElementById('modepvp');
+    var sg = document.getElementById('modestage');
     if (ai) { ai.classList.toggle('on', m === 'ai'); ai.setAttribute('aria-selected', m === 'ai' ? 'true' : 'false'); }
     if (pv) { pv.classList.toggle('on', m === 'pvp'); pv.setAttribute('aria-selected', m === 'pvp' ? 'true' : 'false'); }
+    if (sg) { sg.classList.toggle('on', m === 'stage'); sg.setAttribute('aria-selected', m === 'stage' ? 'true' : 'false'); }
     var box = document.getElementById('pvpbox'); if (box) box.hidden = (m !== 'pvp');
-    var sb = document.getElementById('startbtn'); if (sb) sb.style.display = (m === 'pvp') ? 'none' : '';
-    var cl = document.getElementById('cornerl'); if (cl) cl.style.display = (m === 'pvp') ? 'none' : '';
+    var sb = document.getElementById('startbtn'); if (sb) sb.style.display = (m === 'pvp' || m === 'stage') ? 'none' : '';
+    /* 难度只在普通单机里可选：闯关的强度是关卡定的，摆着个难度选择器会让人以为能改 */
+    var cl = document.getElementById('cornerl'); if (cl) cl.style.display = (m === 'pvp' || m === 'stage') ? 'none' : '';
+    var meta = document.getElementById('startmeta');
+    if (meta) {
+      meta.textContent = m === 'stage'
+        ? '点关卡即开局 · 每关只加强电脑 · 3 星制'
+        : '先摧毁对方大本营 · 没有决胜时刻，打到分出胜负为止';
+    }
+    if (m === 'stage') openStage(); else closeStage();
   }
   (function wireStartMode() {
     var ai = document.getElementById('modeai'), pv = document.getElementById('modepvp');
+    var sg = document.getElementById('modestage');
     if (ai) ai.onclick = function () { setStartMode('ai'); };
     if (pv) pv.onclick = function () { setStartMode('pvp'); };
+    if (sg) sg.onclick = function () { setStartMode('stage'); };
+    var sc = document.getElementById('stageclose');
+    if (sc) sc.onclick = function () {
+      closeStage();
+      /* 关掉面板就把 tab 退回单机，否则会停在"选了闯关但什么都没发生"的状态 */
+      setStartMode('ai');
+    };
     var cc = document.getElementById('pvpcreate'), jj = document.getElementById('pvpjoin');
     var code = document.getElementById('roomcode');
     if (cc) cc.onclick = function () {
@@ -1873,7 +2164,13 @@
      * 这里一并复位，避免「单人局用红方视角 + 红方大本营在下」的错位。 */
     ME = 'blue'; FOE = 'red';
     setFlip(false);
-    state = C.createState({ difficulty: difficulty });
+    /* 闯关模式下把本关的强度倍率交给规则层；普通对局传 null（双方对称）。
+     * 基础难度固定为「普通」：闯关的强度靠关卡倍率来叠，如果再乘上玩家上次选的
+     * 「困难」，同一关在不同人手里会差出一大截，星级就没法比了。 */
+    state = C.createState({
+      difficulty: stageMode ? 'hard' : difficulty,
+      boost: stageMode ? stageBoostOf(stageNo) : null
+    });
     state.aiTeam = FOE;               // 红方是电脑（大本营自愈等难度特判走这一边）
     sel = null;
     selectedUnit = null;
@@ -4142,8 +4439,44 @@
         draw: '战至时限，双方大本营均未被摧毁'
       }[res];
       var mm = Math.floor(state.time / 60), ss = ('0' + Math.floor(state.time % 60)).slice(-2);
-      overMeta.innerHTML = (PVP.active ? '模式 <b>双人对战</b>' : '难度 <b>' + DIFF_INFO[difficulty].name + '</b>') +
+      overMeta.innerHTML = (PVP.active ? '模式 <b>双人对战</b>'
+        : stageMode ? '闯关 <b>第 ' + stageNo + ' 关</b>'
+        : '难度 <b>' + DIFF_INFO[difficulty].name + '</b>') +
         ' · 用时 <b>' + mm + ':' + ss + '</b>';
+
+      /* ---------------- 闯关评星 + 存档 ----------------
+       * 只在这里结算一次：state.over 之后 frame 不会再进来
+       * （外层有 `!overEl.classList.contains('show')` 挡着）。 */
+      if (overStars) overStars.innerHTML = '';
+      if (stageMode) {
+        var won = (state.winner === ME);
+        var sec = state.time;
+        var got = stageStarsOf(won, sec);
+        var lines = stageStarLines(won, sec);
+
+        /* 记最好成绩：重打一次打得差，不该把已经拿到的高星拉下来 */
+        var prev = stageStarOf(stageNo);
+        if (got > prev) stageProg.stars[stageNo] = got;
+        if (won) stageProg.cleared[stageNo] = true;
+        saveStageProg();
+
+        if (overStars) {
+          var cells = '';
+          for (var si = 1; si <= 3; si++) cells += '<span class="' + (si <= got ? 'on' : '') + '">★</span>';
+          var isNew = got > prev;
+          overStars.innerHTML =
+            '<div class="st-stars-big">' + cells + '</div>' +
+            '<div class="st-gain">' + lines.map(function (l) {
+              /* 勾/点单独包一层 <i>：靠 ::first-letter 给勾上色不可靠（前导空格也吃进去） */
+              return '<span class="' + (l.ok ? 'on' : 'off') + '"><i>' + (l.ok ? '✓' : '·') + '</i>' + l.text + '</span>';
+            }).join('　') +
+            (isNew ? '　<b>新纪录</b>' : '') + '</div>';
+        }
+        /* 通关后把下一关照出来，省得玩家回主菜单才看见解锁 */
+        if (won && stageNo < STAGE_MAX) {
+          overMeta.innerHTML += '<br>第 <b>' + (stageNo + 1) + '</b> 关已解锁';
+        }
+      }
       function n(v) { return Math.floor(v).toLocaleString(); }
       function baseCell(team) {
         var b = C.ownBase(state, team);
@@ -4174,6 +4507,22 @@
     get state() { return state; },
     render: render,
     start: startGame,               // 供测试/自动化用：等价于点「开始游戏」
+    /* 闯关模式：规则是纯函数，直接暴露给测试断言（不必真的打三分钟） */
+    stage: {
+      MAX: STAGE_MAX,
+      boost: stageBoostOf,
+      starsOf: stageStarsOf,
+      linesOf: stageStarLines,
+      unlocked: stageUnlocked,
+      stars: stageStarOf,
+      cleared: stageCleared,
+      total: stageTotalStars,
+      get prog() { return stageProg; },
+      setProg: function (p) { stageProg = p || { cleared: {}, stars: {} }; },
+      render: renderStage,
+      get mode() { return stageMode; },
+      get no() { return stageNo; }
+    },
     select: function (x) { sel = x; render(); },
     inspect: function (b) { selectedBuilding = b; selectedUnit = null; renderDetail(); render(); },
     inspectUnit: function (u) { selectedUnit = u; selectedBuilding = null; renderDetail(); render(); },
@@ -4902,7 +5251,10 @@
    *   #codex=unit         打开并切到「兵种」
    *   #codex=bld,ward,5   打开建筑页、翻到防御塔、进详情并停在 Lv5
    *   #codex=spell,fireball  打开法术页并进入「火球」详情
-   * 这样无头浏览器不用模拟点击也能截到任意一层。 */
+   *   #stage              打开闯关关卡面板
+   *   #stage=seed         先塞一份假进度（前 4 关通关）再打开，用来看"已解锁/带星"的样子
+   *   #stage=go,3         直接开局第 3 关（会先塞假进度保证已解锁）
+   * 这样无头浏览器不用模拟点击也能截到任意状态。 */
   (function () {
     try {
       var h = (typeof location !== 'undefined' && location.hash) ? location.hash.replace(/^#/, '') : '';
@@ -4926,8 +5278,35 @@
   ART.load();   // 预加载 v9 贴图（没加载完的部件自动走矢量兜底，不会卡画面）
   // 先建一局（但 startedAt 仍是 -1，所以模拟不会跑），等玩家点「开始游戏」
   buildDiffCards();
+  loadStageProg();      // 闯关进度：开始界面的星数角标要一进来就有数
+  syncStageBadge();
   newGame();
   render();
+
+  /* 闯关调试口放在 newGame() 之后：startStage 会调 startGame()，
+   * 必须等 state 建好，否则刚开的局会被后面的 newGame() 冲掉。 */
+  (function () {
+    try {
+      var h = (typeof location !== 'undefined' && location.hash) ? location.hash.replace(/^#/, '') : '';
+      if (h.indexOf('stage') !== 0) return;
+      var arg = h.indexOf('=') >= 0 ? h.split('=')[1] : '';
+      if (arg) {
+        stageProg = { cleared: {}, stars: {} };
+        for (var i = 1; i <= 4; i++) stageProg.cleared[i] = true;
+        stageProg.stars = { 1: 3, 2: 2, 3: 1, 4: 3 };
+        saveStageProg();
+        syncStageBadge();
+      }
+      if (arg.indexOf('go') === 0) {
+        stageMode = true;
+        stageNo = +(arg.split(',')[1] || 1) || 1;
+        startGame();
+      } else {
+        openStage();
+      }
+    } catch (e) {}
+  })();
+
   requestAnimationFrame(frame);
 })();
 </script>
