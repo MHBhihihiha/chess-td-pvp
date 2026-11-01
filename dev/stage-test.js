@@ -101,6 +101,33 @@ var probe = (function () {
     chk('总星数显示在面板右上', (document.getElementById('sttotal') || {}).textContent === '2',
       (document.getElementById('sttotal') || {}).textContent);
 
+    /* ---------- 6. 买「建筑血量」科技不能把倍率抹掉 ----------
+     * 这段是回归断言：upgradeGlobal 的 bHp 分支是**重算**上限，不是「再加一层」，
+     * 漏乘 boost 的话 AI 花金币买科技反而把自己买脆了（实测第 5 关 4800 → 3520）。 */
+    var L = g.logic;
+    var st5 = L.createState({ seed: 7, difficulty: 'hard', boost: S.boost(5) });
+    var base5 = L.ownBase(st5, 'red');
+    var openHp = base5.hpMax;
+    chk('第 5 关开局 AI 大本营 = 3200×1.5', openHp === 4800, openHp);
+    st5.res.red = 99999;
+    L.upgradeGlobal(st5, 'red', 'bHp');
+    var afterHp = L.ownBase(st5, 'red').hpMax;
+    chk('买一级建筑血量科技后上限只涨不跌（4800 → 5280）', afterHp === 5280, afterHp);
+    chk('科技加成没把闯关倍率顶掉', afterHp > openHp, openHp + ' → ' + afterHp);
+    for (var ti = 0; ti < 3; ti++) L.upgradeGlobal(st5, 'red', 'bHp');
+    var maxHp = L.ownBase(st5, 'red').hpMax;
+    var gm = L.globalBonus(st5, 'red').buildingHp;
+    /* 科技是逐级连乘（1.1^4 = 1.4641），不能手写 1.4 —— 用 globalBonus 现取倍率 */
+    chk('连买 4 级后仍是「等级值 × 科技 × 关卡」', maxHp === Math.round(3200 * gm * 1.5),
+      maxHp + '（科技 ×' + gm.toFixed(4) + '）');
+    var stN = L.createState({ seed: 7, difficulty: 'hard' });
+    var nHp = L.ownBase(stN, 'red').hpMax;
+    stN.res.red = 99999;
+    L.upgradeGlobal(stN, 'red', 'bHp');
+    chk('普通对局（无 boost）科技效果不变：3200 → 3520',
+      nHp === 3200 && L.ownBase(stN, 'red').hpMax === 3520,
+      nHp + ' → ' + L.ownBase(stN, 'red').hpMax);
+
     out.push('---失败 ' + fails + ' 项---');
     document.title = 'RESULT::' + out.join(' ;; ');
   }

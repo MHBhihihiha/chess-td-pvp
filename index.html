@@ -4505,6 +4505,7 @@
   window.addEventListener('resize', function () { if (state) render(); });
   window.__game = {
     get state() { return state; },
+    logic: C,                       // 供测试直接造带 boost 的 state（纯逻辑，不必真开一局）
     render: render,
     start: startGame,               // 供测试/自动化用：等价于点「开始游戏」
     /* 闯关模式：规则是纯函数，直接暴露给测试断言（不必真的打三分钟） */

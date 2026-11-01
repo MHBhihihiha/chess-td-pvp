@@ -1212,11 +1212,15 @@ if (state.aiSpendDebug) state.aiSpendDebug.push({ t: Math.round(state.time*10)/1
     // 建筑血量上限会变 → 同步现有建筑的上限（当前血量按比例跟上，不额外回血）
     if (key === 'bHp') {
       var m = globalBonus(state, team).buildingHp;
+      /* 这里也要乘 boost：它是**重算**上限，不是「加一层」。
+       * 少了这一项，闯关里 AI 一买建筑血量科技，倍率就被整个抹掉 ——
+       * 实测第 5 关大本营 4800 → 3520，花了钱反而更脆。 */
+      var bm = boostOf(state, team, 'hp');
       state.buildings.forEach(function (b) {
         if (b.team !== team) return;
         var baseHp = (b.def.isBase ? DATA.baseLevels[(b.level || 1) - 1].hp
                                    : statsForLevel(b.def, b.level || 1, b.branch).hp);
-        var newMax = Math.round(baseHp * m);
+        var newMax = Math.round(baseHp * m * bm);
         var ratio = b.hpMax > 0 ? b.hp / b.hpMax : 1;
         b.hpMax = newMax;
         b.hp = Math.min(newMax, Math.max(1, newMax * ratio));
